@@ -50,6 +50,16 @@ class RealtimeArPipeline(
 
     private var reusableOutputBitmap: Bitmap? = null
 
+    /** Snapshot of the session counters above. */
+    data class Stats(val processed: Int, val dropped: Int, val failed: Int)
+
+    /**
+     * Frame counters so far. Exposed because [processFrame] logs and swallows frame exceptions:
+     * without these, "no frame arrived" cannot be told apart from "the frame threw".
+     */
+    val stats: Stats
+        get() = Stats(framesProcessed.get(), framesDropped.get(), framesFailed.get())
+
     /**
      * Initializes the underlying YOLO engine.
      */
