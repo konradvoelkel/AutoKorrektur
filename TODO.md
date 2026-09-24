@@ -15,14 +15,19 @@ this native Android rewrite is **AutoKorrektur 2.0**.
       a clone is ~13 MB, the tracked tree under 3 MB (2026-09-24).
 - [x] **REPO-02. Rebrand to 2.0** — README lineage, changelog headings, version fallback, store
       listing and website (2026-09-24).
-- [x] **REPO-03. Canonical repository is now `konradvoelkel/AutoKorrektur`** (2026-09-24), a fork of
-      `xamde/AutoKorrektur`, which stays as the historical upstream. The repo was already a fork of
-      [BenB2/AutoKorrektur](https://github.com/BenB2/AutoKorrektur), so nothing was lost by forking
-      again; a fresh, network-detached repository remains an option for a later major version.
-- [ ] **REPO-04. Ask GitHub Support to garbage-collect the fork network.** The pre-rewrite objects
+- [x] **REPO-03. Canonical repository is `konradvoelkel/AutoKorrektur`** (2026-09-24). It is a fork
+      of `xamde/AutoKorrektur`, which is no longer maintained and receives no further pushes — the
+      repo was already a fork of [BenB2/AutoKorrektur](https://github.com/BenB2/AutoKorrektur) (the
+      1.0 browser version), so the fork marker costs nothing new. A fresh, network-detached
+      repository stays an option for a later major version.
+
+- [ ] **REPO-04. Enable Actions** on `konradvoelkel/AutoKorrektur` (one click in its Actions tab —
+      GitHub suppresses workflow runs on forks until then). Nothing runs CI at the moment.
+- [ ] **REPO-05. Ask GitHub Support to garbage-collect the fork network.** The pre-rewrite objects
       are still reachable by SHA (`.../commit/<old-sha>`), so `TODO-for-human.md` and
       `HUMAN_RELEASE_CHECKLIST.md` can still be fetched from old commits. Only a support-side GC (or
-      a fresh repository pushed from the rewritten history) removes them.
+      a fresh repository pushed from the rewritten history) removes them. Archiving or deleting
+      `xamde/AutoKorrektur` does not: the objects live in the shared network pool.
 
 ### 🏙️ Milestone 1: Field Testing & Data Collection
 - [ ] **FT-01. Physical Field Testing on Device**
