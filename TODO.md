@@ -21,8 +21,8 @@ this native Android rewrite is **AutoKorrektur 2.0**.
       1.0 browser version), so the fork marker costs nothing new. A fresh, network-detached
       repository stays an option for a later major version.
 
-- [ ] **REPO-04. Enable Actions** on `konradvoelkel/AutoKorrektur` (one click in its Actions tab —
-      GitHub suppresses workflow runs on forks until then). Nothing runs CI at the moment.
+- [x] **REPO-04. Actions enabled** on `konradvoelkel/AutoKorrektur` — lint, unit tests, the
+      instrumented emulator suite and the release bundle all run there (2026-09-24).
 - [ ] **REPO-05. Ask GitHub Support to garbage-collect the fork network.** The pre-rewrite objects
       are still reachable by SHA (`.../commit/<old-sha>`), so `TODO-for-human.md` and
       `HUMAN_RELEASE_CHECKLIST.md` can still be fetched from old commits. Only a support-side GC (or
