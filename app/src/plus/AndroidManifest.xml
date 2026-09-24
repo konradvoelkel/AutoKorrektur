@@ -16,6 +16,17 @@
     <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
     <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove" />
 
+    <!-- androidx.work declares these four, and its only consumer is BatchProcessingWorker, which
+         these tiers switch off (FEATURE_BATCH_PROCESSING=false) — so nothing here ever enqueues
+         work and nothing needs them. They are removed because Play lists requested permissions on
+         the store page, and ACCESS_NETWORK_STATE next to PRIVACY_POLICY.md's "no internet
+         permission" invites exactly the wrong question. Turning batch processing on in a tier
+         means dropping these removals from it. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" tools:node="remove" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" tools:node="remove" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" tools:node="remove" />
+
     <application>
         <activity
             android:name=".ar.ArCameraActivity"
