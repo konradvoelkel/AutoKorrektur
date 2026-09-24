@@ -19,9 +19,10 @@ out=$(mktemp -d)
 trap 'rm -rf "$out"' EXIT
 ./build.sh "$out"
 echo "deploy.sh: https://$SITE_DOMAIN <- $VPS_HOST:$VPS_WWW"
-# --no-perms --chmod: die Rechte des Servers gehoeren dem Server. Ohne das traegt `rsync -a`
-# die des lokalen Bauverzeichnisses hinueber (umask 002 -> 0775), und /srv/autokorrektur/www
-# schwankt zwischen jedem Deploy (0775) und jedem `make site` im Infra-Repo (0755).
-# Gesehen am 2026-09-25 im Probelauf dort. Verzeichnisse 755, Dateien 644 -- Caddy liest nur.
-rsync -a --no-perms --chmod=D755,F644 --delete --info=stats1 ${DRY_RUN:+--dry-run} "$out/" "$VPS_HOST:$VPS_WWW/" |
+# --chmod: ohne das traegt `rsync -a` die Rechte des lokalen Bauverzeichnisses hinueber
+# (umask 002 -> 0775), und /srv/autokorrektur/www schwankt zwischen jedem Deploy (0775) und
+# jedem `make site` im Infra-Repo (0755). Verzeichnisse 755, Dateien 644 -- Caddy liest nur.
+# Kein --no-perms dazu: das schaltet -p ab, und --chmod wirkt dann laut rsync(1) auf
+# bestehende Dateien gar nicht -- mit beiden zusammen blieb www am 2026-09-25 auf 0664/0775.
+rsync -a --chmod=D755,F644 --delete --info=stats1 ${DRY_RUN:+--dry-run} "$out/" "$VPS_HOST:$VPS_WWW/" |
   grep -E 'Number of (regular files transferred|deleted)|Total transferred'
