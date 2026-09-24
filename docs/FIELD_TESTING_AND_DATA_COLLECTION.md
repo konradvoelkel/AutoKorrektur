@@ -4,51 +4,60 @@ This guide outlines the protocol for executing real-world field tests with **Aut
 
 ---
 
-## 1. Field Testing Objectives
+## 1. What to test, per flavor
 
-The goal of field testing is to evaluate AutoKorrektur in real urban lighting conditions, varied vehicle geometries, and dynamic pedestrian environments:
+Which build you carry decides what you can test (`docs/PRODUCT_TIERS.md`):
 
-1. **Live AR Passthrough Stability**: Test real-time car removal while walking through streets at 30–60 FPS.
-2. **5-Second AR Video Capture**: Record real-world video snippets and evaluate temporal inpainting stability.
-3. **Full Native Resolution vs Fast Preview**: Test high-resolution progressive inpainting on complex street corners with parked cars, delivery vans, and bicycles.
-4. **Edge Cases**: Evaluate performance under direct sunlight glare, heavy shadows, wet asphalt reflections, snow, and dense car clusters.
+- **`core`** — the Play Store build and the one that matters most: photo in, cars out, before/after
+  slider, split card shared from the share sheet. Test it in real light, on real streets, with real
+  parked cars: glare, deep shadows, wet asphalt, snow, dense clusters, delivery vans, bicycles and
+  people that must *not* be erased.
+- **`full`** — additionally the live AR viewfinder (stability while walking, 30–60 FPS), the 5-second
+  AR video snippets (temporal stability), high-res progressive inpainting on complex corners, the
+  mask brush, and batch mode with CSV export.
+
+Install one with `./gradlew :app:installCoreDebug` or `installFullDebug`.
 
 ---
 
-## 2. In-App Data Collection & Diagnostic Recording
+## 2. Collecting data while testing
 
-AutoKorrektur includes automated diagnostic logging, artifact caching, and batch CSV performance export:
+### A. On-device diagnostics (the main instrument)
+Menu → **Diagnostics** → switch on. From then on the app appends one line per run to a private file:
+per-stage timings, image size, number of detected vehicles, outcome or error class, AR frame rate,
+and once per session the device model, RAM, cores and Android version — never images, file names or
+locations (`PRIVACY_POLICY.md` §5). It is off by default and nothing is transmitted.
 
-### A. Batch Performance & Metric Logging
-1. Open the app $\rightarrow$ Switch to **Studio** or **Batch Mode**.
-2. Pick a folder of field test photos.
-3. Once batch inference completes, tap **"CSV exportieren"**.
-4. The app generates a structured CSV file in the device's `Downloads/` directory:
-   ```csv
-   filename,model,scoreThreshold,maskUpscale,maskDownshift,downscaleMp,inferenceTimeMs,timestamp
-   IMG_20260815_120101.jpg,YOLOv11s-seg,0.25,1.20,0.02,No Scaling,2450,1786780861000
-   IMG_20260815_120145.jpg,YOLOv11s-seg,0.25,1.20,0.02,No Scaling,2890,1786780905000
-   ```
-
-### B. Capturing Real-Time Video & Before/After Pairs
-- **AR Video Clips**: Long-press the shutter in AR mode. The original 30 FPS video and the post-processed car-free HQ MP4 are saved automatically to your device's Movies/AutoKorrektur folder.
-- **Before/After Split Cards**: Use the **Instagram & Social Export** dialog (`📸 Split-Karte` or `🔄 2-Slide Karussell`) to generate synchronized visual comparison pairs.
-
-### C. Extracting Device Telemetry via ADB
-To inspect low-level hardware performance, memory usage, and execution logs from your computer:
+After a session, **Export** hands the file to the share sheet (mail it to yourself), or pull it:
 
 ```bash
-# 1. Stream live application logs
-adb logcat -s AutoKorrektur:* AndroidRuntime:*
-
-# 2. Pull all captured photos, masks, and videos to your computer
-adb pull /sdcard/Pictures/AutoKorrektur/ ./field_test_data/photos/
-adb pull /sdcard/Movies/AutoKorrektur/ ./field_test_data/videos/
-adb pull /sdcard/Download/ ./field_test_data/logs/
-
-# 3. Check memory & GPU footprint during active inpainting
-adb shell dumpsys meminfo de.konradvoelkel.android.autokorrektur
+adb shell run-as de.konradvoelkel.android.autokorrektur cat files/telemetry/events.jsonl
 ```
+
+Each line is JSON, so the whole session aggregates with one command:
+
+```bash
+jq -s '[.[] | select(.event=="pipeline_run")] | {runs: length,
+        median_ms: (map(.total_ms) | sort | .[length/2 | floor]),
+        failures: [.[] | select(.success==false) | .error] | length}' events.jsonl
+```
+
+**Delete** clears the file and the installation id when you are done.
+
+### B. Batch CSV (`beta`/`full` only)
+Batch mode writes `filename,model,scoreThreshold,maskUpscale,maskDownshift,downscaleMp,inferenceTimeMs,timestamp`
+to `Downloads/` via "CSV exportieren" — useful for sweeping parameters over a folder of photos,
+where the diagnostics file gives you the per-stage breakdown.
+
+### C. Artifacts and logs
+
+```bash
+adb logcat -s AutoKorrektur:* AndroidRuntime:*          # live app log
+adb pull /sdcard/Pictures/ ./field_test_data/photos/     # saved results
+adb shell dumpsys meminfo de.konradvoelkel.android.autokorrektur   # memory during inpainting
+```
+
+AR video clips (`full`) land in `Movies/AutoKorrektur/`.
 
 ---
 
@@ -69,16 +78,16 @@ Following the methodology established by Schellscheidt (2024) and Beckers (2025)
 ## 4. Field Testing Checklist for Activists & Researchers
 
 - [ ] **Pre-Trip Check**:
-  - Phone battery $\ge 70\%$.
-  - Latest AutoKorrektur APK installed.
-  - Storage space $\ge 2\text{ GB}$ available for video and high-res captures.
+  - Phone battery $\ge 70\%$, storage $\ge 2\text{ GB}$.
+  - Current build installed, and **Diagnostics switched on** (menu → Diagnostics) so the trip is measured.
+  - Know which flavor you carry: `core` has no AR, video or batch mode.
 - [ ] **In the Field**:
   - Test 1: Typical residential street with parked cars along sidewalk.
   - Test 2: Multi-vehicle cluster (commercial street or parking lot).
   - Test 3: Mixed active mobility scene (cars parked next to parked bicycles / pedestrians).
   - Test 4: Dynamic lighting (bright sunlight vs deep tree canopy shadows).
-  - Test 5: 5-second AR video snippet while walking slowly along sidewalk.
+  - Test 5 (`full` only): 5-second AR video snippet while walking slowly along the sidewalk.
 - [ ] **Post-Trip Evaluation**:
-  - Export CSV benchmark logs from Batch mode.
+  - Export the diagnostics file (menu → Diagnostics → Export); CSV from batch mode if you used it.
   - Review captures in `VisionGalleryBottomSheet`.
   - Rate samples against the 5-criteria rubric.

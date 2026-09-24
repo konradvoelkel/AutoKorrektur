@@ -6,9 +6,10 @@ This document defines the core architecture, dataflow pipelines, matrix conventi
 
 ## 1. System Overview
 
-AutoKorrektur employs a **hybrid on-device and cloud machine learning architecture**:
-- **On-Device (Default)**: Zero-network, privacy-preserving pipeline combining YOLOv11-seg (TFLite) instance segmentation with MI-GAN (ONNX Runtime) local neural inpainting.
-- **Cloud Backend (Premium)**: Remote FastAPI backend orchestrating PyTorch Stable Diffusion inpainting with memory-only GDPR guarantees and Google Play Integrity attestation.
+- **On-device (what ships)**: zero-network pipeline combining YOLOv11-seg (TFLite) instance segmentation with MI-GAN (ONNX Runtime) local inpainting. The Play Store flavor `core` has no `INTERNET` permission at all.
+- **Cloud SDXL (not shipped)**: an optional remote FastAPI service, present in the `beta`/`full` flavors behind `FEATURE_CLOUD_SDXL` and **not used by any published build**. The service itself lives in [autokorrektur-backend](https://github.com/konradvoelkel/autokorrektur-backend); the client code and the mask contract below are kept here so the path still compiles and is tested.
+
+See `docs/PRODUCT_TIERS.md` for which flavor contains what.
 
 ```mermaid
 graph TD

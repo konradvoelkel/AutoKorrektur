@@ -4,7 +4,12 @@
 
 AutoKorrektur is an Android application that automatically removes cars from photographs using machine learning. This is a reimplementation of the [AutoKorrektur Web Version](https://github.com/BenB2/AutoKorrektur), based on Till Schellscheidt's Bachelor Thesis "Autokorrektur - Automatisierte Objektersetzung in Fotos".
 
-The app's purpose is to help users visualize cities with fewer cars using a hybrid architecture: fast 100% on-device processing by default, with opt-in Server SDXL processing for ultra high-resolution results.
+The app's purpose is to help people visualize cities with fewer cars. Everything ships on-device; the
+published flavor (`core`) has no `INTERNET` permission at all. The optional SDXL cloud path exists
+only in the `beta`/`full` flavors behind a feature flag and is not used by any published build.
+
+**Read `CLAUDE.md` first** — it lists the invariants that are easy to break (assets are not in git,
+Gradle tasks need a flavor prefix, the localization contract).
 
 ## Technology Stack
 
@@ -19,7 +24,7 @@ The app's purpose is to help users visualize cities with fewer cars using a hybr
     - ONNX Runtime Android (with NNAPI EP support)
     - TensorFlow Lite (with NNAPI Delegate support)
     - OpenCV for Android
-    - OkHttp 4.x (for server SDXL API communication)
+    - OkHttp 4.x (for the optional server SDXL API, `beta`/`full` only)
 
 ### Machine Learning Models
 

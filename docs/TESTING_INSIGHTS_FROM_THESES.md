@@ -69,7 +69,7 @@ From the empirical evaluations of 500 Mapillary Vistas images and 51 real-world 
 
 ## 3. Ground-Truth Metric Alignment
 
-To benchmark model quality on desktop and CI (via `backend/benchmark_ml.py`):
+To benchmark model quality on the desktop (`benchmark_ml.py` in [autokorrektur-backend](https://github.com/konradvoelkel/autokorrektur-backend)):
 
 1. **IoU & Boundary-IoU**: Validates mask edge snapping against human-annotated vehicle ground truth.
 2. **Dice Similarity (F1)**: Quantifies contour accuracy.

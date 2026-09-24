@@ -9,7 +9,8 @@ Welcome to the AutoKorrektur technical documentation repository.
 | **🧪 Testing & Field Operations** | [FIELD_TESTING_AND_DATA_COLLECTION.md](FIELD_TESTING_AND_DATA_COLLECTION.md) | Field testing protocol, CSV batch telemetry & on-device diagnostics. |
 | | [TESTING_INSIGHTS_FROM_THESES.md](TESTING_INSIGHTS_FROM_THESES.md) | 5-criteria evaluation framework & failure mode taxonomy. |
 | | [TESTING.md](../TESTING.md) | Unit/instrumented test suites & hardware benchmarking matrix. |
-| **🏗️ Architecture & Engineering** | [ARCHITECTURE.md](../ARCHITECTURE.md) | System architecture, CameraX AR loop & MediaCodec encoder. |
+| **🏗️ Architecture & Engineering** | [PRODUCT_TIERS.md](PRODUCT_TIERS.md) | The four product flavors, what `core` deliberately lacks, how to promote a feature. |
+| | [ARCHITECTURE.md](../ARCHITECTURE.md) | System architecture, CameraX AR loop & MediaCodec encoder. |
 | | [IMAGE_PIPELINE_SPECIFICATION.md](IMAGE_PIPELINE_SPECIFICATION.md) | ML pipeline specification & tensor coordinate transformations. |
 | **🚀 Release & Play Store** | [PLAY_STORE_LISTING.md](PLAY_STORE_LISTING.md) | Google Play Store copy (DE & EN) and graphic assets. |
 | | [RELEASE_CHECKLIST.md](../RELEASE_CHECKLIST.md) | Release pre-flight checklist & keystore procedures. |

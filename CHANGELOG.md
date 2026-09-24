@@ -14,6 +14,7 @@ app's own internal numbering.
 ## [Unreleased] — towards 2.0.0
 
 ### Added
+- `CLAUDE.md`: orientation for anyone (or any agent) picking the repository up — the invariants that are easy to break (assets are not in git, Gradle tasks need a flavor prefix, `core` has no network permission, the localization contract, derived colours), plus the layout and conventions.
 - Store assets regenerated from the brand palette in `media/play_store_assets/`: icons, a new feature graphic (`feature_graphic.svg` → PNG) and four screenshots from a real `core` run — start, detection mask, before/after slider, save & share.
 - Opt-in, on-device diagnostics (`telemetry/`, "Diagnostics" in the menu): JSON-Lines events (stage timings, image size, detections, outcome, AR frame rate, crash class) in a 2 MB-capped private file. Never uploaded — export via the share sheet or delete. Off by default; see `PRIVACY_POLICY.md` §5.
 - `PipelineStage`: pipeline progress labels are string resources, so a German device no longer sees "Running YOLO Segmentation" next to "Verarbeitung…".
@@ -44,6 +45,7 @@ app's own internal numbering.
 - Dead `useFP16` code path and the unused fp16 model (~20 MB).
 
 ### Fixed
+- `StringResourceLocalizationTest.kt` contained a literal NUL byte where a space was meant (a separator in `joinToString`), which made every text tool treat the file as binary — grep silently found nothing in it. Replaced, and the repo scanned for others.
 - **The before/after badges were hardcoded German** ("VORHER"/"NACHHER"/"AUTOFREI"), so an English device showed them in the UI *and* burned them into the shared image — the app's main output. They are string resources now, resolved per locale.
 - **The comparison slider swallowed vertical drags**: it locked the parent scroll view on touch-down, so after processing a photo the Download and Export buttons below could not be scrolled to on a normal-size phone. It now claims the gesture only once the drag is clearly horizontal.
 - Capture buttons wrapped to three lines at 50% width (worse in German) and the primary buttons sat at 70% width; both fixed.
