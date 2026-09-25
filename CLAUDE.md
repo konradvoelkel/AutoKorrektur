@@ -7,6 +7,11 @@ version](https://github.com/BenB2/AutoKorrektur); this is the native rewrite.
 Canonical repository: **konradvoelkel/AutoKorrektur**. (`xamde/AutoKorrektur` is the retired fork it
 was forked from — don't push there.)
 
+Lessons shared with the sibling projects (Laberampel, bubatzblick, hAInrich) live in
+`~/files/work/PLAYBOOK.md`, outside this repo: its §4 row for AutoKorrektur is the audit checklist,
+§7 lists what is stale here right now, and a lesson learned here that is not AutoKorrektur-specific
+goes there the same day.
+
 ## Five things that will bite you
 
 1. **The models and test fixtures are not in git.** Run `scripts/fetch_assets.sh` after cloning; it
