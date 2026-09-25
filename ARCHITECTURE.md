@@ -70,6 +70,23 @@ When scaling an arbitrary $W \times H$ photo to model input $640 \times 640$:
 4. Ratios for coordinate un-mapping:
    $$xRatio = \frac{\max(W, H)}{W}, \quad yRatio = \frac{\max(W, H)}{H}$$
 
+### Inpainting resolution
+
+Three scale steps stack, and the last one is invisible in the tensor shapes above:
+
+1. `ImageProcessor` loads at most `DEFAULT_MAX_MEGAPIXELS` (8 MP) with power-of-two subsampling,
+   so a 50 MP camera file arrives as roughly 3 MP.
+2. MI-GAN always generates at $512 \times 512$, whatever the photo measures.
+3. `processOutputMat` resizes that generation to $\max(W, H)$ of the processed image and crops it
+   back, and `blendResult` copies it into the mask with a hard binary `copyTo` — no feathering,
+   no alpha.
+
+So the detail inside a removed vehicle is fixed at 512 px across the image's longest side: on a
+2040 px photo the patch is a 4x upscale of generated content. This is why a removed car can leave
+a soft or iridescent ghost while the untouched background stays sharp, and it is what high-res
+progressive tile inpainting (`beta`/`full`, `InpaintingQualityMode.HIGH_RES_PROGRESSIVE`) exists to
+avoid. `core` has no such fallback, so its output quality is image-dependent by construction.
+
 ---
 
 ## 5. Memory & Native JNI Lifecycle Protocol

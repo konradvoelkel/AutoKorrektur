@@ -65,7 +65,27 @@ reference for the exact thresholds.
   degrades to a no-op when disabled. On a device: menu → Diagnostics → on, then
   `adb shell run-as de.konradvoelkel.android.autokorrektur cat files/telemetry/events.jsonl`.
 
-## 3. Hardware caveat
+## 3. Getting pipeline output off a device
+
+`connectedAndroidTest` uninstalls the app when it finishes, which deletes the app's private
+storage with it — a test that writes PNGs to `appContext.cacheDir` leaves nothing to look at. To
+eyeball what the pipeline actually produced, drive the instrumentation by hand instead, which
+leaves both APKs installed:
+
+```bash
+./gradlew :app:assembleFullDebug :app:assembleFullDebugAndroidTest
+adb install -r -t app/build/outputs/apk/full/debug/app-full-debug.apk
+adb install -r -t app/build/outputs/apk/androidTest/full/debug/app-full-debug-androidTest.apk
+adb shell am instrument -w -e class <fully.qualified.TestClass> \
+  de.konradvoelkel.android.autokorrektur.full.test/androidx.test.runner.AndroidJUnitRunner
+adb shell 'run-as de.konradvoelkel.android.autokorrektur.full cat cache/<file>.png' > out.png
+```
+
+Note the flavor's `applicationIdSuffix` in both the `run-as` target and the runner component —
+`full` is `…autokorrektur.full`, and `run-as` reports "unknown package" rather than anything
+helpful when you get it wrong.
+
+## 4. Hardware caveat
 
 x86_64 emulators software-emulate NNAPI and translate arm64 code, so delegate fallback and native
 crashes behave differently there than on real hardware — the TFLite interpreter, for instance,
@@ -73,7 +93,7 @@ segfaults under arm64 translation on the Pixel AVD. Model-execution changes need
 device before release; every Espresso suite additionally asserts that no error Snackbar appears on
 launch, which catches initialization failures that would otherwise pass silently.
 
-## 4. Proposed: config-matrix screenshots and accessibility checks
+## 5. Proposed: config-matrix screenshots and accessibility checks
 
 Field testing surfaced "lots of minor issues, too much to report" — presentation bugs across
 locale × theme × width, which no one sweeps by hand. Two cheap additions would catch them:

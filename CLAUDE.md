@@ -25,7 +25,11 @@ goes there the same day.
    `full` is the development baseline (every feature on); `core` is what goes to the Play Store.
 3. **`core` has no `INTERNET` permission**, and the privacy policy, the Play listing and the Data
    Safety answers all say so. Anything that adds a network call to `core` — or promotes the cloud
-   tier into it — means changing those texts *first*.
+   tier into it — means changing those texts *first*. Permissions also arrive uninvited: a library
+   merges its own into every flavor (androidx.work contributed four, for a feature `core` disables),
+   Play prints the merged set on the store page, and `app/src/core/AndroidManifest.xml` removes them
+   one by one. Read the merged manifest, not the source one, before a release:
+   `app/build/intermediates/merged_manifests/coreRelease/processCoreReleaseManifest/AndroidManifest.xml`.
 4. **German and English are both complete, and a test enforces it.** `values/strings.xml` is English
    and the fallback for every locale; `values-de/` is a complete override; there is no `values-en/`.
    `StringResourceLocalizationTest` checks key parity, placeholder parity and that no German entry is
