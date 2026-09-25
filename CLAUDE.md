@@ -27,9 +27,9 @@ goes there the same day.
    Safety answers all say so. Anything that adds a network call to `core` — or promotes the cloud
    tier into it — means changing those texts *first*. Permissions also arrive uninvited: a library
    merges its own into every flavor (androidx.work contributed four, for a feature `core` disables),
-   Play prints the merged set on the store page, and `app/src/core/AndroidManifest.xml` removes them
-   one by one. Read the merged manifest, not the source one, before a release:
-   `app/build/intermediates/merged_manifests/coreRelease/processCoreReleaseManifest/AndroidManifest.xml`.
+   and Play prints the merged set on the store page. `verify<Variant>Permissions` holds each flavor
+   to an exact allowlist in `app/build.gradle.kts` and runs from `assemble`, `bundle` and `check`;
+   a new permission fails the build with the `tools:node="remove"` line that would fix it.
 4. **German and English are both complete, and a test enforces it.** `values/strings.xml` is English
    and the fallback for every locale; `values-de/` is a complete override; there is no `values-en/`.
    `StringResourceLocalizationTest` checks key parity, placeholder parity and that no German entry is

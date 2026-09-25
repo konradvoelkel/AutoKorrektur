@@ -22,7 +22,7 @@ app's own internal numbering.
 - `PRIVACY_POLICY.en.md` — English translation; the German text stays binding.
 - `scripts/fetch_assets.sh` + `scripts/assets.manifest`: models and test fixtures are fetched from the `assets-v1` release and SHA-256 verified; Gradle's `verifyAssets` fails early when they are missing, CI caches them.
 - Four product flavors (`core`/`plus`/`beta`/`full`) driven by per-tier `BuildConfig` feature flags; `core` is the Play Store candidate. See `docs/PRODUCT_TIERS.md`.
-- Test and CI infrastructure: `StringResourceLocalizationTest`, `TelemetryStoreTest`, unit/instrumented tests for the ML and UI layers, JaCoCo coverage, and a GitHub Actions workflow (backend pytest, lint, unit tests, emulator tests, release bundle).
+- Test and CI infrastructure: `StringResourceLocalizationTest`, `TelemetryStoreTest`, unit/instrumented tests for the ML and UI layers, JaCoCo coverage, and a GitHub Actions workflow (lint, unit tests, emulator tests, release bundle).
 - `ARCHITECTURE.md` — mask polarity, colour spaces, coordinate transforms and JNI lifecycle rules.
 
 ### Changed

@@ -40,11 +40,17 @@ This codebase serves as a benchmark for how far modern **Agentic AI** and **Vibe
 
 1. **Vibe Coding to Native Execution**: High-level activist persona workflows, user interviews, and intuitive design goals ("vibe") translated directly into low-level C++/JNI OpenCV operations, Android MediaCodec hardware video encoders, and StateFlow architectures.
 2. **Autonomous Tool Augmentation**: AI agents orchestrating compiler checks, running headless test suites, executing wireless ADB debugging against a physical Pixel, capturing screen artifacts, and resolving JNI lifecycle edge cases autonomously.
-3. **Rigorous Verification Loop**: Combining prompt-driven engineering with deterministic engineering standards: strict ProGuard/R8 rules, 75+ unit and instrumented tests, automated detekt static analysis, and zero-storage GDPR compliance.
+3. **Rigorous Verification Loop**: Combining prompt-driven engineering with deterministic engineering standards: strict ProGuard/R8 rules, unit and instrumented test suites, automated detekt static analysis, and zero-storage GDPR compliance.
 
 ---
 
 ## 🌟 Key Features
+
+> The app builds as four tiers and **only `core` is published** — it has the capture → detect →
+> inpaint → split-card share loop and nothing below it on this list. Live AR, video snippets, cloud
+> SDXL, the mask brush and the extra export layouts are `plus`/`beta`/`full`, distributed as direct
+> APKs. [docs/PRODUCT_TIERS.md](docs/PRODUCT_TIERS.md) has the matrix; `app/build.gradle.kts` is the
+> authority.
 
 ### 1. 🎥 Live AR Viewfinder (30–60 FPS)
 - **Decoupled Passthrough**: Native camera preview runs at full hardware framerate (30–60 FPS).
@@ -87,8 +93,8 @@ This codebase serves as a benchmark for how far modern **Agentic AI** and **Vibe
 
 ### First checkout: fetch the large assets
 
-The ML models and the instrumented-test fixtures are **not stored in git** — they are ~230 MB of
-binaries that change rarely, so they live as assets on the
+The ML models and the instrumented-test fixtures are **not stored in git** — they are hundreds of
+megabytes of binaries that change rarely, so they live as assets on the
 [`assets-v1`](https://github.com/konradvoelkel/AutoKorrektur/releases/tag/assets-v1) release and are
 pinned by SHA-256 in [`scripts/assets.manifest`](scripts/assets.manifest):
 
@@ -115,8 +121,8 @@ ABIs) and is the day-to-day dev target; `core` is the Play Store candidate.
 # Run Unit Tests
 ./gradlew testFullDebugUnitTest
 
-# Build Release APK (with ProGuard/R8 minification) — core is the Play Store flavor
-./gradlew assembleCoreRelease
+# Build the release App Bundle (ProGuard/R8) — core is the flavor that goes to Play
+./gradlew bundleCoreRelease
 
 # Run Static Analysis (Detekt)
 ./gradlew detekt

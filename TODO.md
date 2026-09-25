@@ -1,7 +1,9 @@
 # AutoKorrektur — Active Roadmap & Next Milestones
 
-> **Current Version**: 1.0.0 (Release Candidate)  
-> **Status**: Core ML engine, CameraX AR live viewfinder, MediaCodec video pipeline, progressive tile inpainting, security, GDPR zero-storage, and CI/CD fully implemented and passing 100% of test suites.  
+> **Current Version**: 2.0.0 — tagged `v2.0.0`, not yet published.  
+> **Status**: the ML pipeline, the AR viewfinder, the video pipeline, progressive tile inpainting,
+> the privacy posture and CI are all implemented and green. What is unproven is on-device behaviour:
+> no build has run on arm64 hardware yet (FT-01).  
 > **Historical Archive**: See [docs/ARCHIVE_TODO.md](docs/ARCHIVE_TODO.md) for completed milestones M1–M8 and Phases 1–4.
 
 ---

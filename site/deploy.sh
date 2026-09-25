@@ -24,5 +24,6 @@ echo "deploy.sh: https://$SITE_DOMAIN <- $VPS_HOST:$VPS_WWW"
 # jedem `make site` im Infra-Repo (0755). Verzeichnisse 755, Dateien 644 -- Caddy liest nur.
 # Kein --no-perms dazu: das schaltet -p ab, und --chmod wirkt dann laut rsync(1) auf
 # bestehende Dateien gar nicht -- mit beiden zusammen blieb www am 2026-09-25 auf 0664/0775.
-rsync -a --chmod=D755,F644 --delete --info=stats1 ${DRY_RUN:+--dry-run} "$out/" "$VPS_HOST:$VPS_WWW/" |
-  grep -E 'Number of (regular files transferred|deleted)|Total transferred'
+# --itemize-changes statt `| grep` auf --info=stats1: rsync 3.2.7 druckt die "Number of ..."-Zeilen
+# nicht, grep endet mit 1, und `set -o pipefail` meldet einen geglueckten Upload als Fehler.
+rsync -a --chmod=D755,F644 --delete --itemize-changes ${DRY_RUN:+--dry-run} "$out/" "$VPS_HOST:$VPS_WWW/"

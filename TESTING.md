@@ -85,6 +85,13 @@ Note the flavor's `applicationIdSuffix` in both the `run-as` target and the runn
 `full` is `…autokorrektur.full`, and `run-as` reports "unknown package" rather than anything
 helpful when you get it wrong.
 
+A file pushed to the device is invisible to the photo picker until MediaStore indexes it:
+
+```bash
+adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE \
+  -d file:///sdcard/Download/<name>.png
+```
+
 ## 4. Hardware caveat
 
 x86_64 emulators software-emulate NNAPI and translate arm64 code, so delegate fallback and native

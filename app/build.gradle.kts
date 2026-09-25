@@ -1,3 +1,4 @@
+import com.android.build.api.artifact.SingleArtifact
 import java.util.Properties
 import java.io.ByteArrayOutputStream
 
@@ -255,6 +256,108 @@ val verifyAssets = tasks.register("verifyAssets") {
 }
 
 tasks.named("preBuild") { dependsOn(verifyAssets) }
+
+// What each flavor is allowed to ask the user's device for, checked against the MERGED manifest --
+// dependencies contribute permissions of their own, and Play prints the merged set on the store
+// page (androidx.work once put ACCESS_NETWORK_STATE next to a policy promising no network).
+// Exact equality, not a blocklist: an unexplained new permission and a silently vanished one are
+// both bugs, and the vanished one is how a privacy promise quietly becomes a lie in the other
+// direction. `{applicationId}` stands for the variant's own id, which carries the flavor suffix.
+val basePermissions = setOf(
+    "android.permission.CAMERA",
+    "android.permission.READ_EXTERNAL_STORAGE",
+    "android.permission.READ_MEDIA_IMAGES",
+    "android.permission.WRITE_EXTERNAL_STORAGE",
+    "{applicationId}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+)
+
+// beta/full turn on cloud SDXL (INTERNET), video (READ_MEDIA_VIDEO/AUDIO) and batch processing,
+// whose WorkManager brings the remaining four. core/plus remove all of them in their manifests.
+val networkedPermissions = basePermissions + setOf(
+    "android.permission.INTERNET",
+    "android.permission.READ_MEDIA_AUDIO",
+    "android.permission.READ_MEDIA_VIDEO",
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.FOREGROUND_SERVICE",
+    "android.permission.RECEIVE_BOOT_COMPLETED",
+    "android.permission.WAKE_LOCK",
+)
+
+val permissionAllowlist = mapOf(
+    "core" to basePermissions,
+    "plus" to basePermissions,
+    "beta" to networkedPermissions,
+    "full" to networkedPermissions,
+)
+
+abstract class VerifyPermissionsTask : DefaultTask() {
+    @get:InputFile
+    abstract val mergedManifest: RegularFileProperty
+
+    @get:Input
+    abstract val allowed: SetProperty<String>
+
+    @get:Input
+    abstract val applicationId: Property<String>
+
+    @get:Input
+    abstract val variantName: Property<String>
+
+    @get:OutputFile
+    abstract val stamp: RegularFileProperty
+
+    @TaskAction
+    fun verify() {
+        val xml = mergedManifest.get().asFile.readText()
+        val found = Regex("""<uses-permission[^>]*android:name="([^"]+)"""", RegexOption.DOT_MATCHES_ALL)
+            .findAll(xml).map { it.groupValues[1] }.toSortedSet()
+        val expected = allowed.get().map { it.replace("{applicationId}", applicationId.get()) }.toSortedSet()
+
+        val added = found - expected
+        val missing = expected - found
+        if (added.isNotEmpty() || missing.isNotEmpty()) {
+            throw GradleException(
+                buildString {
+                    appendLine("Permission set of ${variantName.get()} does not match its allowlist.")
+                    if (added.isNotEmpty()) {
+                        appendLine("  unexpected (a dependency added these; remove them in the flavor manifest")
+                        appendLine("  with tools:node=\"remove\", or widen the allowlist deliberately):")
+                        added.forEach { appendLine("    + $it") }
+                    }
+                    if (missing.isNotEmpty()) {
+                        appendLine("  gone (a feature that needs one of these will fail at runtime):")
+                        missing.forEach { appendLine("    - $it") }
+                    }
+                    appendLine("  allowlist: app/build.gradle.kts, permissionAllowlist")
+                    append("  merged manifest: ${mergedManifest.get().asFile}")
+                }
+            )
+        }
+        stamp.get().asFile.writeText(found.joinToString("\n", postfix = "\n"))
+    }
+}
+
+androidComponents {
+    onVariants { variant ->
+        val allowedForFlavor = permissionAllowlist[variant.flavorName] ?: return@onVariants
+        val verify = tasks.register<VerifyPermissionsTask>("verify${variant.name.replaceFirstChar(Char::titlecase)}Permissions") {
+            group = "verification"
+            description = "Fails if ${variant.name} requests a different permission set than its allowlist."
+            mergedManifest.set(variant.artifacts.get(SingleArtifact.MERGED_MANIFEST))
+            allowed.set(allowedForFlavor)
+            applicationId.set(variant.applicationId)
+            variantName.set(variant.name)
+            stamp.set(layout.buildDirectory.file("reports/permissions/${variant.name}.txt"))
+        }
+        // Wired into the two ways an artifact leaves this project, plus `check`, so it is not a
+        // task someone has to remember to run.
+        tasks.matching { it.name == "assemble${variant.name.replaceFirstChar(Char::titlecase)}" }
+            .configureEach { dependsOn(verify) }
+        tasks.matching { it.name == "bundle${variant.name.replaceFirstChar(Char::titlecase)}" }
+            .configureEach { dependsOn(verify) }
+        tasks.matching { it.name == "check" }.configureEach { dependsOn(verify) }
+    }
+}
 
 // Coverage is measured against the "full" flavor specifically: it's the only flavor that
 // exercises every code path (all FEATURE_* flags true), and product flavors don't have a

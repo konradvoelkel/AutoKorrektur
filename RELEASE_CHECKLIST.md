@@ -14,9 +14,9 @@ Status as of 2026-09-25.
 - [x] Release keystore generated and stored outside the repository; `keystore.properties` (gitignored)
       supplies it, so `bundleCoreRelease` is signed automatically and no key material is in git.
 - [x] `core`/`plus` ship without the `INTERNET` permission — keeps the promise the privacy policy
-      makes — and without the four androidx.work permissions their tiers never use. Check the
-      **merged** manifest before each release, not `app/src/main/AndroidManifest.xml`: every
-      dependency can add to the set Play prints on the store page.
+      makes — and without the four androidx.work permissions their tiers never use. Enforced, not
+      just declared: `verify<Variant>Permissions` compares the **merged** manifest against an exact
+      allowlist and runs from `assemble`, `bundle` and `check`.
 
 ## 2. Metadata & versioning
 - [x] `versionCode` / `versionName` are derived from git (`rev-list --count`, `describe --tags`); nothing to hand-edit.

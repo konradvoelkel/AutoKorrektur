@@ -9,7 +9,7 @@
 
 ## 2. Inpainting & Blending Polarity
 - **OpenCV `copyTo` Invariant**: `src.copyTo(dst, mask)` copies pixels where `mask > 0`. If the detection pipeline produces an overlay mask where background is 255 and target is 0, invert the mask via `Core.bitwise_not(mask, targetMask)` before blending.
-- **ONNX Inpainting Binary Mask**: The ONNX model `mi-gan-512.onnx` requires a binary mask with `1` on the inpaint hole and `0` on preserved background (`Imgproc.threshold(onnxMask, onnxMask, 127.0, 1.0, THRESH_BINARY)`). Passing `255` bypasses inpainting and produces passthrough output.
+- **ONNX Inpainting Mask Polarity**: `mi-gan-512.onnx` takes `0` on the hole to inpaint and `255` on the background to preserve — the same subtractive polarity the mask assembler emits, so `MiGanInference.preprocessMask` rescales and resizes it but never thresholds or inverts it. `ARCHITECTURE.md` §2 is the authority for every stage of the contract; this bullet is a copy and must not be read against it.
 - **Color Channel Order**: OpenCV Android `Utils.bitmapToMat` outputs `RGBA` order (not `BGRA`). Convert to 3-channel RGB using `Imgproc.COLOR_RGBA2RGB` and back to Bitmap using `Imgproc.COLOR_RGB2RGBA`.
 
 ## 3. Ultra HDR & Native Rendering (Android 14+)
