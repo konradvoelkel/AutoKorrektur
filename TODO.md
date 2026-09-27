@@ -64,8 +64,9 @@ this native Android rewrite is **AutoKorrektur 2.0**.
       `site/build.sh` copies it out of `app/build/outputs/apk/core/release/` and refuses to publish
       one that is stale, x86_64 (`-PscreenshotAbi`) or debug-signed. `DOWNLOAD_VERSION`,
       `APK_BUILD_DATE` and `deploy.sh KEEP_DOWNLOAD=1` allow a pages-only deploy that leaves the
-      published bytes alone. **Not deployed yet**: the download page describes it as an early test
-      build because FT-01 is still open — see the note there before shipping it.
+      published bytes alone. Live since 2026-09-28: https://autokorrektur.org/#android serves
+      `2.0.0-13-g662dacd`. The page calls it an early test build because FT-01 is still open —
+      delete that note once a phone has actually run it.
 
 ---
 
