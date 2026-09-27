@@ -141,6 +141,15 @@ android {
     testOptions {
         unitTests.isIncludeAndroidResources = true
     }
+    // StringResourceLocalizationTest reads src/main/res straight off disk, which Gradle cannot see
+    // as a task input — so editing a string and re-running the tests reported a stale PASS. That is
+    // how the "100% On-Device" crash survived a green run on 2026-09-28. Declaring the directory
+    // makes any resource edit re-run the unit tests.
+    tasks.withType<Test>().configureEach {
+        inputs.dir(layout.projectDirectory.dir("src/main/res"))
+            .withPropertyName("stringResourcesReadAtRuntime")
+            .withPathSensitivity(PathSensitivity.RELATIVE)
+    }
     lint {
         // Pre-existing debt baselined so CI isn't blocked by it; new lint issues introduced
         // later still fail CI. (The 119 MissingTranslation entries the baseline used to carry

@@ -31,6 +31,11 @@ import javax.xml.parsers.DocumentBuilderFactory
  *    cannot crash `getString(res, args)` at runtime.
  * 4. No `values-en` directory exists any more (its content would silently shadow the default
  *    file for English devices and drift again).
+ * 5. Every string that carries a real format specifier is a *valid* format string, so
+ *    `getString(res, args)` cannot throw on a literal `%`. This shipped once: `about_dialog_content`
+ *    ended in "100% On-Device", `String.format` read `% O` as the conversion `'O'`, and tapping
+ *    "About & Licenses" killed the app in both languages (2026-09-28, found on a phone). Check 3
+ *    could not catch it — both locales had the *same* bug, so their placeholders agreed perfectly.
  */
 class StringResourceLocalizationTest {
 
@@ -143,6 +148,95 @@ class StringResourceLocalizationTest {
             "Format placeholders differ between values/ and values-de/ for: $mismatched — " +
                 "getString(res, args) would throw or print garbage in one language",
             mismatched.isEmpty()
+        )
+    }
+
+    /**
+     * Java's conversion characters, from `%[index$][flags][width][.precision]conversion`. Anything
+     * else after a `%` makes `String.format` throw `UnknownFormatConversionException` at runtime.
+     * Note `o` (octal) is valid and `O` is not — that single letter was the 2026-09-28 crash.
+     */
+    private val validConversions = "bBhHsScCdoxXeEfgGaAtTn".toSet()
+
+    // The dollar in "%1$s" must reach the regex escaped. Writing it as a bare ${'$'} makes it an
+    // end-of-line anchor instead of a literal, "%1$s" then reads as the invalid conversion '$',
+    // sawSpecifier below never flips, and every real finding is swallowed — this test passed
+    // against the very crash it was written for until `detectorRecognisesKnownGoodAndBadStrings`
+    // was added to hold it honest.
+    private val specifierRegex =
+        Regex("%(\\d+\\${'$'})?([-#+ 0,(]*)(\\d+)?(\\.\\d+)?(.)", RegexOption.DOT_MATCHES_ALL)
+
+    /** One complaint per malformed `%` in [value]; empty if the string is sound or never formatted. */
+    private fun formatProblems(value: String): List<String> {
+        val problems = mutableListOf<String>()
+        var sawSpecifier = false
+        var i = 0
+        while (i < value.length) {
+            if (value[i] != '%') {
+                i++
+                continue
+            }
+            if (value.startsWith("%%", i)) {
+                i += 2
+                continue
+            }
+            val match = specifierRegex.matchAt(value, i)
+            val conversion = match?.groupValues?.get(5)?.firstOrNull()
+            if (match != null && conversion in validConversions) {
+                sawSpecifier = true
+                i = match.range.last + 1
+            } else {
+                val around = value.substring(maxOf(0, i - 18), minOf(value.length, i + 18))
+                problems += "invalid conversion '${conversion ?: "<end of string>"}' near " +
+                    "\"…${around.replace("\n", "\\n")}…\""
+                i++
+            }
+        }
+        // A string with no specifier at all never reaches String.format (e.g. video_progress_zero,
+        // which is only a layout's android:text="0%"), so a bare % there is harmless — and
+        // escaping it would render a literal "%%" on screen.
+        return if (sawSpecifier) problems else emptyList()
+    }
+
+    /**
+     * Holds the detector itself honest. A checker that silently answers "nothing wrong" is worse
+     * than no checker, and this one did exactly that on its first draft.
+     */
+    @Test
+    fun `detector recognises known good and bad strings`() {
+        // Valid: a positional argument plus a properly escaped literal percent.
+        assertTrue(
+            "A sound format string must produce no complaints",
+            formatProblems("Version: %1\$s — 100%% on-device").isEmpty()
+        )
+        // The real crash: %1$s marks the string as formatted, "% O" is then conversion 'O'.
+        val real = formatProblems("Version: %1\$s\n\n100% On-Device AI processing.")
+        assertTrue(
+            "The 2026-09-28 crash string must be reported, got: $real",
+            real.any { it.contains("'O'") }
+        )
+        // Not formatted at all (a layout's android:text): a bare % is fine and must not be flagged.
+        assertTrue(
+            "A string with no specifier is never formatted and must not be flagged",
+            formatProblems("0%").isEmpty()
+        )
+    }
+
+    @Test
+    fun `formatted strings are valid format strings in both languages`() {
+        val res = resDir()
+        val broken = mutableListOf<String>()
+        for (dir in listOf("values", "values-de")) {
+            for ((key, entry) in parseStrings(File(res, "$dir/strings.xml"))) {
+                formatProblems(entry.value).forEach { broken += "$dir/strings.xml [$key]: $it" }
+            }
+        }
+        assertTrue(
+            "These strings carry a format placeholder, so getString(res, args) runs String.format " +
+                "over the whole text — and these would throw UnknownFormatConversionException the " +
+                "moment that screen opens. Escape a literal percent as %%:\n" +
+                broken.joinToString("\n"),
+            broken.isEmpty()
         )
     }
 
