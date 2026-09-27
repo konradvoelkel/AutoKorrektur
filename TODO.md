@@ -3,7 +3,8 @@
 > **Current Version**: 2.0.0 — tagged `v2.0.0`, not yet published.  
 > **Status**: the ML pipeline, the AR viewfinder, the video pipeline, progressive tile inpainting,
 > the privacy posture and CI are all implemented and green. What is unproven is on-device behaviour:
-> no build has run on arm64 hardware yet (FT-01).  
+> the first arm64 hardware run happened on 2026-09-28 and found a crash within a minute
+> (`a7f59c5`, "About & Licenses"); the walkthrough itself is still open (FT-01).  
 > **Historical Archive**: See [docs/ARCHIVE_TODO.md](docs/ARCHIVE_TODO.md) for completed milestones M1–M8 and Phases 1–4.
 
 ---
@@ -35,7 +36,12 @@ this native Android rewrite is **AutoKorrektur 2.0**.
 - [ ] **FT-01. Physical Field Testing on Device**
   - Walk through real urban environments (residential street, commercial parking, mixed bike/pedestrian zones).
   - Execute the test scenarios in [docs/FIELD_TESTING_AND_DATA_COLLECTION.md](docs/FIELD_TESTING_AND_DATA_COLLECTION.md) (the owner also keeps a private, device-specific walkthrough outside this repo).
-  - Nothing has ever run `installCoreRelease` on arm64 hardware; every emulator run is x86_64. Judge
+  - First real-hardware run: 2026-09-28, on the published APK. It crashed on the first menu item
+    opened — `about_dialog_content` had an unescaped `%` (`a7f59c5`). Nothing else has been
+    exercised on arm64 yet, and no automated test opens the options menu at all: the overflow
+    menu, the diagnostics dialog and the settings screens are untested surface. An instrumented
+    smoke test that opens every menu entry would have caught this before the website did.
+  - Every other run is an x86_64 emulator. Judge
     inpainting quality at full size, not on a phone screen — the generated patch is a 512 px
     upscale (`ARCHITECTURE.md` §4) and can leave a visible ghost. If that shows up on most shots
     rather than a minority, `core` needs the progressive path before it goes public.
@@ -65,7 +71,8 @@ this native Android rewrite is **AutoKorrektur 2.0**.
       one that is stale, x86_64 (`-PscreenshotAbi`) or debug-signed. `DOWNLOAD_VERSION`,
       `APK_BUILD_DATE` and `deploy.sh KEEP_DOWNLOAD=1` allow a pages-only deploy that leaves the
       published bytes alone. Live since 2026-09-28: https://autokorrektur.org/#android serves
-      `2.0.0-13-g662dacd`. The page calls it an early test build because FT-01 is still open —
+      `2.0.0-15-ga7f59c5` (the first published build, `2.0.0-13-g662dacd`, was up for about an
+      hour and crashed on About & Licenses; it is deleted from the server). The page calls it an early test build because FT-01 is still open —
       delete that note once a phone has actually run it.
 
 ---
