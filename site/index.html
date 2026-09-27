@@ -16,15 +16,15 @@
 <header class="site">
   <img src="icons/icon.svg" alt="" width="44" height="44">
   <a class="name" href="./">AutoKorrektur</a>
-  <nav><a href="#android">Android</a><a href="privacy">Datenschutz</a><a href="en.html" lang="en" hreflang="en">English</a></nav>
+  <nav><a href="#android">Download</a><a href="privacy">Datenschutz</a><a href="en.html" lang="en" hreflang="en">English</a></nav>
 </header>
 <main>
   <section class="hero">
     <h1>Deine Straße ohne Autos. Berechnet auf deinem Gerät.</h1>
     <p class="lede">AutoKorrektur erkennt parkende Autos in deinem Foto und lässt sie verschwinden – die KI läuft komplett auf dem Smartphone. Kein Konto, kein Upload, kein Tracking. Ein Vorher/Nachher-Bild zum Teilen in zwei Tipps.</p>
     <div class="actions">
-      <a class="button primary" href="#android">Für Android<small>Google Play · Version __VERSION__</small></a>
-      <a class="button secondary" href="privacy">Datenschutzerklärung<small>kurz: nichts verlässt dein Gerät</small></a>
+      <a class="button primary" href="download/__APK_FILE__">Für Android herunterladen<small>APK · __APK_MB__ MB · Version __APK_VERSION__</small></a>
+      <a class="button secondary" href="#android">Installieren &amp; prüfen<small>Sideloading, Prüfsumme, Zertifikat</small></a>
     </div>
   </section>
 
@@ -39,13 +39,20 @@
     <div class="card"><h3>Vorher / Nachher</h3><p>Ein Schieberegler zeigt den Unterschied. Die fertige Split-Karte („VORHER / AUTOFREI“) teilst du über das normale Android-Teilen-Menü – Instagram, Signal, Mail, was du willst.</p></div>
     <div class="card"><h3>Für die Mobilitätswende</h3><p>Gemacht für Aktivist:innen, Stadtplaner:innen und alle, die zeigen wollen, wie viel Platz eine Straße ohne Blech hat. Kostenlos, Open Source (AGPLv3).</p></div>
   </div>
-  <p>Die KI-Modelle stecken in der App; deshalb ist sie einige hundert Megabyte groß, dafür braucht sie nach der Installation kein Internet. Das Ergebnis ist eine Skizze, keine Fotomontage in Druckqualität: Schatten, Spiegelungen und verdeckte Details erfindet das Netz plausibel, aber nicht immer richtig.</p>
+  <p>Die KI-Modelle stecken in der App; deshalb ist die Installationsdatei __APK_MB__ MB groß, dafür braucht die App nach der Installation kein Internet. Das Ergebnis ist eine Skizze, keine Fotomontage in Druckqualität: Schatten, Spiegelungen und verdeckte Details erfindet das Netz plausibel, aber nicht immer richtig.</p>
 
   <h2>Datenschutz, in einem Absatz</h2>
   <p>Objekterkennung und Inpainting laufen auf dem Prozessor deines Geräts; deine Fotos verlassen es nicht. Die App hat kein Konto, keine Werbung, keine Analyse-Dienste. Was du teilst, geht ausschließlich über das Android-Teilen-Menü an die App, die du dort auswählst. Optional kannst du in den Einstellungen anonyme Diagnosedaten (Rechenzeiten, Gerätemodell – nie Bilder) auf dem Gerät mitschreiben lassen und selbst exportieren; standardmäßig ist das aus. <a href="privacy">Vollständige Datenschutzerklärung</a>.</p>
 
-  <h2 id="android">Android</h2>
-  <p>AutoKorrektur erscheint bei Google Play (Paket <code>de.konradvoelkel.android.autokorrektur</code>). Android 10 oder neuer; ein Gerät mit 4 GB RAM oder mehr ist empfehlenswert, ältere Geräte rechnen länger.</p>
+  <h2 id="android">Android: herunterladen und installieren</h2>
+  <p>AutoKorrektur liegt hier als signierte APK-Datei zum direkten Installieren. Bei Google Play (Paket <code>de.konradvoelkel.android.autokorrektur</code>) erscheint die App erst später. Android 10 oder neuer; ein Gerät mit 4 GB RAM oder mehr ist empfehlenswert, ältere Geräte rechnen länger.</p>
+  <table>
+    <tr><th>Datei</th><th>Für</th><th>Größe</th></tr>
+    <tr><td><a href="download/__APK_FILE__">__APK_FILE__</a></td><td>praktisch jedes Telefon und Tablet (64-Bit-ARM)</td><td>__APK_MB__ MB</td></tr>
+  </table>
+  <p>Installieren („Sideloading“): Datei auf dem Telefon herunterladen, sie in der Benachrichtigung oder im Ordner <em>Downloads</em> antippen und dem Browser erlauben, unbekannte Apps zu installieren, wenn Android danach fragt. Den Rest prüft Android selbst.</p>
+  <p>Version __APK_VERSION__, gebaut am __APK_DATE__. Die SHA-256-Summe der Datei steht in <a href="download/SHA256SUMS">SHA256SUMS</a>. Jede Veröffentlichung ist mit demselben Zertifikat signiert; sein SHA-256-Fingerprint ist <span class="mono sum">10:0a:d8:62:bb:84:19:45:42:76:5f:4e:30:33:47:e8:4f:fc:14:af:e9:c6:bb:3a:8b:20:1c:bc:97:98:38:9f</span> – nachprüfbar mit <code>apksigner verify --print-certs</code>.</p>
+  <p class="note">Dies ist ein früher Testbuild: gerechnet wurde bisher nur im Emulator, auf echten Telefonen hat die App noch niemand laufen lassen. Rechenzeiten und Bildqualität können deutlich schlechter ausfallen als in den Beispielbildern oben, und ein Absturz ist möglich. Fehlermeldungen sind ausdrücklich willkommen: siehe <a href="impressum">Impressum</a>.</p>
   <p class="note">Version __VERSION__, Stand __DATE__. Der Quellcode liegt auf <a href="https://github.com/konradvoelkel/AutoKorrektur">GitHub</a>.</p>
 
   <h2>Wer dahinter steht</h2>

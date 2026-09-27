@@ -53,6 +53,19 @@ this native Android rewrite is **AutoKorrektur 2.0**.
 - [x] **REL-02. Privacy Policy Hosting** — live since 2026-09-21 at https://autokorrektur.org/privacy (`/privacy-en` English); redeploy with `site/deploy.sh`. Still to do by hand: paste the URL into Play Console → App content.
 - [ ] **REL-03. Release App Bundle Generation**
   - Build signed `.aab` bundle via `./gradlew bundleCoreRelease` (`core` is the Play Store flavor) and upload to Play Console Internal Testing track.
+  - Decide on **Play App Signing** before the first upload. If Play generates its own app signing key,
+    the Play build and the APK on autokorrektur.org (REL-04) carry different signatures, and anyone
+    who sideloaded has to uninstall before they can take a Play update. Uploading the existing
+    release key (`~/.android-signing/autokorrektur`, `keystore.properties`) as the app signing key
+    keeps the two interchangeable. The certificate fingerprint is printed on the website, so it is
+    a promise to users either way.
+- [x] **REL-04. Direct APK download on autokorrektur.org** (2026-09-28) — `/download/` serves the
+      signed `core` release APK (arm64-v8a) named with the versionName, plus `SHA256SUMS`;
+      `site/build.sh` copies it out of `app/build/outputs/apk/core/release/` and refuses to publish
+      one that is stale, x86_64 (`-PscreenshotAbi`) or debug-signed. `DOWNLOAD_VERSION`,
+      `APK_BUILD_DATE` and `deploy.sh KEEP_DOWNLOAD=1` allow a pages-only deploy that leaves the
+      published bytes alone. **Not deployed yet**: the download page describes it as an early test
+      build because FT-01 is still open — see the note there before shipping it.
 
 ---
 

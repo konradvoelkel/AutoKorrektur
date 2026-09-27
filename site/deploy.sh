@@ -8,6 +8,11 @@
 #   VPS_HOST   user@<server>   (key via ~/.ssh/config) -- deploy.local.env only, the repo is public
 #   VPS_WWW    /srv/autokorrektur/www
 #   DRY_RUN=1  show what rsync would do, upload nothing
+#   KEEP_DOWNLOAD=1  leave /download/ on the server untouched (pages-only deploy). `--delete` does
+#                    not remove excluded paths, so the published APK and its SHA256SUMS survive --
+#                    which is the point: never republish different bytes under a name people have
+#                    checksummed. Pair it with build.sh DOWNLOAD_VERSION and APK_BUILD_DATE so the
+#                    pages keep describing the release that is actually up there.
 set -euo pipefail
 cd "$(dirname "$0")"
 . ./site.env
@@ -26,4 +31,5 @@ echo "deploy.sh: https://$SITE_DOMAIN <- $VPS_HOST:$VPS_WWW"
 # bestehende Dateien gar nicht -- mit beiden zusammen blieb www am 2026-09-25 auf 0664/0775.
 # --itemize-changes statt `| grep` auf --info=stats1: rsync 3.2.7 druckt die "Number of ..."-Zeilen
 # nicht, grep endet mit 1, und `set -o pipefail` meldet einen geglueckten Upload als Fehler.
-rsync -a --chmod=D755,F644 --delete --itemize-changes ${DRY_RUN:+--dry-run} "$out/" "$VPS_HOST:$VPS_WWW/"
+rsync -a --chmod=D755,F644 --delete --itemize-changes ${DRY_RUN:+--dry-run} \
+  ${KEEP_DOWNLOAD:+--exclude=/download/} "$out/" "$VPS_HOST:$VPS_WWW/"
