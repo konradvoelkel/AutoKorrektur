@@ -11,28 +11,33 @@
         android:layout_height="match_parent"
         android:padding="16dp">
 
-        <!-- Images Container -->
-        <LinearLayout
-            android:id="@+id/imagesContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
-            android:gravity="center"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Interactive Before/After Split Slider View (Initially Hidden) -->
+        <!-- The result comes first. Usability run 001 (UX-01): imagesContainer used to sit above
+             the slider, so after processing the red mask preview filled the whole first screen and
+             the before/after comparison needed a scroll on a 720x1280 phone; the novice tester
+             took the diagnostic overlay for the finished picture and shared that. The slider is
+             GONE until there is a result, and a GONE view collapses to a point here, so before
+             processing imagesContainer still renders at the top exactly as it did. -->
         <de.konradvoelkel.android.autokorrektur.ui.BeforeAfterSliderView
             android:id="@+id/beforeAfterSliderView"
             android:layout_width="match_parent"
             android:layout_height="320dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="50dp"
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/imagesContainer" />
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Images Container: the selected image before processing, the mask preview after it. -->
+        <LinearLayout
+            android:id="@+id/imagesContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/beforeAfterSliderView" />
 
         <!-- Image Source: two direct action buttons (no intermediate "how?" dialog) -->
         <LinearLayout
@@ -43,7 +48,7 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/beforeAfterSliderView">
+            app:layout_constraintTop_toBottomOf="@id/imagesContainer">
 
             <!-- Stacked, not side by side: at 50% width each, the labels wrap to three lines on a
                  normal-width phone, and the German strings ("Foto aufnehmen", "Bild auswählen")
@@ -217,6 +222,7 @@
         <Button
             android:id="@+id/download"
             android:layout_width="0dp"
+            android:enabled="false"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/download"
@@ -231,6 +237,7 @@
         <Button
             android:id="@+id/exportInstagram"
             android:layout_width="0dp"
+            android:enabled="false"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:text="@string/export_instagram"

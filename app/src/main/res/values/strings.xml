@@ -33,7 +33,7 @@
     <string name="start_btn">Start</string>
     <string name="select_image_btn">Select Image</string>
     <string name="processing">Processing…</string>
-    <string name="export_instagram">Export for Instagram</string>
+    <string name="export_instagram">Share image</string>
     <string name="share_to_instagram">Share graphic</string>
     <string name="save_graphic">Save graphic</string>
 
@@ -43,6 +43,10 @@
     <string name="label_image_numbered">Image %1$d</string>
     <string name="label_original">Original</string>
     <string name="label_mask">Detected Vehicles (Mask Preview)</string>
+    <!-- Zero detections is a normal outcome; without its own label the unchanged photo was
+         captioned "Detected Vehicles", i.e. the opposite of what happened (UX-02). -->
+    <string name="label_mask_none">No vehicles detected</string>
+    <string name="msg_no_vehicles_detected">No vehicles found in this photo. Try one where the parked cars are clearly visible and not too far away.</string>
     <string name="loading_status">%1$s (%2$d%%)</string>
     <string name="btn_start_batch_processing">Start Batch Processing</string>
     <string name="msg_image_saved">Image saved to gallery</string>
@@ -54,7 +58,7 @@
     <string name="error_create_file_message">Error creating image file: %1$s</string>
     <string name="msg_batch_completed">Batch processing completed!\n%1$d/%2$d images processed successfully</string>
     <string name="btn_export_csv">Export CSV</string>
-    <string name="error_export_instagram_no_image">Process an image first before exporting for Instagram</string>
+    <string name="error_export_instagram_no_image">Process an image first, then you can share it</string>
     <string name="dialog_instagram_format_title">Select Instagram Format</string>
     <string name="instagram_format_square">1:1 Square (Side-by-Side)</string>
     <string name="instagram_format_portrait">4:5 Feed Portrait (Stacked)</string>

@@ -40,6 +40,7 @@ import de.konradvoelkel.android.autokorrektur.databinding.FragmentFirstBinding
 import de.konradvoelkel.android.autokorrektur.ui.model.MainUiProperties
 import de.konradvoelkel.android.autokorrektur.ui.model.MainUiState
 import de.konradvoelkel.android.autokorrektur.utils.AppLogger
+import de.konradvoelkel.android.autokorrektur.pipeline.PipelineResult
 import de.konradvoelkel.android.autokorrektur.utils.BitmapMemoryUtils
 import de.konradvoelkel.android.autokorrektur.model.InpaintingQualityMode
 import de.konradvoelkel.android.autokorrektur.utils.ImageExportManager
@@ -217,6 +218,7 @@ class FirstFragment : Fragment() {
             is MainUiState.Idle -> {
                 binding.beforeAfterSliderView.visibility = View.GONE
                 binding.imagesContainer.visibility = View.VISIBLE
+                setResultActionsEnabled(false)
                 updateInferenceButtonState(viewModel.properties.value)
                 binding.fileSelect.isEnabled = true
                 binding.batchMode.isEnabled = true
@@ -238,6 +240,7 @@ class FirstFragment : Fragment() {
                 }
                 binding.fileSelect.isEnabled = false
                 binding.batchMode.isEnabled = false
+                setResultActionsEnabled(false)
 
                 if (state.intermediateInpaintedBitmap != null && !viewModel.properties.value.isBatchMode) {
                     val displayAfter = BitmapMemoryUtils.createScaledBitmapForDisplay(
@@ -261,47 +264,13 @@ class FirstFragment : Fragment() {
                             finalizeBatchProcessing()
                         }
                     } else {
-                        displayBeforeBmp?.recycle()
-                        displayAfterBmp?.recycle()
-                        combinedMaskBmp?.recycle()
-
-                        val displayBefore =
-                            BitmapMemoryUtils.createScaledBitmapForDisplay(
-                                result.originalBitmap, maxDimension = 1440
-                            )
-                        val displayAfter =
-                            BitmapMemoryUtils.createScaledBitmapForDisplay(
-                                inpainted, maxDimension = 1440
-                            )
-                        
-                        displayBeforeBmp = displayBefore
-                        displayAfterBmp = displayAfter
-
-                        binding.beforeAfterSliderView.setBitmaps(displayBefore, displayAfter)
-                        binding.beforeAfterSliderView.visibility = View.VISIBLE
-
-                        // Render intermediate vehicle mask preview with a semi-transparent red overlay
-                        val overlay = MaskOverlayUtils.createRedOverlayBitmap(
-                            result.maskBitmap,
-                            displayBefore.width,
-                            displayBefore.height
-                        )
-                        val combinedMask = Bitmap.createBitmap(displayBefore.width, displayBefore.height, Bitmap.Config.ARGB_8888)
-                        val canvas = Canvas(combinedMask)
-                        canvas.drawBitmap(displayBefore, 0f, 0f, null)
-                        canvas.drawBitmap(overlay, 0f, 0f, null)
-                        overlay.recycle()
-
-                        combinedMaskBmp = combinedMask
-
-                        binding.imagesContainer.removeAllViews()
-                        addImageToContainer(combinedMask, getString(R.string.label_mask))
-                        binding.imagesContainer.visibility = View.VISIBLE
+                        renderSingleResult(result, inpainted)
                     }
                 } else {
                     showSnackbar(getString(R.string.error_no_processed_image))
                     viewModel.clearState()
                 }
+                setResultActionsEnabled(inpainted != null && result.detectionCount != 0)
                 updateInferenceButtonState(viewModel.properties.value)
                 binding.fileSelect.isEnabled = true
                 binding.batchMode.isEnabled = true
@@ -717,6 +686,66 @@ class FirstFragment : Fragment() {
             addView(textView)
         }
         binding.imagesContainer.addView(container)
+    }
+
+    /**
+     * Draws one finished image: the before/after comparison first, the vehicle mask below it.
+     * Extracted from handleUiState, which detekt had at its complexity ceiling.
+     */
+    private fun renderSingleResult(result: PipelineResult, inpainted: Bitmap) {
+        displayBeforeBmp?.recycle()
+        displayAfterBmp?.recycle()
+        combinedMaskBmp?.recycle()
+
+        val displayBefore = BitmapMemoryUtils.createScaledBitmapForDisplay(
+            result.originalBitmap, maxDimension = 1440
+        )
+        val displayAfter = BitmapMemoryUtils.createScaledBitmapForDisplay(
+            inpainted, maxDimension = 1440
+        )
+        displayBeforeBmp = displayBefore
+        displayAfterBmp = displayAfter
+
+        binding.beforeAfterSliderView.setBitmaps(displayBefore, displayAfter)
+        binding.beforeAfterSliderView.visibility = View.VISIBLE
+
+        // Render intermediate vehicle mask preview with a semi-transparent red overlay
+        val overlay = MaskOverlayUtils.createRedOverlayBitmap(
+            result.maskBitmap,
+            displayBefore.width,
+            displayBefore.height
+        )
+        val combinedMask = Bitmap.createBitmap(displayBefore.width, displayBefore.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(combinedMask)
+        canvas.drawBitmap(displayBefore, 0f, 0f, null)
+        canvas.drawBitmap(overlay, 0f, 0f, null)
+        overlay.recycle()
+        combinedMaskBmp = combinedMask
+
+        // Zero detections is a normal outcome and, until UX-02, an invisible one: the photo came
+        // back unchanged under a caption claiming vehicles had been detected, with nothing else on
+        // screen. detectionCount is -1 when the segmenter did not run (server path), which is not
+        // the same as zero.
+        val foundNothing = result.detectionCount == 0
+        binding.imagesContainer.removeAllViews()
+        addImageToContainer(
+            combinedMask,
+            getString(if (foundNothing) R.string.label_mask_none else R.string.label_mask)
+        )
+        binding.imagesContainer.visibility = View.VISIBLE
+        if (foundNothing) {
+            showSnackbar(getString(R.string.msg_no_vehicles_detected))
+        }
+    }
+
+    /**
+     * "Herunterladen" and "Bild teilen" are filled primary buttons, so on first launch they were
+     * the loudest things on an empty screen and tapping either only produced an error snackbar
+     * (usability run 001, UX-03). They are live only once there is a result worth saving.
+     */
+    private fun setResultActionsEnabled(enabled: Boolean) {
+        binding.download.isEnabled = enabled
+        binding.exportInstagram.isEnabled = enabled
     }
 
     private fun showSnackbar(message: String) {

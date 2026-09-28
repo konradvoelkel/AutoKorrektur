@@ -41,7 +41,14 @@ data class PipelineResult(
     val maskBitmap: Bitmap,
     val inpaintedBitmap: Bitmap?,
     val isServerProcessed: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    /**
+     * Vehicles the segmenter found, or -1 when it did not run (server path, or a failure before
+     * segmentation). Zero is a legitimate outcome and looks exactly like a successful run unless
+     * the UI says otherwise -- usability run 001, UX-02: a car-free photo produced an unchanged
+     * image captioned "Erkannte Fahrzeuge" and no message at all.
+     */
+    val detectionCount: Int = -1
 )
 
 /**
@@ -212,7 +219,8 @@ class StaticImagePipeline(
                 originalBitmap = processedImage.originalBitmap,
                 maskBitmap = maskBitmap,
                 inpaintedBitmap = inpaintedBitmap,
-                isServerProcessed = isServer
+                isServerProcessed = isServer,
+                detectionCount = detectionCount
             )
             
         } catch (e: Exception) {
