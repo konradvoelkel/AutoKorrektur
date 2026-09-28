@@ -53,6 +53,51 @@ this native Android rewrite is **AutoKorrektur 2.0**.
 
 ---
 
+### 🧭 Milestone 1b: Usability run 001
+Five personas walked the live site and the `core` build on 2026-09-28 (`scenarios/`, `reports/`,
+ranked in `reports/improvements-001.adoc`). Findings that were artefacts of the test environment
+are listed in that report and are not repeated here. The site's stale "no phone has ever run it"
+claim was the eleventh finding and is already fixed (`322f984`, deployed).
+
+UX-01 to UX-09 were implemented on 2026-09-28 and verified on an x86_64 emulator (`core`, German
+and English): a fresh launch shows both result actions disabled, a processed street photo opens on
+the before/after slider with the mask preview below it, and a car-free photo is captioned "Keine
+Fahrzeuge erkannt" with the actions still disabled. The site half is committed but only reaches
+users at the next `site/deploy.sh` run. UX-10 is owner/infra and stays open.
+
+- [x] **UX-01. The result screen leads with the mask preview.** After processing, the red
+      "Erkannte Fahrzeuge (Masken-Vorschau)" overlay fills the first screenful and the before/after
+      slider needs a scroll at 720x1280 — `imagesContainer` sits above `beforeAfterSliderView` in
+      `fragment_first.xml`. The novice persona took the mask *for* the result and shared it.
+      Show the comparison first and demote the diagnostic view below it. (High)
+- [x] **UX-02. Zero detections produce no message.** When YOLO finds no vehicles the app shows the
+      unchanged photo captioned "Erkannte Fahrzeuge", with no toast and no empty state — the
+      caption asserts the opposite of what happened. `PipelineResult` does not carry the detection
+      count, so the UI cannot tell this case apart from a successful run. (High)
+- [x] **UX-03. Download and export are offered before there is anything to export.** On first
+      launch both are filled primary buttons, visually louder than "Foto aufnehmen" and "Bild
+      auswählen"; tapping either only produces an error snackbar. Disable until a result exists. (Medium)
+- [x] **UX-04. "Für Instagram exportieren" is the only share control.** It opens the ordinary
+      Android share sheet, and there is no button labelled "Teilen" anywhere. The persona who
+      wanted to send the picture to a WhatsApp group had to guess. (Medium)
+- [x] **UX-05. The site's risk warning sits 4.8 screens below the download button** at 375 px
+      (page is 6 screens; install instructions start at 3.6). The rushed persona who taps download
+      never reaches it. One line next to the button. (High)
+- [x] **UX-06. The route to the install help is labelled for experts** — "Installieren & prüfen /
+      Sideloading, Prüfsumme, Zertifikat". It is above the fold, so placement is fine; the persona
+      who needed it read the subtitle as technical and dismissed it. (Medium)
+- [x] **UX-07. The English path ends in a German-only Impressum.** Both English pages send the
+      reader there for contact details, and `privacy-en` declares the German text binding. Print
+      the responsible person and the contact address on the English page. (Medium)
+- [x] **UX-08. Verification instructions assume tools they do not supply** — the page names
+      `apksigner verify --print-certs` without saying where `apksigner` comes from, and never says
+      how to compute a SHA-256. (Low)
+- [x] **UX-09. "Ein Vorher/Nachher-Bild zum Teilen in zwei Tipps" overstates the flow** — measured
+      at four taps plus a scroll, on an already-picked photo. (Low)
+- [ ] **UX-10. `https://autokorrektur.org/download/` returns 404.** Nothing links to the bare
+      directory, so only a URL-trimming visitor meets it — which is exactly the verification-minded
+      reader. Owner/infra: Caddy lives in `~/files/work/server` (role `autokorrektur`), not here. (Low)
+
 ### 🚀 Milestone 2: Google Play Store Release
 - [ ] **REL-01. Google Play Console Listing Setup**
   - Paste prepared German & English metadata from [docs/PLAY_STORE_LISTING.md](docs/PLAY_STORE_LISTING.md).
