@@ -1,0 +1,182 @@
+= Think-aloud report: Carol — run 001
+:persona: Carol
+:run-id: 001
+:date: 2026-09-28
+:scenario: scenarios/scenario-carol.adoc
+:tool-type: web
+
+== Context
+
+Tool: Desktop web browser, visited https://autokorrektur.org (German version), https://autokorrektur.org/en.html (English version), https://autokorrektur.org/download/SHA256SUMS (checksum file), https://autokorrektur.org/impressum (legal notice).
+Goal (from scenario): Decide whether to install and write about AutoKorrektur. Specifically: (a) find the responsible person and contact info, (b) verify the file against a published checksum, (c) assess the software maturity.
+How run: Desktop viewport (1280x720), standard browser, no downloads executed (APK too large).
+
+== Walkthrough
+
+=== Step 1: Initial scan of homepage
+
+Scan:: Homepage in German. Headline: "Deine Straße ohne Autos. Berechnet auf deinem Gerät." Two action buttons: "Für Android herunterladen" (122 MB, version 2.0.0-15-ga7f59c5) and "Installieren & prüfen" (sideloading, checksum, certificate). Navigation shows Download, Datenschutz, English. Before/after example images.
+
+Expect:: I'm looking for contact info first, then verification instructions. The page description promises "no account, no upload, no tracking" which is good for privacy. The maturity should be documented somewhere. The "Installieren & prüfen" button likely links to verification details.
+
+Act:: Scroll down to see if there's footer with contact info or more detail about the project.
+
+Observe:: Page scrolls but shows mostly blank space after images. Page structure appears to load all content on one page.
+
+Verdict:: EXPECTED — single-page layout is fine. I'll need to use find or navigation to locate the Impressum.
+
+Note:: The page clearly states "Kein Konto, kein Upload, kein Tracking" (no account, no upload, no tracking) prominently. Good transparency here.
+
+=== Step 2: Finding the Impressum (legal notice) for contact information
+
+Scan:: After scrolling, page appears mostly blank. Used find function to locate "Impressum" links on the page.
+
+Expect:: The Impressum typically contains contact details and legal information in Germany. Should be linked from the footer or navigation. Expect to find a name and email address.
+
+Act:: Search for "Impressum" using find, which returned 3 matches. Clicked on ref_47.
+
+Observe:: Navigation to Impressum page. Found:
+- **Name:** Konrad Völkel
+- **Address:** Universitätsstr. 1, 40225 Düsseldorf
+- **Email:** kontakt [at] autokorrektur [punkt] org (anti-spam notation)
+- **Legal status:** "privates, nicht-kommerzielles Angebot" (private, non-commercial offering)
+
+Verdict:: EXPECTED — Found exactly what I was looking for. Contact information is clear and in English notation (email address with [at] and [punkt] to prevent spam scraping).
+
+Note:: The address is at a university street, which adds credibility. The non-commercial status is reassuring. Email is: kontakt@autokorrektur.org (decoding the notation). DELIGHT: The Impressum is short, factual, and not full of legal jargon I cannot understand.
+
+=== Step 3: Finding the SHA256SUMS file and checksum
+
+Scan:: Returned to homepage. Full page text revealed that SHA256SUMS file is linked and mentioned in the Android section. The link is ref_43 with href="download/SHA256SUMS".
+
+Expect:: The checksum file should contain at least one line with the APK filename and its SHA-256 hash. I want to verify the filename in the checksum file matches the download link filename exactly.
+
+Act:: Clicked on the SHA256SUMS link (ref_43).
+
+Observe:: SHA256SUMS file opened in browser, displaying:
+```
+1b51e662d7687cb850ff4a4fa856d774ff0a7002591bb8eeb0227589c70a077f  autokorrektur-2.0.0-15-ga7f59c5-arm64-v8a.apk
+```
+
+Filename in checksum file: **autokorrektur-2.0.0-15-ga7f59c5-arm64-v8a.apk**
+Filename in download link: **autokorrektur-2.0.0-15-ga7f59c5-arm64-v8a.apk**
+
+These match exactly. Checksum: `1b51e662d7687cb850ff4a4fa856d774ff0a7002591bb8eeb0227589c70a077f`
+
+Verdict:: EXPECTED — The checksum file is accessible, contains exactly one entry, and the filename matches the download link perfectly. This is exactly what a verification-minded user wants to see.
+
+Note:: File only contains one APK entry, which is clean and simple. The checksum is provided in standard format (hash followed by filename).
+
+=== Step 4: Examining verification instructions
+
+Scan:: Full page text from main page (German version) states:
+"Version 2.0.0-15-ga7f59c5, gebaut am 2026-09-27. Die SHA-256-Summe der Datei steht in SHA256SUMS. Jede Veröffentlichung ist mit demselben Zertifikat signiert; sein SHA-256-Fingerprint ist 10:0a:d8:62:bb:84:19:45:42:76:5f:4e:30:33:47:e8:4f:fc:14:af:e9:c6:bb:3a:8b:20:1c:bc:97:98:38:9f – nachprüfbar mit apksigner verify --print-certs."
+
+English version says: "The file's SHA-256 is in SHA256SUMS. Every release is signed with the same certificate; its SHA-256 fingerprint is 10:0a:d8:62:bb:84:19:45:42:76:5f:4e:30:33:47:e8:4f:fc:14:af:e9:c6:bb:3a:8b:20:1c:bc:97:98:38:9f – check it with apksigner verify --print-certs."
+
+Expect:: I'm looking to see if the verification instructions are complete enough for a non-developer. I can download the file and compare its SHA-256 using standard tools on my computer. But the apksigner command needs explanation.
+
+Act:: Reviewed both German and English versions of the page for any additional guidance on: (a) where to get apksigner, (b) how to run it, (c) step-by-step instructions for verifying on the phone.
+
+Observe:: Neither version provides these additional details. The instructions assume the reader knows what apksigner is and how to use it. No reference to Android SDK or where to obtain the tool.
+
+Verdict:: SURPRISING — Severity: High. The verification instructions are incomplete for a non-developer. The checksum verification is actionable (I can sha256sum on my computer), but certificate verification assumes technical knowledge not provided on the page.
+
+Note:: As Carol, I can:
+- Download the file
+- Run `sha256sum autokorrektur-2.0.0-15-ga7f59c5-arm64-v8a.apk` on my computer to verify it matches `1b51e662d7687cb850ff4a4fa856d774ff0a7002591bb8eeb0227589c70a077f`
+- But I would be stuck on the apksigner command without additional research
+
+The page tells me WHAT to do but not HOW or WHERE to get the tools.
+
+=== Step 5: Assessing software maturity and warning visibility
+
+Scan:: Full page text includes maturity warning:
+"Dies ist ein früher Testbuild: gerechnet wurde bisher nur im Emulator, auf echten Telefonen hat die App noch niemand laufen lassen. Rechenzeiten und Bildqualität können deutlich schlechter ausfallen als in den Beispielbildern oben, und ein Absturz ist möglich."
+
+English: "This is an early test build: it has only ever been computed in an emulator, nobody has run the app on a real phone yet. Compute times and image quality can be markedly worse than the examples above, and a crash is possible. Bug reports are genuinely welcome: see the Impressum (German)."
+
+Expect:: Maturity warnings should be prominent and clear. This page claims early testing only. I want to verify this is easy to find and not buried.
+
+Act:: Scanned page structure. The warning appears in the main content after the installation instructions, not in small print at the bottom.
+
+Observe:: The maturity warning is in a dedicated paragraph and clearly marked as "Dies ist ein früher Testbuild" / "This is an early test build". Position is good — after installation details so readers who will install see it before attempting to use. Warnings are explicit: "nobody has run the app on a real phone yet", "crash is possible".
+
+Verdict:: EXPECTED — The maturity warning is clear, visible, and not buried. This is responsible disclosure.
+
+Note:: DELIGHT: The warning is neither hidden nor exaggerated. It's factual: emulator-only testing, no real-phone testing yet, possible crashes. This is exactly what an early-stage project should say. The invitation for bug reports is also good ("Fehlermeldungen sind ausdrücklich willkommen").
+
+=== Step 6: Checking download directory for additional files
+
+Scan:: Navigated to /download/ directory to see if there were any README files or other documentation with more complete verification instructions.
+
+Expect:: Many open-source projects provide a VERIFY.txt or README in the download directory with step-by-step instructions.
+
+Act:: Navigated to https://autokorrektur.org/download/
+
+Observe:: Directory appears empty or does not display a directory listing.
+
+Verdict:: EXPECTED — Not unusual. The files are properly linked from the main page anyway.
+
+Note:: This is fine. The main page provides all necessary links.
+
+=== Step 7: Reviewing English version for improved instructions
+
+Scan:: Navigated to English version (en.html) to check if the verification instructions were more complete or better explained.
+
+Expect:: English version might have clearer step-by-step guidance.
+
+Act:: Reviewed full page text of English version.
+
+Observe:: Verification instructions are essentially identical to German version. English version also refers to "see the Impressum (German)" for contact info, which means the Impressum is only in German.
+
+Verdict:: EXPECTED — No improvement in English version. Verification instructions remain equally incomplete.
+
+Note:: The English version is a complete translation, but the Impressum reference assumes readers can read German. For Carol with school German, this is manageable but not ideal.
+
+== Outcome
+
+Goal achieved:: Partially. Carol can make a decision to install, but with reservations about certificate verification.
+
+Carol's three questions::
+
+(a) **Responsible person + contact:** FOUND in 2 steps. Konrad Völkel, kontakt@autokorrektur.org, Universitätsstr. 1, 40225 Düsseldorf. Private, non-commercial project. Also credits Benjamin Beckers and university researchers.
+
+(b) **Checksum verification:** FOUND. SHA256SUMS file is accessible and contains the matching filename and checksum (1b51e662d7687cb850ff4a4fa856d774ff0a7002591bb8eeb0227589c70a077f). Carol can verify the SHA-256 on her computer using sha256sum. Certificate verification instructions exist but lack implementation details (apksigner tool not explained). Took ~4 steps.
+
+(c) **Software maturity:** FOUND and clearly stated. Early test build, emulator-only testing, no real-phone testing yet, crashes possible. Took 1 step (information on homepage).
+
+Time / steps to goal:: Approximately 7 major steps. Total time if reading carefully: 5-10 minutes. Checksum verification is doable on her computer; certificate verification would require external research.
+
+Where the persona struggled or gave up:: Carol did not give up, but she would encounter friction when implementing the apksigner verification. The page says "check it with apksigner verify --print-certs" but does not explain where apksigner comes from, whether it requires the Android SDK, or whether it runs on the phone or computer. She would need to stop and research this separately. For a quick decision to install, this is not blocking; for a thorough pre-installation audit (as she intends for her article), it's a gap.
+
+Would she install it?:: YES, but with conditions. Carol is satisfied that: (1) the responsible person is identified and has a clear contact address, (2) the checksum is verifiable on her computer, (3) the maturity warning is clear and honest about limitations. She would feel confident writing an article saying "this is an early-stage project by Konrad Völkel" and "it has only been tested on emulators so far." The non-commercial, privacy-first positioning aligns with her interest in activist tech. She would NOT perform the apksigner certificate verification without additional research, but she considers that a bonus, not a requirement for installation.
+
+== Findings (raw)
+
+- CRITICAL: Apksigner verification instructions assume technical knowledge (where to get the tool, how to run it, command-line syntax) that is not provided. For a "comfortable in terminal but not a developer" user, this is a gap. Severity: High (blocks thorough pre-installation audit, but not installation itself).
+
+- HIGH: English version directs readers to "see Impressum (German)" for contact info, but Impressum is German-only. Carol can read it with school German, but this is not ideal for English speakers. Alternative: provide Impressum in English or clearly state that contact info is in Impressum with a direct link.
+
+- MEDIUM: No step-by-step guide for verifying the file after download. The page says "SHA-256 is in SHA256SUMS" but does not explain how to compute SHA-256 on a phone or computer. For Carol with terminal knowledge, this is trivial; for a non-technical user, it would be friction.
+
+- DELIGHT: Checksum file is correctly formatted (hash + filename), filename matches download link exactly, and file is easily accessible. This is exactly what a verification-minded user wants. No surprises, clean implementation.
+
+- DELIGHT: Maturity warning is prominent, factual, and not exaggerated. "Nobody has run the app on a real phone yet" is refreshingly honest. No yellow-sticker warnings or false claims.
+
+- DELIGHT: Contact information (Impressum) is clear, short, and factual. Non-commercial status is stated upfront. Adds trust.
+
+- DELIGHT: Privacy policy is concise and understandable. "Your photos never leave your phone" is the key message and it's stated clearly in the first sentence of the privacy paragraph.
+
+== Verification steps Carol actually completed
+
+1. Found responsible person and email address via Impressum page.
+2. Located and opened SHA256SUMS file, verified filename matches download link.
+3. Recorded the checksum value for potential later verification on her computer.
+4. Read the maturity warning and understood the early-stage status.
+5. Reviewed apksigner instruction but noted it requires external research to implement.
+6. Checked English version to see if instructions were clearer (they were not).
+
+== Article thesis Carol is now ready to write
+
+"AutoKorrektur is an early-stage, privacy-first tool for removing parked cars from photos. The project is run by Konrad Völkel in Düsseldorf as a non-commercial effort. The latest build (2.0.0-15-ga7f59c5) is a test version that has only been verified on Android emulators, not on real phones yet. Users should expect potential crashes and lower image quality than the examples shown. The app is open source (AGPLv3) and provides a checksum for file verification. Contact: kontakt@autokorrektur.org."

@@ -1,0 +1,22 @@
+= Scenario: Carol
+:persona: Carol
+:tool-type: web
+
+== Persona
+
+Carol is a 23-year-old journalism student writing a short piece on activist tech.
+Context / device: laptop, Firefox-style habits, comfortable in a terminal but not a developer; English-speaking with school German.
+Expertise: intermediate. She has heard "don't install APKs from the internet" and takes it seriously.
+Mindset: skeptical and verification-minded. She wants to know who is behind the thing and whether the file is what it claims to be before she trusts it, and she is looking for the catch.
+
+== Goal
+
+Carol wants to decide whether this download is trustworthy enough to install and to write about — who built it, whether the file can be verified, and how finished the software actually is.
+
+== Starting point
+
+She opens https://autokorrektur.org/ on a laptop after finding the project on GitHub.
+
+== Success criteria
+
+Carol can (a) name the responsible person and find a contact, (b) verify the downloaded file against a published checksum, and (c) state how mature the build is — or she can name exactly which of those three she could not establish.

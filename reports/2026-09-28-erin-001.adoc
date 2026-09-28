@@ -1,0 +1,220 @@
+= Think-aloud report: Erin — run 001
+:persona: Erin
+:run-id: 001
+:date: 2026-09-28
+:scenario: scenarios/scenario-erin.adoc
+:tool-type: android
+
+== Context
+
+Tool: AutoKorrektur app, package `de.konradvoelkel.android.autokorrektur`, core/full flavor, version 2.0.0-16-g97af409, emulator-5554, Android 14, 720x1280, English UI.
+
+Goal (from scenario): Confirm, BEFORE processing any photo, that:
+1. Diagnostics logging is OFF by default and under user control
+2. The app states its licence (AGPLv3) and origin (academic research)
+
+How run: App launched fresh from home screen via `am start -n de.konradvoelkel.android.autokorrektur/.MainActivity`. No photos processed.
+
+== Walkthrough
+
+=== Step 1: Main screen inspection
+
+Scan:: App has launched. Main screen visible with title "AutoKorrektur" at top, four buttons below (Take Photo, Select Image, Download, Export for Instagram), and a three-dot overflow menu in the top-right corner of the app bar.
+
+Expect:: The overflow menu should contain settings and about screens where Erin can find the diagnostics and license information.
+
+Act:: Tapped the three-dot menu icon (top right).
+
+Observe:: A dropdown menu opened showing two options: "Diagnostics" and "About & Licenses". Both options are in English with no visible translation issues.
+
+Verdict:: EXPECTED — The menu appeared as expected with exactly the two options Erin needs.
+
+Evidence:: Screenshot erin-03.png
+
+=== Step 2: Diagnostics setting - default state verification
+
+Scan:: The Diagnostics menu has opened, showing:
+- Dialog title: "Diagnostics"
+- A toggle switch labeled "Record diagnostics on this device"
+- The toggle switch is visibly in the OFF position (circle on the left, grey/unfilled)
+- Below the toggle, descriptive text beginning with "Off by default..."
+
+Expect:: The toggle should be OFF by default (as the website promised), and the description should list what data IS collected and what is NOT.
+
+Act:: Opened the Diagnostics dialog by tapping "Diagnostics" from the menu.
+
+Observe:: The dialog opened successfully. The toggle switch is clearly OFF (`checked="false"` in UI dump). The complete description text reads:
+
+"Off by default. When on, the app records compute times, image sizes, modes, detection counts, error types and your device model into a file that stays on this device. Never images, file names, locations or personal data. Nothing is uploaded — you decide whether to share the file with the developers."
+
+All text is in English, clear and grammatically correct. The wording matches exactly what the website promised: "it is off by default" and "Diagnostics" menu location confirmed.
+
+Verdict:: EXPECTED — Diagnostics is OFF by default, exactly as the website promised. The description is complete, accurate, and emphasizes privacy. The toggle can be turned ON if the user chooses.
+
+Evidence:: Screenshots erin-04.png
+
+=== Step 3: Close Diagnostics dialog, re-open menu
+
+Scan:: Diagnostics dialog is still open. Erin needs to close it to access the About & Licenses screen.
+
+Expect:: Clicking Cancel should close the dialog and return to the main screen.
+
+Act:: Tapped the "Cancel" button at the bottom of the Diagnostics dialog.
+
+Observe:: The dialog closed without errors. We returned to the main screen with the four buttons visible.
+
+Verdict:: EXPECTED — Dialog closed cleanly.
+
+Evidence:: Screenshot erin-05.png
+
+=== Step 4: Open menu again
+
+Scan:: Back at the main screen. The three-dot menu is visible in the top right.
+
+Expect:: Tapping it again should open the same menu with "Diagnostics" and "About & Licenses" options.
+
+Act:: Tapped the three-dot menu icon again.
+
+Observe:: The menu opened again showing the same two options: "Diagnostics" and "About & Licenses".
+
+Verdict:: EXPECTED
+
+Evidence:: Screenshot erin-06.png
+
+=== Step 5: About & Licenses - license and origin verification
+
+Scan:: The "About & Licenses" dialog has opened. Initial view shows:
+- Title: "About AutoKorrektur"
+- Subtitle: "AutoKorrektur – Car-Free AR & Inpainting"
+- Version: "Version: 2.0.0-16-g97af409"
+- **License: "License: GNU AGPLv3"** ← Key finding
+- Academic Research Foundation section with "Till Schellscheidt: Bachelor Thesis..." (text cut off)
+
+Expect:: The license should state AGPLv3 (as the website promised). The screen should provide attribution to the academic work this app is based on.
+
+Act:: Tapped "About & Licenses" from the menu.
+
+Observe:: A dialog opened with the app's license immediately visible as "License: GNU AGPLv3". This exactly matches the website's claim of "Free, open source (AGPLv3)". The dialog shows it is building on academic research, with at least one thesis visible. All text is in English or appropriately German (for thesis titles from German universities).
+
+Verdict:: EXPECTED (License confirmed) + SURPRISE DEPTH (the full attribution is thorough)
+
+Evidence:: Screenshot erin-07.png
+
+=== Step 6: Scroll to see complete academic attribution
+
+Scan:: The About dialog has more content below. Erin scrolls to see the complete academic foundation section.
+
+Expect:: More information about the academic theses and authors should be visible below.
+
+Act:: Scrolled down within the dialog.
+
+Observe:: After the first scroll, the complete academic foundation appeared:
+- Till Schellscheidt: Bachelor Thesis "Autokorrektur – Automatisierte Objektersetzung in Fotos" (HHU Düsseldorf, 2024)
+- Ben Beckers: Bachelor Thesis "Autokorrektur – Inpainting auf mobilen Endgeräten" (HHU Düsseldorf, 2025)
+- Dr. Konrad Völkel: Supervision, Native Android Architecture & AR Pipeline
+
+The website promised the app "is a rewrite of an earlier browser version... building on two university theses." Both theses are now visible and properly credited.
+
+Verdict:: EXPECTED — The two university theses are both listed and dated.
+
+Evidence:: Screenshot erin-08.png
+
+=== Step 7: Continue scrolling to see open source components
+
+Scan:: More content is visible. Open Source Components section appears with several libraries listed.
+
+Expect:: The app should list its dependencies with their licenses, demonstrating respect for open source.
+
+Act:: Scrolled down further.
+
+Observe:: The Open Source Components section appeared, listing:
+- YOLOv11-seg: GNU AGPLv3 (Ultralytics)
+- MI-GAN: MIT License (Picsart AI Research)
+- OpenCV Android SDK 5: Apache 2.0
+- ONNX Runtime / TFLite: MIT / Apache 2.0
+- CameraX & Jetpack: Apache 2.0
+
+All components are properly attributed with their licenses. This demonstrates thorough compliance with open source licensing.
+
+Verdict:: EXPECTED + DELIGHT — Comprehensive attribution of all dependencies.
+
+Evidence:: Screenshots erin-09.png, erin-10.png
+
+=== Step 8: Scroll to see privacy statement
+
+Scan:: The dialog continues. A final closing statement is becoming visible.
+
+Expect:: The About screen should end with a clear statement reinforcing the privacy commitment.
+
+Act:: Scrolled down one more time to reach the end of the About dialog.
+
+Observe:: The final statement appeared: "100% On-Device AI processing without data collection."
+
+This perfectly reinforces what the website promised and what Erin saw in the Diagnostics dialog. It's in English, clear, and directly addresses her privacy concerns.
+
+Verdict:: DELIGHT — This closing statement powerfully reinforces the privacy promise.
+
+Evidence:: Screenshot erin-11.png
+
+=== Step 9: Close About dialog
+
+Scan:: About & Licenses dialog is still open. Time to close it.
+
+Expect:: Clicking OK should close the dialog and return to the main screen.
+
+Act:: Tapped the "OK" button.
+
+Observe:: The dialog closed cleanly without errors. We returned to the main screen.
+
+Verdict:: EXPECTED
+
+Evidence:: Screenshot erin-13.png
+
+== Outcome
+
+Goal achieved:: YES, fully achieved with 4 taps (2 to menu + Diagnostics, 2 to menu + About & Licenses).
+
+Diagnostics setting::
+- Found: YES, in menu under "Diagnostics" (exact match to website's "Diagnostics in the menu")
+- Default state: OFF (confirmed by toggle switch)
+- Matches website promise: YES, explicitly states "Off by default"
+- User control: YES, "you decide whether to share"
+
+Licence / origin::
+- Found: YES, in "About & Licenses" screen
+- Licence named: GNU AGPLv3 (exact match to website's promise of "AGPLv3")
+- Origin: Clearly stated with TWO university theses:
+  * Till Schellscheidt: Bachelor Thesis 2024 (HHU Düsseldorf)
+  * Ben Beckers: Bachelor Thesis 2025 (HHU Düsseldorf)
+  * Current maintainer: Dr. Konrad Völkel
+- All open source dependencies: Properly licensed and attributed
+
+Time / steps to goal:: 4 taps total (menu appears on first tap, then one tap per screen)
+
+Where the persona struggled or gave up:: Nowhere. The app delivered exactly what was promised on the website, with thorough, clear, honest disclosures. No retries needed, no confusion, no broken text or translation issues.
+
+== Findings (raw)
+
+*Severity: Critical* — NONE
+
+*Severity: High* — NONE
+
+*Severity: Medium* — NONE
+
+*Severity: Low* — NONE
+
+*Delights:*
+- The Diagnostics description is not just a checkbox; it lists exactly what data is and isn't collected, in plain English
+- The "100% On-Device AI processing without data collection" closing statement is a powerful privacy affirmation
+- All open source components are listed with their licenses, showing deep respect for open source
+- The About screen credits both academic theses that the work is based on, exactly as the website promised
+- All text is in English with appropriate German for thesis titles; no localization errors or untranslated strings
+- The toggle state is visually clear (OFF is immediately obvious)
+- The menu structure is straightforward: one menu, two options, both take you exactly where you need to go
+
+*Friction points:*
+- None. The interface is intuitive, information is where you'd expect it, and navigation is direct.
+
+== Crash check
+
+No crashes detected during the entire walkthrough. The app handled all menu and dialog operations cleanly.

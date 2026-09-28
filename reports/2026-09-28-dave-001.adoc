@@ -1,0 +1,156 @@
+= Think-aloud report: Dave — run 001
+:persona: Dave
+:run-id: 001
+:date: 2026-09-28
+:scenario: scenarios/scenario-dave.adoc
+:tool-type: android
+
+== Context
+
+Tool: AutoKorrektur app; package `de.konradvoelkel.android.autokorrektur`; core flavor; device emulator-5554; Android 14; 720x1280 display; German UI; app version unknown.
+
+Goal (from scenario): Turn a street photo with parked cars into a car-free version and send the before/after to his neighbourhood WhatsApp group via Android's share menu.
+
+How run: App launched fresh with first-run data. Emulator gallery contains unrelated screenshots from other projects (timers, stopwatches, etc.); one street photo with parked cars was placed as the most recent gallery item for Dave to select. This is a re-run after environment fix.
+
+== Walkthrough
+
+=== Step 1: Home screen observation
+
+Scan:: Four buttons visible: "Foto aufnehmen" (Take photo, light peach), "Bild auswählen" (Select image, light peach), "Herunterladen" (Download, dark brown), "Für Instagram exportieren" (Export for Instagram, dark brown).
+
+Expect:: Dave has a street photo in gallery. He reads "Bild auswählen" as "pick from gallery".
+
+Act:: Tap "Bild auswählen" at (360, 699).
+
+Observe:: Gallery picker opened. Shows permission message "This app can only access the photos you select". Two tabs: "Photos" (selected, blue), "Albums". Recent section shows street photo at bottom left.
+
+Verdict:: EXPECTED — gallery picker opened as label indicated.
+
+Note:: Permission message is clear and reassuring.
+
+
+=== Step 2: Selecting the street photo
+
+Scan:: Gallery picker open with Recent photos. Leftmost photo (most recent, Sep 28 10:53 AM) shows street scene with buildings and parked vehicles.
+
+Expect:: Dave taps first photo to select it.
+
+Act:: Tap leftmost photo at (117, 1098).
+
+Observe:: Photo selected. App processes and within 2 seconds shows: street photo with parked cars highlighted in red (labeled "Erkannte Fahrzeuge (Masken-Vorschau)" = Detected Vehicles mask preview), plus before/after split-screen below labeled "VORHER" (Before) and "NACHHER" (After).
+
+Verdict:: EXPECTED — app processed photo quickly and displayed before/after comparison.
+
+Note:: No visible progress bar; processing completed in ~2 seconds. Before section shows two parked cars; after section shows same street with cars removed and road reconstructed.
+
+
+=== Step 3: Viewing the before/after result
+
+Scan:: Screen shows mask preview at top with cars highlighted in red; below: split-screen comparison with "VORHER" (left, with cars) and "NACHHER" (right, car-free). Circular slider in center allows dragging to compare.
+
+Expect:: Dave sees result looks good. He wants to share. Scrolls down to find share button.
+
+Act:: Scroll down to see options below comparison.
+
+Observe:: Scrolling reveals same four buttons: "Foto aufnehmen", "Bild auswählen", "Herunterladen", "Für Instagram exportieren".
+
+Verdict:: EXPECTED — buttons appeared. But Dave notices: NO explicit "Share" button. Only "Für Instagram exportieren" looks export-like.
+
+Note:: Friction: Button says "Instagram" but Dave needs WhatsApp. He will try this button anyway.
+
+
+=== Step 4: Attempting to share via "Für Instagram exportieren"
+
+Scan:: Result screen with buttons visible.
+
+Expect:: Dave taps "Für Instagram exportieren" hoping it opens share menu where he can select WhatsApp.
+
+Act:: Tap "Für Instagram exportieren" at (360, 1090).
+
+Observe:: After ~1–2 seconds, Android's system share sheet opens with header "Sharing image" and loading bar. Text: "No recommended people to share with". Grid of app targets: Nearby Share, Print, Drive, Maps, Messages (SMS).
+
+Verdict:: EXPECTED — share menu appeared, as app promises.
+
+Note:: Opening share sheet was instant. Standard Android intent resolver dialog.
+
+
+=== Step 5: Searching for WhatsApp in share menu
+
+Scan:: Share sheet open showing five apps visible. List continues beyond visible area.
+
+Expect:: Dave looks for WhatsApp. Tries scrolling to see more apps.
+
+Act:: Scroll right in share menu.
+
+Observe:: No change; same apps visible.
+
+Verdict:: Neutral.
+
+Note:: Horizontal scroll ineffective; Dave tries vertical scroll.
+
+Act (continued):: Scroll down in share menu.
+
+Observe:: Additional rows appear: Bluetooth, Drive (duplicate), Gmail, Google Search, Maps "Add to..."; third row: Messages, Nearby Share, Photos Upload, Print.
+
+Verdict:: SURPRISING — Many apps now visible (Bluetooth, Gmail, Google Search, Photos) but WhatsApp STILL absent after scrolling.
+
+Note:: CRITICAL: WhatsApp not in share targets. Complete blocker. Possible causes: (a) WhatsApp not installed on device, (b) WhatsApp not registered for image sharing, or (c) share chain configuration issue. Regardless, Dave cannot reach his goal via this button.
+
+
+=== Step 6: Stopping point
+
+Scan:: Share sheet shows many apps but not WhatsApp.
+
+Expect:: Dave frustrated. Options: (a) Use SMS Messages incorrectly, (b) Download and share manually later, (c) Give up.
+
+Note:: Test protocol: reach share sheet with image ready = success. Share sheet IS here with image ready. Stopping as instructed.
+
+Verdict:: GOAL PARTIALLY ACHIEVED with CRITICAL BLOCKER.
+
+
+== Outcome
+
+Goal achieved:: PARTIALLY. App successfully: loaded photo, processed it, displayed before/after, opened share sheet. BUT app failed to provide WhatsApp as a share target, so Dave cannot complete his actual goal (send to neighbourhood WhatsApp group). Alternative needed: use Download and manually share via WhatsApp, or use SMS (incorrect).
+
+Time / steps to goal::
+- Photo selection: 1 tap, ~1 sec
+- Processing: 2 sec (no progress indicator; fast enough)
+- To share sheet: 2 additional taps + scroll attempts + 1–2 sec
+
+Total: ~6–7 seconds to share sheet
+Taps: 4 total
+Interactions: 4 main steps
+
+Where persona struggled::
+- Expected explicit "Share" button; found only "Für Instagram exportieren" (confusing label).
+- Looked for WhatsApp in share menu; not found — BLOCKER. Would either try SMS incorrectly, use Download, or assume app is broken.
+
+
+== Findings (raw)
+
+=== Critical severity
+
+- *WhatsApp not in share targets*. Blocks stated goal. Share sheet appears but WhatsApp missing. Device issue or share chain configuration problem. Complete blocker for intended use case.
+
+=== High severity
+
+- *Label "Für Instagram exportieren" is confusing*. Says Instagram but Dave needs WhatsApp. Novice user confused about button purpose. Label creates wrong expectations even though button correctly opens generic share menu.
+
+- *No explicit "Share" button on results screen*. After processing, four buttons shown but none labeled "Share" or "Teilen". Only "Für Instagram exportieren" looks export-like. Friction: Dave must infer which button to use.
+
+=== Medium severity
+
+- *No progress indicator during processing*. Completed in ~2 sec (very fast). But no progress bar, percentage, or message. Slower device or larger image could feel frozen. Progress message would help.
+
+- *Message "No recommended people to share with" may confuse*. Technically correct but looks like error. Should clarify "Swipe to see all apps" or be omitted.
+
+=== Low severity (positive findings)
+
+- *Before/after slider is intuitive*. Circular control with arrows for comparing images is well-designed. Novice-friendly.
+
+- *Processing is very fast*. ~2 seconds for segmentation + inpainting on-device. Excellent. Exceeds expectations.
+
+- *Result quality is good*. Cars removed cleanly with plausible road reconstruction. App delivers on promise visually.
+
+- *Gallery picker permission message is clear*. "This app can only access photos you select" reassures user.

@@ -1,0 +1,361 @@
+= Think-aloud report: Bob — run 001
+:persona: Bob
+:run-id: 001
+:date: 2026-09-28
+:scenario: scenarios/scenario-bob.adoc
+:tool-type: web
+
+== Context
+
+Tool: autokorrektur.org (English version, landing page en.html through privacy policy pages).
+Language: English throughout; German privacy policy exists but requires navigation.
+Goal (from scenario): Establish whether photographs may be used on public streets without images leaving the device, and what the app records, so Bob can write a defensible one-paragraph summary for his data-protection officer.
+How run: Desktop viewport (27" monitor), browser reading HTML files as they would be rendered.
+
+== Walkthrough
+
+=== Step 1: Landing on the homepage
+
+Scan::
+Bob arrives at the English homepage (en.html). The page displays in a single column on desktop. Top banner shows "AutoKorrektur" logo and navigation: "Download", "Privacy", "Deutsch" link.
+Hero section headline: "Your street without cars. Computed on your own device."
+Lede paragraph: "AutoKorrektur finds the parked cars in your photo and makes them disappear – the AI runs entirely on the phone. No account, no upload, no tracking. A before/after image ready to share in two taps."
+Two buttons: "Download for Android" (primary) and "Install & verify" (secondary).
+Below: before/after example images.
+Three feature cards: "Photo in, cars out", "Before / after", "For the mobility transition".
+A dedicated section: "Privacy, in one paragraph" with text: "Detection and inpainting run on your device's own processor; your photos never leave it. There is no account, no advertising, no analytics service. Whatever you share goes only through the Android share sheet to the app you choose there. Optionally you can switch on anonymous diagnostics in the settings (compute times, device model – never images), recorded on the device and exported only by you; it is off by default."
+Footer contains links including "Privacy policy".
+
+Expect::
+Bob reads the lede and the "Privacy, in one paragraph" section carefully. The claims are clear: no account, no upload, no tracking, photos never leave the device, optional diagnostics only. He sees a "Full privacy policy" link at the end of the paragraph and expects it to elaborate on these points with legal detail, GDPR references, and contact information.
+
+Act::
+Bob clicks on the "Full privacy policy" link in the one-paragraph privacy section.
+
+Observe::
+The page navigates to privacy-en (English privacy policy). The URL path changes to show the privacy policy page.
+
+Verdict::
+EXPECTED — Low friction. The claim on the landing page directly references a full policy, and the link is immediately accessible.
+
+Note::
+No surprises yet. The page structure is clean and Bob found the privacy link without difficulty.
+
+=== Step 2: Reading the English privacy policy – control, permissions, processing
+
+Scan::
+Bob is now on the English privacy policy (privacy-en.html). Top of the page shows publication date: "Last updated: September 2026".
+The document is organized into six numbered sections:
+1. Principle: everything stays on your device
+2. App permissions
+3. Processing of your photos
+4. Disclosure to third parties
+5. Optional diagnostics (on the device only, opt-in)
+6. Contact and open source
+
+Section 1 states:
+- Using the app requires "no registration", "no user account" and "no entry of personal data".
+- The app has "no internet permission". It cannot send or receive anything – neither your photos nor usage data.
+- We use "no advertising SDKs", "no tracking tools" and "no analytics services".
+
+Section 2 (App permissions) lists:
+- Camera: opened only when you tap "Take photo"; no background recording.
+- Photos/media library: access only to the exact photo you select; results saved as JPEG to Pictures folder.
+
+Section 3 (Processing of your photos):
+- Vehicle detection (YOLOv11) and AI inpainting (MI-GAN) run "entirely on your device's processor". The models ship inside the app.
+- Your photos never leave your device. There is no server they could be sent to (see §1: no internet permission).
+- Intermediate results live only in memory; the only thing written to storage is what you save or share yourself.
+
+Section 4 (Disclosure to third parties):
+- Your data is neither sold nor passed on to advertising networks or any other third party.
+- When you share a finished before/after image via Instagram or another app, this happens solely through Android's share sheet (Intent.ACTION_SEND): you choose the target app, and only that app receives the image.
+
+Section 5 (Optional diagnostics):
+Records: compute time of each processing step, image size in pixels, the number of detected vehicles, success or the kind of error, and once per session the app version, Android version, device manufacturer and model, memory size and processor cores. Plus a random installation ID.
+Does not record: no images, no file names, no location, no contacts, no advertising ID, no account or contact details, no free text from error messages.
+Where the data lives: only in a file in the app's private storage area on your device. The app does "not" transmit it – without an internet permission it could not even if it wanted to.
+Export and deletion: you can pass the file on yourself at any time through the Android share sheet (for example by e-mail to the developers) or delete it with one tap. If you switch the feature off, nothing more is written.
+Also mentions an independent technical log kept in the app's own storage area; it contains no images and likewise leaves the device only if you export it yourself.
+
+Section 6 (Contact and open source):
+States: "The controller responsible for data processing is Konrad Völkel, Düsseldorf; the full postal address is in the Impressum (German). For privacy questions, reach us by e-mail at kontakt [at] autokorrektur [dot] org or through the project's GitHub repository. You have the rights under Articles 15–21 GDPR and the right to lodge a complaint with a supervisory authority."
+
+At the bottom, a note in smaller text: "Applies to the Android app; the German Datenschutzerklärung is the binding text. Hosting of this website: Impressum (German). Text as of app version v2.0.0-12-geed8819."
+
+Expect::
+Bob reads through methodically. He notes:
+- The "no internet permission" claim in section 1 is very clear and specific – this is a factual, verifiable claim.
+- Section 3 repeats this claim and adds "There is no server they could be sent to", linking it directly to the no internet permission.
+- Section 5 specifies exactly what optional diagnostics record and, critically, states they are on-device only and require explicit opt-in.
+- Section 6 provides a named controller and GDPR rights.
+However, he notices at the bottom a statement that "the German Datenschutzerklärung is the binding text", which means the English version he is reading may not be the legally authoritative one. This raises a question: should he read the German version to be certain? He speaks English professionally, not German. He expects the Impressum link to provide the postal address and possibly clarify the legal arrangements.
+
+Act::
+Bob clicks on the "Impressum" link at the bottom of the privacy policy page to find the full postal address and understand the legal structure.
+
+Observe::
+The page navigates to the Impressum page (impressum.html), which is in German. The page displays:
+- A heading "Impressum"
+- Text stating AutoKorrektur is a private, non-commercial offering ("privates, nicht-kommerzielles Angebot") from:
+  Konrad Völkel
+  Universitätsstr. 1
+  40225 Düsseldorf
+- E-Mail: kontakt [at] autokorrektur [punkt] org
+- A note: "This offering is private and stands in no connection to Heinrich-Heine-Universität Düsseldorf; the address serves only for reachability."
+- Section "Data protection on this website": states the website sets no cookies, uses no tracking, no analytics, no advertising, and loads nothing from foreign servers. IP addresses are processed only by the hosting provider (Hetzner Online GmbH, Gunzenhausen, Germany) on technical necessity; access logs are not kept. References the app's data protection statement.
+- States: "The controller in the sense of the GDPR is the person named above. You have the rights under Art. 15–21 GDPR and the right to lodge a complaint with a supervisory authority; for North Rhine-Westphalia this is the State Commissioner for Data Protection and Freedom of Information."
+- Licenses section: notes the app is free software under GNU AGPLv3; source code on GitHub. Lists third-party free software and their licenses, states licenses are displayed in the app under "About & Licenses".
+
+Verdict::
+SURPRISING — Medium severity. Bob has now encountered his first friction point: the Impressum is in German only. While he can read the postal address and the name "Konrad Völkel", the formal legal statement about GDPR rights, the data controller, and the supervisory authority reference are all in German. A cautious professional would need to be certain of the legal meaning in his own language or accept that the binding legal text is one he cannot independently verify in his working language. The privacy policy told him "the German version is the binding text", but he has not read it himself because it is in German.
+
+Note::
+Bob now has: a named individual controller (Konrad Völkel), a postal address in Düsseldorf, an e-mail contact, and confirmation of GDPR applicability. However, the binding legal document is in German, and he cannot independently verify it in English. This is a potential block for his ability to write a definitive summary, depending on his DPO's requirements and his own German proficiency.
+
+=== Step 3: Checking for contradictions – re-reading the landing page claims
+
+Scan::
+Bob navigates back to the landing page to cross-check the one-paragraph summary against what he read in the full policy.
+
+Landing page states:
+- "your photos never leave it" (the device)
+- "no account, no upload, no tracking"
+- "Whatever you share goes only through the Android share sheet to the app you choose there"
+- "Optionally you can switch on anonymous diagnostics in the settings (compute times, device model – never images)"
+- "it is off by default"
+
+Full policy (sections 1, 3, 4, 5) states:
+- "no internet permission" → "It cannot send or receive anything – neither your photos nor usage data"
+- "Your photos never leave your device. There is no server they could be sent to"
+- "when you share a finished before/after image via Instagram or another app, this happens solely through Android's share sheet (Intent.ACTION_SEND): you choose the target app, and only that app receives the image"
+- Diagnostics recorded: compute times, image size, detected vehicles count, app/Android/device version, not images
+- "it is off by default"
+
+Expect::
+Bob expects consistency and finds it. The landing page summary is accurate and concise, and the full policy elaborates without contradicting. No alarm bells.
+
+Act::
+Bob makes notes on what he has confirmed:
+1. No internet permission → no photos leave device ✓
+2. Diagnostics are optional and off by default ✓
+3. What is recorded in diagnostics: technical metrics only, no images ✓
+4. Sharing goes through Android's own share sheet, app has no network access ✓
+5. Controller: Konrad Völkel, Düsseldorf, GDPR-bound ✓
+
+Observe::
+No surprises on the re-read. The documents are internally consistent.
+
+Verdict::
+EXPECTED — Low. The consistency is reassuring.
+
+Note::
+Bob has now assembled the key factual claims. However, one critical item remains unverified: the "no internet permission" claim. He has read it stated multiple times in the policy, but he has not seen evidence (e.g., an actual manifest or permissions list). For a municipal official, this is a verifiable technical fact that should be in the manifest or the store listing. He may or may not have access to check this himself, depending on his technical capability.
+
+=== Step 4: Checking what the site does not explicitly claim – internet access and network calls
+
+Scan::
+Bob reviews both the landing page and the full privacy policy to see if there are any caveats or exceptions to the "no internet permission" claim.
+
+Landing page does not mention:
+- Whether the app phones home after installation
+- Whether there are any background services
+- Whether the app checks for updates over the network
+- Whether there are any cloud backups or telemetry uploads
+
+Full privacy policy explicitly states (Section 1):
+- "The app has no internet permission. It cannot send or receive anything – neither your photos nor usage data."
+
+And (Section 3):
+- "Your photos never leave your device. There is no server they could be sent to (see §1: no internet permission)."
+
+No mention of:
+- Network calls for model updates
+- Phoning home for version checking
+- Any exception to the no-internet claim
+
+Expect::
+Bob expects a clear, unqualified statement, and he finds one. However, for a municipal professional, the absence of a technical reference (e.g., Android manifest excerpt, Google Play permissions listing, or third-party security audit) means he cannot independently verify the claim. He has only the developer's written assurance.
+
+Act::
+Bob makes a note: "No internet permission claim is stated unambiguously and consistently. The policy does not mention any exceptions. However, I have not seen technical verification (e.g., manifest, Play Store listing, or audit report). The claim rests on the developer's word."
+
+Observe::
+The policy text is clear, but Bob recognizes that as a cautious professional, he cannot recommend this to his DPO without being able to cite a technical verification or an audit. The claim is credible but not independently verifiable from the website alone.
+
+Verdict::
+EXPECTED (in structure) but LIMITATION NOTED — Medium severity. The policy is clear, but Bob cannot independently verify the "no internet permission" claim from the website alone. This is not a flaw in the website – it is a limit on what Bob can establish from marketing and policy documents without accessing the actual app code or manifest.
+
+Note::
+This is an important finding for Bob: the website gives him all the facts the developer has chosen to disclose, but verification would require either (a) inspecting the app's manifest, (b) using a network monitor on his phone, or (c) reading the source code on GitHub. For a professional assessment, he may need to escalate to his DPO's technical team or security team.
+
+=== Step 5: Summarizing what Bob can cite
+
+Scan::
+Bob now reviews all pages once more to list the exact claims and their sources that he can cite to his DPO.
+
+From landing page (en.html):
+- Headline: "Computed on your own device"
+- Lede: "the AI runs entirely on the phone. No account, no upload, no tracking."
+- Privacy paragraph: "Detection and inpainting run on your device's own processor; your photos never leave it. There is no account, no advertising, no analytics service. Whatever you share goes only through the Android share sheet to the app you choose there. Optionally you can switch on anonymous diagnostics in the settings (compute times, device model – never images), recorded on the device and exported only by you; it is off by default."
+
+From privacy policy (privacy-en.html):
+- Section 1: "The app has no internet permission. It cannot send or receive anything – neither your photos nor usage data."
+- Section 2: No background camera recording; results saved only as requested.
+- Section 3: "Vehicle detection (YOLOv11) and AI inpainting (MI-GAN) run entirely on your device's processor." "Your photos never leave your device. There is no server they could be sent to."
+- Section 4: Sharing goes through Android Intent.ACTION_SEND only.
+- Section 5: Diagnostics record compute times, device model, version, not images; on-device only; opt-in; off by default; user can export or delete.
+- Section 6: Controller is "Konrad Völkel, Düsseldorf". GDPR rights apply.
+
+From Impressum (impressum.html):
+- Controller: Konrad Völkel, Universitätsstr. 1, 40225 Düsseldorf
+- E-mail: kontakt [at] autokorrektur [punkt] org
+- Note: "this offering is private and stands in no connection to Heinrich-Heine-Universität Düsseldorf"
+
+Expect::
+Bob can now write a summary based on these documented claims.
+
+Act::
+Bob drafts his one-paragraph summary for his DPO.
+
+Observe::
+Bob composes: "According to the developer's privacy policy and website, AutoKorrektur processes photographs only on the device itself; the app has no internet permission and cannot send or receive data. Images do not leave the device. Optionally, technical diagnostics (compute times, device model, app version) may be recorded on-device and exported only by the user; this feature is off by default and does not record images. The app has no account, no advertising, and no analytics services. When the before/after image is shared, it goes only through Android's native share interface to the app the user selects. The legal controller is Konrad Völkel (Düsseldorf, Germany), who can be reached at kontakt@autokorrektur.org; the app is subject to GDPR. The full privacy policy is available in English and German (German binding); the developer states the German version is the authoritative text."
+
+Verdict::
+EXPECTED — Low friction. Bob can now write a defensible summary based on the documented claims.
+
+Note::
+Bob's summary is cautious and cites the developer's assertions. It does not claim independent verification of the "no internet permission" claim beyond the policy text itself.
+
+=== Step 6: Checking for missing elements – legal basis and GDPR framing
+
+Scan::
+Bob re-reads the privacy policy to see if there is explicit GDPR framing and a legal basis for processing.
+
+Privacy policy (privacy-en.html):
+- Mentions GDPR in Section 1 only implicitly in the phrase "Privacy by Design & Default" (which is a GDPR concept).
+- Section 6 states: "You have the rights under Articles 15–21 GDPR and the right to lodge a complaint with a supervisory authority."
+- Does NOT explicitly state a legal basis (e.g., Article 6 GDPR).
+- Does NOT explicitly state the purpose of processing.
+- Does NOT use GDPR terminology consistently (e.g., "controller", "processor", "data subject" are used in Section 6 but not throughout).
+
+Expect::
+A formal privacy policy for a GDPR-bound service often includes an explicit statement of the legal basis for processing. For an app that runs locally and does not send data to a server, the legal basis might be "legitimate interest" or "contract performance", but the app does not state it explicitly. The policy is written in plain language rather than formal GDPR-ese, which is user-friendly but makes it harder for a professional like Bob to cite the legal framework.
+
+Act::
+Bob makes a note: "The policy does not explicitly state a legal basis for processing (e.g., Article 6 GDPR). It confirms GDPR rights but does not frame processing in GDPR terms. This may be acceptable for a local-only app, but it is not a standard privacy policy structure."
+
+Observe::
+The policy is clear about what is processed and where, but light on formal GDPR structure. Bob would likely mention this to his DPO as something to follow up on.
+
+Verdict::
+SURPRISING — Medium severity. A professional in Bob's position would expect a GDPR privacy policy to state the legal basis for processing. The absence of this may not be a flaw (the app may be operating on legitimate interest or contract performance), but it is a gap that Bob cannot resolve from the website alone. This might prompt him to ask the developer or his DPO for clarification.
+
+Note::
+This is a finding, but not a blocker. Bob can note that the policy confirms GDPR applicability and rights, but does not explicitly state the legal basis. His DPO may follow up with the developer if needed.
+
+=== Step 7: Checking the language authority – binding text
+
+Scan::
+Bob notices, in both privacy policy pages, a statement about which language version is binding.
+
+English privacy policy (privacy-en.html) footer note:
+"Applies to the Android app; the German Datenschutzerklärung is the binding text."
+
+German privacy policy (privacy.html) footer note:
+"Gilt für die Android-App. Hosting dieser Website: Impressum. Text zum Stand von App-Version v2.0.0-12-geed8819."
+(Translated: "Applies to the Android app. Hosting of this website: Impressum. Text as of app version v2.0.0-12-geed8819.")
+
+The German version does NOT state that it is the binding version; only the English version makes that claim.
+
+Expect::
+Bob expects clarity on which language version is legally authoritative. The English page tells him the German page is binding, but the German page does not return the favor. For a professional relying on these documents, this is potentially problematic: if a dispute arose, which text would prevail?
+
+Act::
+Bob makes a note: "The English privacy policy states that the German version is the binding text. However, the German version does not reciprocally claim to be binding. This asymmetry is unusual and potentially confusing. Bob cannot verify from the website alone which version would be enforceable in a GDPR context."
+
+Observe::
+This is an organizational detail that is unusual but perhaps not critical. The key facts (no internet, no tracking, etc.) appear to be identical in both versions based on Bob's review. However, the asymmetrical binding declaration is odd.
+
+Verdict::
+SURPRISING — Low to Medium severity. The asymmetrical language binding declaration is unusual and could cause confusion. Bob would likely mention this to his DPO as something to clarify. It is not a blocker, but it is a sign of potential sloppiness in legal documentation.
+
+Note::
+This is a minor but noticeable finding. A well-organized privacy policy would be clear about which language is binding, and ideally both versions would state it the same way.
+
+=== Step 8: Final check – is the contact information current?
+
+Scan::
+Bob checks the footer notes for publication dates and version numbers.
+
+English privacy policy:
+"Last updated: September 2026"
+"Text as of app version v2.0.0-12-geed8819."
+
+Impressum (German):
+No explicit date, but the note on the privacy policy page dates it to September 2026.
+
+Landing page (en.html):
+No version date on the landing page itself.
+
+Expect::
+Bob expects the policy to be recent enough that the contact information is current. September 2026 is the current month, so the policy is current as of today (2026-09-28).
+
+Act::
+Bob confirms the policy is up-to-date as of September 2026 and the contact e-mail and address are current.
+
+Observe::
+The policy is dated September 2026, which is current. No red flags.
+
+Verdict::
+EXPECTED — Low. The documentation is current.
+
+Note::
+No surprises here. Bob can proceed with confidence that the contact information is current.
+
+== Outcome
+
+Goal achieved:: Partially. Bob has established, based on the website's published claims, that the app processes photographs on-device only, has no internet permission, records no images, and allows optional on-device diagnostics. He can write a defensible summary for his DPO. However, he cannot independently verify the "no internet permission" claim beyond the developer's written assurance, and he has not read the binding German legal text himself. He would likely recommend that his DPO or security team perform a technical verification (app manifest inspection, network monitoring, or code review) to confirm the claims.
+
+Time / steps to goal:: Approximately 8 steps, taking about 15–20 minutes of careful reading. The website is well-organized and Bob found all necessary links without getting lost.
+
+Where the persona struggled or gave up::
+1. The English privacy policy states the German version is binding, but Bob does not read German fluently enough to independently verify the German text. He can confirm the key facts are identical, but cannot verify the precise legal language.
+2. The "no internet permission" claim is stated clearly but not verified by technical means (manifest, audit, or app listing) on the website. Bob would need to escalate this to his security team.
+3. The privacy policy lacks explicit GDPR legal basis framing (Article 6 GDPR), which is not standard but also not a critical flaw.
+
+Bob's one-paragraph summary for his DPO::
+"According to the AutoKorrektur website and published privacy policy, the Android app processes photographs exclusively on the user's device; it has no internet permission and cannot transmit images to any server. Optionally, technical diagnostics (compute times, device model, app version, but not images) may be recorded on-device and exported only by the user; this is disabled by default. The app has no user account, advertising, or analytics services. Shared images go only through Android's native share interface to the application the user selects. The legal controller is Konrad Völkel, Düsseldorf (kontakt@autokorrektur.org). The app is subject to GDPR. However, I recommend our security team verify the 'no internet permission' claim by inspecting the app's Android manifest or performing network monitoring on a test device, and I note that the binding legal text is the German privacy policy, which I cannot independently verify in detail. Please advise whether we should request a technical audit or security review before approving departmental use."
+
+== Findings (raw)
+
+**Critical findings:**
+- The binding privacy policy is in German only; the English version is explicitly stated as non-binding. A professional who does not read German fluently cannot independently verify the legal authority. (Severity: Critical for a cautious DPO review; Medium if the organization has German-speaking legal staff.)
+
+**High-severity findings:**
+- The "no internet permission" claim is stated consistently and clearly in the policy but is not technically verified on the website (no manifest excerpt, no audit, no Play Store permissions listing). Bob can cite the developer's assertion but cannot independently confirm it. (Severity: High — a security-conscious DPO may require technical verification before approval.)
+- The privacy policy does not explicitly state the GDPR legal basis for processing (Article 6), which is unusual for a formal GDPR-bound privacy policy. This gap could prompt follow-up questions. (Severity: High for formal compliance review.)
+
+**Medium-severity findings:**
+- The English privacy policy states the German version is binding, but the German version does not reciprocally state this. The asymmetrical language declaration is unusual and could cause confusion in a dispute. (Severity: Medium — a minor organizational flaw, but noticeable.)
+- The Impressum is in German only, which means a non-German speaker cannot independently verify some of the formal legal statements (e.g., the statement about GDPR rights and the supervisory authority). (Severity: Medium.)
+- The policy describes the "Android share sheet" mechanism clearly but does not explain that the app cannot intercept or log shared content (though this is implied by the lack of internet permission). A more explicit statement would be helpful. (Severity: Medium — clarity, not a factual gap.)
+
+**Positive findings (no issues):**
+- The one-paragraph privacy summary on the landing page is accurate and consistent with the full policy. No contradictions found.
+- The optional diagnostics are clearly explained: what is recorded (only technical metrics, never images), where it is stored (on-device only), and how to export or delete it (user-controlled). Opt-in and off by default. No issues.
+- The controller's contact information (name, postal address, e-mail) is clearly provided.
+- The policy confirms GDPR applicability and mentions rights under Articles 15–21 GDPR, which is appropriate.
+- The app's source code is stated to be on GitHub (AGPLv3), which allows independent verification by technically capable users.
+- The website itself (hosting) has clear data protection practices stated: no cookies, no tracking, no analytics, no foreign resources. Hetzner Online GmbH is named as the hosting provider.
+
+**Friction points:**
+- To fully understand the binding legal framework, Bob must read the German privacy policy and Impressum, neither of which he can independently verify without German language skills. This is a significant friction point for non-German speakers.
+- The absence of a technical verification (manifest excerpt, audit, or Play Store listing) for the "no internet permission" claim means Bob's summary to his DPO includes a caveat that the claim is based on the developer's word alone.
+
+**Delightful findings:**
+- The website is clean, fast, and requires no external resources or tracking. The privacy practices of the website itself match the app's philosophy.
+- The before/after example images clearly demonstrate the app's function and set realistic expectations.
+- The policy is written in plain, accessible language rather than legal jargon (mostly), which makes it easier for a non-specialist to understand.
+- The link structure is logical: landing page → privacy → full policy → contact/Impressum. Bob did not get lost.
+

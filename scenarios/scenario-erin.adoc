@@ -1,0 +1,22 @@
+= Scenario: Erin
+:persona: Erin
+:tool-type: android
+
+== Persona
+
+Erin is a 29-year-old data-protection-conscious software tester who installed the app after reading the website's privacy paragraph.
+Context / device: the installed app on an Android 14 phone, 720x1280 screen. The app is in English (applied via Android per-app language on a shared development emulator).
+Expertise: expert with mobile apps; she reads settings screens before using a feature and expects an About screen to name a licence.
+Mindset: cautious and thorough, but not hostile. She pokes at the edges of an app first — menus, settings, anything the website promised — and she notices untranslated or wrong text immediately.
+
+== Goal
+
+Erin wants to confirm, from inside the app, the two things the website promised her — that the diagnostics logging is off by default and under her control, and that the app states its licence and origin — before she processes any photo of her own.
+
+== Starting point
+
+She opens the installed app (fresh app data) on an English-language phone and goes looking for settings and an about screen.
+
+== Success criteria
+
+Erin has found the diagnostics setting, confirmed its default state, and found the licence/attribution information — or she can say which of those the app does not let her see.

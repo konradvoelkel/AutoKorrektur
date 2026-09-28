@@ -1,0 +1,22 @@
+= Scenario: Dave
+:persona: Dave
+:tool-type: android
+
+== Persona
+
+Dave is a 41-year-old delivery driver who joined a neighbourhood chat group about a planned parking-space conversion.
+Context / device: the installed app on a small, older-feeling Android phone — 720x1280 screen, Android 14. The app is in German (the device is a shared development emulator whose own UI is English, so German is applied to the app itself via Android per-app language; the app UI Dave sees is fully German).
+Expertise: novice. He uses WhatsApp, the camera, and Google Maps. He has never used an image editor and does not know what "inpainting" or "segmentation" means.
+Mindset: mildly impatient and easily discouraged. If something takes long with no sign of progress he assumes it is broken.
+
+== Goal
+
+Dave wants to turn a photo of a parked-up street into a car-free picture and send the before/after to his neighbourhood chat group.
+
+== Starting point
+
+He taps the AutoKorrektur icon on the home screen of his phone (fresh app data, no onboarding seen before). Photos of streets are already in his gallery.
+
+== Success criteria
+
+A before/after image has left the app through the Android share sheet — or Dave abandoned the attempt, and the point at which he gave up is recorded.
