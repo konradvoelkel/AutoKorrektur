@@ -24,7 +24,7 @@
       <a class="button primary" href="download/__APK_FILE__">Download for Android<small>APK · __APK_MB__ MB · version __APK_VERSION__</small></a>
       <a class="button secondary" href="#android">Install it step by step<small>guide, checksum, certificate</small></a>
     </div>
-    <p class="note">Early test build: crashes are possible and image quality can be worse than the examples. <a href="#android">What that means</a>.</p>
+    <p class="note">Early test build: crashes are possible and image quality can be worse than the examples. <a href="#testbuild">What that means</a>.</p>
   </section>
 
   <div class="pair">
@@ -44,7 +44,7 @@
   <p>Detection and inpainting run on your device's own processor; your photos never leave it. There is no account, no advertising, no analytics service. Whatever you share goes only through the Android share sheet to the app you choose there. Optionally you can switch on anonymous diagnostics in the settings (compute times, device model – never images), recorded on the device and exported only by you; it is off by default. <a href="privacy-en">Full privacy policy</a> (the <a href="privacy" lang="de">German version</a> is the binding one).</p>
 
   <h2 id="android">Android: download and install</h2>
-  <p>AutoKorrektur is here as a signed APK you can install directly. Google Play (package <code>de.konradvoelkel.android.autokorrektur</code>) comes later. Android 10 or newer; a device with 4 GB of RAM or more is recommended, older devices take longer.</p>
+  <p>AutoKorrektur is here as a signed APK you can install directly. Google Play (package <code>de.konradvoelkel.android.autokorrektur</code>) comes later. Android 10 or newer; a device with 4 GB of RAM or more is recommended, older devices take longer (to check what your phone has, look under Settings → About phone).</p>
   <table>
     <tr><th>File</th><th>For</th><th>Size</th></tr>
     <tr><td><a href="download/__APK_FILE__">__APK_FILE__</a></td><td>practically every phone and tablet (64-bit ARM)</td><td>__APK_MB__ MB</td></tr>
@@ -52,11 +52,11 @@
   <p>Installing it (“sideloading”): download the file on the phone, tap it in the notification or in your <em>Downloads</em> folder, and allow your browser to install unknown apps when Android asks. Android checks the rest itself.</p>
   <p>Version __APK_VERSION__, built __APK_DATE__. The file's SHA-256 is in <a href="download/SHA256SUMS">SHA256SUMS</a>. Every release is signed with the same certificate; its SHA-256 fingerprint is <span class="mono sum">10:0a:d8:62:bb:84:19:45:42:76:5f:4e:30:33:47:e8:4f:fc:14:af:e9:c6:bb:3a:8b:20:1c:bc:97:98:38:9f</span> – check it with <code>apksigner verify --print-certs</code>.</p>
   <p>To do it yourself: <code>sha256sum &lt;file&gt;</code> (Linux), <code>shasum -a 256 &lt;file&gt;</code> (macOS) or <code>certutil -hashfile &lt;file&gt; SHA256</code> (Windows) — the output must match the line in <a href="download/SHA256SUMS">SHA256SUMS</a>. <code>apksigner</code> ships with the Android SDK build-tools (<code>build-tools/&lt;version&gt;/apksigner</code>); without the SDK the checksum on its own already tells you a lot.</p>
-  <p class="note">This is an early test build: almost all of it has only ever been computed in an emulator. The app has run on a real phone exactly once, and it crashed on the first menu item opened; that bug is fixed in the version offered here. Everything else is still untested on real hardware: compute times and image quality can be markedly worse than the examples above, and a crash is possible. Bug reports are genuinely welcome: write to kontakt [at] autokorrektur [punkt] org, or see the <a href="impressum">Impressum</a> (German).</p>
+  <p class="note" id="testbuild">This is an early test build: almost all of it has only ever been computed in an emulator. The app has run on a real phone exactly once, and it crashed on the first menu item opened; that bug is fixed in the version offered here. Everything else is still untested on real hardware: compute times and image quality can be markedly worse than the examples above, and a crash is possible. Bug reports are genuinely welcome: write to kontakt [at] autokorrektur [dot] org, or see the <a href="impressum">Impressum</a> (German).</p>
   <p class="note">Version __VERSION__, as of __DATE__. The source code is on <a href="https://github.com/konradvoelkel/AutoKorrektur">GitHub</a>.</p>
 
   <h2>Who is behind this</h2>
-  <p>AutoKorrektur 2.0 is the native Android rewrite of Benjamin Beckers' <a href="https://github.com/BenB2/AutoKorrektur">browser version (1.0)</a> and a private project by Konrad Völkel in Düsseldorf. It builds on two bachelor theses at Heinrich Heine University Düsseldorf (Till Schellscheidt 2024, “Autokorrektur – Automatisierte Objektersetzung in Fotos”; Ben Beckers 2025, “Autokorrektur – Inpainting auf mobilen Endgeräten”). Questions and bug reports: Konrad Völkel, Universitätsstr. 1, 40225 Düsseldorf, kontakt [at] autokorrektur [punkt] org — the full <a href="impressum">Impressum</a> is in German.</p>
+  <p>AutoKorrektur 2.0 is the native Android rewrite of Benjamin Beckers' <a href="https://github.com/BenB2/AutoKorrektur">browser version (1.0)</a> and a private project by Konrad Völkel in Düsseldorf. It builds on two bachelor theses at Heinrich Heine University Düsseldorf (Till Schellscheidt 2024, “Autokorrektur – Automatisierte Objektersetzung in Fotos”; Ben Beckers 2025, “Autokorrektur – Inpainting auf mobilen Endgeräten”). Questions and bug reports: Konrad Völkel, Universitätsstr. 1, 40225 Düsseldorf, kontakt [at] autokorrektur [dot] org — the full <a href="impressum">Impressum</a> is in German.</p>
 </main>
 <footer class="site">
   <a href="privacy-en">Privacy policy</a><a href="impressum">Impressum</a><a href="./" lang="de">Deutsch</a>
