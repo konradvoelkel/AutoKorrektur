@@ -101,8 +101,8 @@ byte-identical to `site/dist/`. UX-10 was owner/infra and is now done in the ser
       `autokorrektur`, tracked and done there as **B13** (`ef3be16`, 2026-09-29) — `browse` on a
       matcher for exactly `/download` and `/download/`, deliberately not `/download/*`, so the one
       intentionally public directory lists itself and no other path does. Verified live on
-      2026-09-29: `/download/` returns 200 and lists the APK, `SHA256SUMS` and `apache-2.0.txt`;
-      `/download` 308-redirects to it; `/icons/` still 404s. Nothing left to do in this repo. (Low)
+      2026-09-29: `/download/` returns 200 and lists the APK and `SHA256SUMS`; `/download`
+      308-redirects to it; `/icons/` still 404s. Nothing left to do in this repo. (Low)
 
 ### 🧭 Milestone 1c: Usability run 002
 Five fresh personas on 2026-09-28 — two re-walking the paths UX-01 to UX-09 touched, three on ground
@@ -134,8 +134,13 @@ row into the body. And `site/dist/` is gitignored and was rebuilt from source he
 carry UX-15/UX-22/UX-25 while the published APK stays byte-identical
 (`accc64b0…`, unchanged — never republish different bytes under a checksummed name).
 
-**Not yet deployed:** the site half of this batch reaches users only at the next `site/deploy.sh`
-run. The app half reaches users only at the next release build.
+**Shipped 2026-09-29** as `v2.0.0-25-gddaed40`. The release APK was rebuilt without
+`-PscreenshotAbi` (arm64-only, 0 x86_64 libs, release-signed, checked before publishing) and
+`site/deploy.sh` put both halves up. Verified live afterwards: the pages carry UX-15/UX-22/UX-25,
+`/download/` serves `autokorrektur-2.0.0-25-gddaed40-arm64-v8a.apk`, and the published
+`SHA256SUMS` matches the local build byte for byte (`6aabc7e9…`). The previous APK
+(`…-21-g2e25a9e`) is gone rather than overwritten — a new version gets a new filename, so no name
+anyone has checksummed was ever rebound to different bytes.
 
 - [x] **UX-11. Deleting diagnostics data looks like it silently failed.** Delete works — but the
       switch stays on, so `Telemetry.clear()` immediately mints a new install ID and writes a new
