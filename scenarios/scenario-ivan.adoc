@@ -1,0 +1,24 @@
+= Scenario: Ivan
+:persona: Ivan
+:tool-type: android
+:run: 002
+:kind: new-ground
+
+== Persona
+
+Ivan is a 38-year-old works-council member at a logistics company, self-taught on data protection.
+Context / device: the installed app on a 720x1280 Android 14 phone (emulator-5554), English app language, fresh app data.
+Expertise: expert at reading settings screens and privacy texts; not a developer, cannot read code.
+Mindset: meticulous and adversarial in a fair way. He does not accept "we don't collect data" as a claim; he wants to see the switch, turn it on, look at what was recorded, and then delete it and confirm it is gone.
+
+== Goal
+
+Ivan wants to exercise the diagnostics feature end to end — find it, see its default, switch it on, process a photo, read what was actually recorded about him, export it, then delete it and confirm the deletion — so he can tell colleagues exactly what the app keeps.
+
+== Starting point
+
+He opens the app with fresh app data and goes looking for diagnostics or settings.
+
+== Success criteria
+
+Ivan can state the default, has seen the actual recorded content with his own eyes, and has confirmed that deleting it worked — or he can name which of those the app did not let him do. Whether the install ID, the export format and the delete confirmation are comprehensible to a non-developer is the substance of the finding.

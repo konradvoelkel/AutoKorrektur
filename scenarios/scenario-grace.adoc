@@ -1,0 +1,33 @@
+= Scenario: Grace
+:persona: Grace
+:tool-type: android
+:run: 002
+:kind: regression
+
+== Persona
+
+Grace is a 27-year-old hairdresser who is annoyed that the delivery vans on her street block the pavement with her pram.
+Context / device: the installed app on a 720x1280 Android 14 phone (emulator-5554), German app language via Android per-app language, fresh app data.
+Expertise: novice. She edits photos with the filter slider in her gallery app and nothing more. "Maske", "Segmentierung" and "Inpainting" mean nothing to her.
+Mindset: impatient and quick to conclude something is broken. She will not scroll looking for a feature she has no reason to believe exists.
+
+== Goal
+
+Grace wants to turn a photo of her parked-up street into a picture without the cars and send it to her residents' WhatsApp group.
+
+== Starting point
+
+She taps the app icon with fresh app data. Street photos are already in the phone's gallery.
+
+== Success criteria
+
+A before/after image has left the app through the Android share sheet — or she gave up, and the point where she did is recorded.
+
+== Regression note
+
+This re-walks the path that produced UX-01 (result screen led with the red mask preview),
+UX-02 (zero detections produced no message), UX-03 (export buttons live before there is
+anything to export) and UX-04 ("Für Instagram exportieren" was the only share control).
+All four are recorded as fixed. Grace must not be told so. In addition to her own photo,
+she should at some point process a photo with no cars in it — a plain building or a room —
+because that is the case UX-02 covers, and record what the app tells her.

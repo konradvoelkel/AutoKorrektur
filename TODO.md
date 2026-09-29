@@ -62,8 +62,9 @@ claim was the eleventh finding and is already fixed (`322f984`, deployed).
 UX-01 to UX-09 were implemented on 2026-09-28 and verified on an x86_64 emulator (`core`, German
 and English): a fresh launch shows both result actions disabled, a processed street photo opens on
 the before/after slider with the mask preview below it, and a car-free photo is captioned "Keine
-Fahrzeuge erkannt" with the actions still disabled. The site half is committed but only reaches
-users at the next `site/deploy.sh` run. UX-10 is owner/infra and stays open.
+Fahrzeuge erkannt" with the actions still disabled. The site half is deployed too — verified on
+2026-09-28 during usability run 002, when the live `index.html` and `en.html` were found
+byte-identical to `site/dist/`. UX-10 was owner/infra and is now done in the server repo (below).
 
 - [x] **UX-01. The result screen leads with the mask preview.** After processing, the red
       "Erkannte Fahrzeuge (Masken-Vorschau)" overlay fills the first screenful and the before/after
@@ -94,9 +95,116 @@ users at the next `site/deploy.sh` run. UX-10 is owner/infra and stays open.
       how to compute a SHA-256. (Low)
 - [x] **UX-09. "Ein Vorher/Nachher-Bild zum Teilen in zwei Tipps" overstates the flow** — measured
       at four taps plus a scroll, on an already-picked photo. (Low)
-- [ ] **UX-10. `https://autokorrektur.org/download/` returns 404.** Nothing links to the bare
-      directory, so only a URL-trimming visitor meets it — which is exactly the verification-minded
-      reader. Owner/infra: Caddy lives in `~/files/work/server` (role `autokorrektur`), not here. (Low)
+- [x] **UX-10. `https://autokorrektur.org/download/` returned 404.** Nothing links to the bare
+      directory, so only a URL-trimming visitor met it — which is exactly the verification-minded
+      reader. Owner/infra, so it was fixed where Caddy lives: `~/files/work/server`, role
+      `autokorrektur`, tracked and done there as **B13** (`ef3be16`, 2026-09-29) — `browse` on a
+      matcher for exactly `/download` and `/download/`, deliberately not `/download/*`, so the one
+      intentionally public directory lists itself and no other path does. Verified live on
+      2026-09-29: `/download/` returns 200 and lists the APK, `SHA256SUMS` and `apache-2.0.txt`;
+      `/download` 308-redirects to it; `/icons/` still 404s. Nothing left to do in this repo. (Low)
+
+### 🧭 Milestone 1c: Usability run 002
+Five fresh personas on 2026-09-28 — two re-walking the paths UX-01 to UX-09 touched, three on ground
+run 001 never reached (the camera path, diagnostics end to end, a Turkish-locale device). Ranked in
+`reports/improvements-002.adoc`; scenarios `frank`, `grace`, `heidi`, `ivan`, `judy`.
+
+**UX-01 to UX-09 all hold.** Re-confirmed blind: each persona was denied access to this file and to
+the scenarios' own regression notes, so nothing told them what had changed. Findings discarded as
+test artefacts — including a Critical "diagnostics delete is a no-op" that turned out to be a
+mis-aimed tap — are listed in that report and are not repeated here.
+
+The theme is narrower than run 001's: *the app states an outcome but not its consequence*. UX-11,
+UX-13, UX-15 and UX-16 are all that shape, and all four are wording or one-line-of-feedback fixes.
+
+**UX-11 to UX-25 were implemented on 2026-09-29** and verified on an x86_64 emulator (`core`, both
+languages) — 93 unit tests green, `verifyCoreDebugPermissions` / `verifyFullDebugPermissions` green.
+Verified by hand on the device, not just in code: diagnostics deleted leaves `0 events · 0.0 KB`,
+no install-ID line, `telemetry_enabled=false` and no `events.jsonl` on disk; the event list reads
+"Sep 29, 11:01 — Photo processed: 1 vehicle found, 1.3 s"; a car-free photo records
+`detections=0, inpaint_ms=3` (a street photo's was 1090) and shows the unchanged image with no
+slider and the line "Nothing was changed, so there is nothing to save."; the camera rationale
+appears on the first ask only; and with the device in English but the app in German the overflow
+icon is described "Weitere Optionen" and dialogs say "Abbrechen".
+
+Two things found while fixing, both now handled and worth remembering: the diagnostics dialog grew
+taller than a 720x1280 screen once the event list was added, which pushed its own **Delete button
+off the bottom** — the body is now a height-capped ScrollView and Delete moved out of the button
+row into the body. And `site/dist/` is gitignored and was rebuilt from source here, so the pages
+carry UX-15/UX-22/UX-25 while the published APK stays byte-identical
+(`accc64b0…`, unchanged — never republish different bytes under a checksummed name).
+
+**Not yet deployed:** the site half of this batch reaches users only at the next `site/deploy.sh`
+run. The app half reaches users only at the next release build.
+
+- [x] **UX-11. Deleting diagnostics data looks like it silently failed.** Delete works — but the
+      switch stays on, so `Telemetry.clear()` immediately mints a new install ID and writes a new
+      `session_start` (`telemetry/Telemetry.kt:101-112`, deliberate). Reopening the dialog shows
+      "1 event · ID 8d49ed78…" seconds after confirming "Delete all recorded diagnostics and the
+      installation ID?". Either turn the switch off as part of deleting, or say what happened. (High)
+- [x] **UX-12. Diagnostics data cannot be read without exporting it to another app.** The dialog
+      offers only a count, a size and a truncated ID; Export opens a share sheet with no
+      "open"/"view" target, and the file is `.jsonl`. Add a plain in-app list of the events in human
+      words and local time. (High)
+- [x] **UX-13. After "no vehicles detected", Download and Share are dead with no explanation.**
+      Tapping the disabled buttons gives no feedback at all. The camera persona, who had just taken
+      the photo herself, could not save it and could not learn why; the gallery persona met the same
+      state and read it as correct. Explain them — do not re-enable them. (Medium)
+- [x] **UX-14. Dialog buttons come from the system, so they change language independently.** On a
+      Turkish phone the About dialog is all English but for "Tamam"; Diagnostics shows "İptal" beside
+      "Delete" and "Export". Four call sites use `android.R.string.ok`/`cancel` —
+      `MainActivity.kt:68`, `ui/diagnostics/DiagnosticsDialog.kt:38` and `:82`,
+      `ui/delegate/BatchUiDelegate.kt:38`. `btn_delete` is already app-owned, so add `btn_ok` and
+      `btn_cancel` to `values/` and `values-de/`. (Medium)
+- [x] **UX-15. "Was das heißt" lands on the install heading, not its own explanation.** Both
+      languages: `site/index.html` line 29 links to `#android` (the `<h2>` at line 48) while the
+      explanation is the `<p class="note">` at line 57; `site/en.html` the same at 27/46/55. The
+      paragraph has no `id`. Add `id="testbuild"` and point the link at it. `#android` is also
+      overloaded — the nav download link shares the target. Needs `site/deploy.sh`. (Medium)
+- [x] **UX-16. The diagnostics description undersells what is recorded.** It names "compute times,
+      image sizes, modes, detection counts, error types and your device model"; the file also carries
+      manufacturer, RAM, core count, locale, app version, version code, build flavor and build type.
+      Every one is defensible — omitting them from the list is not. (Medium)
+- [x] **UX-17. "100% On-Device AI processing without data collection" sits against diagnostics.**
+      Nothing is untrue, but the unqualified phrasing in About invites the objection once a reader
+      finds the diagnostics screen. "All processing happens on your device. Nothing is uploaded."
+      survives contact with it and is the stronger claim anyway. (Medium)
+- [x] **UX-18. Nothing explains why the app wants the camera before Android asks.** "Take Photo"
+      goes straight to the stock permission dialog; a user wary of a non-Play-Store install has only
+      the OS's generic wording. One line of rationale on the first ask. Note the *decline* path is
+      already handled well — see below. (Low)
+- [x] **UX-19. The before/after captions disappear on a no-detection result.** Each badge is drawn
+      only when the divider is >40dp from its side (`ui/BeforeAfterSliderView.kt:270-281`), so both
+      vanish when it sits at an edge. Check the divider's initial position on that path, or hide the
+      slider when there is nothing to compare. No localization risk — the badges use
+      `badge_before`/`badge_after`. (Low)
+- [x] **UX-20. Inpainting still runs when the detection mask is empty.** A car-free photo advances
+      through an "Inpainting auf dem Gerät" stage doing work on an empty mask. Skip the stage and its
+      progress label. Developer-facing; it earns a line only because the label claims work with no
+      purpose. (Low)
+- [x] **UX-21. The install ID is truncated with no way to see or copy it.** Shown as "570a9891…";
+      the full value appears only inside the exported `.jsonl`. It is a random UUID, so there is
+      nothing to protect by shortening it — make the line long-pressable or show it in full. (Low)
+- [x] **UX-22. The English contact address must be decoded and retyped.** "kontakt [at]
+      autokorrektur [punkt] org" is not a `mailto:`, and "punkt" is German. Residue of the UX-07 fix,
+      not a regression. Use "[dot]" on the English page, or put a real `mailto:` behind the
+      obfuscated text. (Low)
+- [x] **UX-23. Switching diagnostics on is itself the first thing it records.** The count reads
+      "1 event" before the user has done anything. Arguably correct; no code change needed if UX-12
+      is done, since an in-app view would show "Diagnostics switched on" as the first line. (Low)
+- [x] **UX-24. The overflow menu is an unlabelled icon whose description follows the device.** On a
+      Turkish phone its only name is "Diğer seçenekler" while the menu it opens is English. Standard
+      Android, recorded because both features a cautious user hunts for (UX-11, UX-12) live behind
+      it. Supply the content description from the app's own strings. (Low)
+- [x] **UX-25. "4 GB RAM empfehlenswert" gives the reader no way to check.** Add where to look
+      ("Einstellungen → Über das Telefon"), or drop the number and keep the consequence: older
+      phones take longer. Ranked last — the soft phrasing kept it from blocking anyone. (Low)
+
+Worth preserving, confirmed by this run and not to be "fixed": the declined-camera-permission path
+(plain snackbar, app still usable, one-tap recovery); diagnostics genuinely off by default with a
+description that held up under adversarial reading; live percentage progress on every stage; the
+thoroughness of About & Licenses; and the site's German/English switch. The novice flow now completes
+with no wrong turns — the Turkish-locale persona finished it without reading any English at all.
 
 ### 🚀 Milestone 2: Google Play Store Release
 - [ ] **REL-01. Google Play Console Listing Setup**

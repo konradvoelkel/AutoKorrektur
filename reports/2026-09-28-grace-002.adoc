@@ -1,0 +1,257 @@
+= Think-aloud report: Grace — run 002
+:persona: Grace
+:run-id: 002
+:date: 2026-09-28
+:scenario: scenarios/scenario-grace.adoc
+:tool-type: android
+:device: emulator-5554 (720x1280, Android 14, app language de-DE, fresh app data)
+:model: sonnet
+
+== Context
+
+Tool: AutoKorrektur, package `de.konradvoelkel.android.autokorrektur`. No version string or flavor
+badge was visible anywhere on screen during this run, so the flavor can't be confirmed from the UI
+alone.
+
+Goal (from scenario): Grace wants to turn a photo of her parked-up street into a picture without
+the cars and send it to her residents' WhatsApp group.
+
+How run: Launched via `monkey -p de.konradvoelkel.android.autokorrektur -c
+android.intent.category.LAUNCHER 1` on a freshly-data-cleared install. Two seeded photos in
+DCIM/Camera: `IMG_20260927_083104.jpg` (cobblestone street, one parked blue car) and
+`IMG_20260927_084512.png` (a plain building/road, no cars).
+
+== Walkthrough
+
+Each step follows the think-aloud loop: scan → expect → act → observe → judge.
+
+=== Step 1: First launch
+
+Scan:: Title "AutoKorrektur" with a three-dot overflow menu. Two large filled buttons in the
+app's warm salmon/orange: "📷 Foto aufnehmen" (take photo) and "🖼 Bild auswählen" (select
+image). Below them, two visibly greyed-out pill buttons: "Herunterladen" (download) and "Bild
+teilen" (share image). Screenshot grace-01.png.
+
+Expect:: The two colourful buttons are obviously "the thing to press." The grey ones look
+disabled/inactive — Grace reads them as "not yet," not as broken.
+
+Act:: Tap "Bild auswählen".
+
+Observe:: The Android system photo picker opens directly — no in-app permission dialog first, just
+the OS's own "This app can only access the photos you select" screen with Photos/Albums tabs and a
+Recent grid. Screenshot grace-02.png.
+
+Verdict:: EXPECTED — no severity issue.
+
+Note:: On first launch, the two buttons that "look like the main thing to press" are unambiguously
+"Foto aufnehmen" and "Bild auswählen" — filled, high-contrast, top of screen. The disabled
+"Herunterladen"/"Bild teilen" pair reads as inactive rather than broken, which is exactly what a
+first-time, nothing-loaded-yet screen should communicate.
+
+=== Step 2: Picking the street photo
+
+Scan:: System picker grid shows three recent images: the app's own icon tile, a building photo,
+and a street photo with a visible blue parked car.
+
+Expect:: Tapping the photo with the car will bring it into the app to be processed.
+
+Act:: Tap the street/car thumbnail.
+
+Observe:: Back in the app instantly: the chosen photo appears full-width, captioned "Original"
+underneath, and — with no extra tap required — a line of text appears below it: "Erkenne
+Fahrzeuge (50%)" (Detecting vehicles, 50%). Screenshot grace-03.png.
+
+Verdict:: EXPECTED, and a small delight — severity n/a (positive).
+
+Note:: Processing started automatically the moment a photo was chosen; Grace never had to find or
+press a separate "start" button. The progress label uses a plain German verb phrase ("Erkenne
+Fahrzeuge") rather than a technical term like "Segmentierung."
+
+=== Step 3: Processing finishes
+
+Scan:: (After ~1-2s more) The screen now shows a full-width split image with a centred round
+drag-handle (◀▶) in the middle, and each half is captioned in a dark overlay pill: "VORHER"
+(before, left) and "NACHHER" (after, right). The "after" half shows the same street with the car
+gone — the road surface is filled in, though the patch has a soft, slightly smeared look up close.
+Screenshot grace-04.png.
+
+Expect:: n/a (this is the observation step).
+
+Act:: none — just scanning.
+
+Observe:: This before/after comparison, clearly labelled in German, is the first thing on screen
+without scrolling. There is no red mask overlay, no technical screen, nothing to interpret — it is
+the finished car-free picture, side by side with the original, with a slider Grace could drag.
+
+Verdict:: EXPECTED — no severity issue (this is the answer to the "what's the first thing on
+screen" question, and it's the finished picture).
+
+Note:: The inpainted patch where the car was has a visible soft/blurred texture next to the sharp
+cobblestones around it. That's a picture-quality observation, not a navigation problem — Grace
+would likely still recognise "the car is gone," but a close look shows the fix isn't invisible.
+
+=== Step 4: Scrolling for more
+
+Scan:: Scrolling down past the before/after slider reveals a second, smaller image: the original
+street photo with the car area highlighted in solid red, captioned "Erkannte Fahrzeuge
+(Masken-Vorschau)" (Detected vehicles (mask preview)). Below that, "Foto aufnehmen" and "Bild
+auswählen" reappear, and — no longer greyed out — "Herunterladen" and "Bild teilen" are now shown
+in solid brown, i.e. enabled. Screenshots grace-05.png, grace-06.png.
+
+Expect:: Since the result already looked finished, Grace had no reason to scroll for this — she
+found it only because the walkthrough required checking. She would likely never see the red mask
+image on her own.
+
+Act:: Continue reading, no tap yet.
+
+Observe:: The mask/detection preview exists, but it now lives below the finished result and carries
+an explanit caption, rather than being the first or only thing shown.
+
+Verdict:: EXPECTED — severity Low (informational only; "Masken-Vorschau" is still a word Grace
+doesn't know, but she isn't required to read or act on this panel to finish her task).
+
+=== Step 5: Sharing the picture
+
+Scan:: Two enabled buttons: "🖫 Herunterladen" and "⇗ Bild teilen".
+
+Expect:: "Bild teilen" reads plainly as "share image" — Grace expects this opens the normal Android
+share/send-to sheet she already knows from her gallery app.
+
+Act:: Tap "Bild teilen".
+
+Observe:: The standard Android share sheet opens, titled "Sharing image", with app icons for
+Nearby Share, Print, Drive, Maps, Messages, etc. (WhatsApp/Instagram are not installed on this
+emulator, as expected for the test setup — not a finding). Screenshot grace-07.png.
+
+Verdict:: EXPECTED — no severity issue.
+
+Note:: This answers the "is there a control she recognises as share this picture" question: yes,
+labelled exactly "Bild teilen," and it does what the label says on the very first tap.
+
+=== Step 6: Back to the result
+
+Scan:: Backing out of the share sheet returns cleanly to the same result screen (mask preview
+still visible, both action buttons still enabled). Screenshot grace-08.png.
+
+Expect:: n/a.
+
+Act:: Press system Back once.
+
+Observe:: No crash, no lost state, no re-processing triggered.
+
+Verdict:: EXPECTED — no severity issue.
+
+This completes the main run: Grace picked her street photo, watched it process with visible
+progress, was shown the finished before/after picture first, found a plainly-labelled share
+button, and reached the Android share sheet on the first attempt.
+
+== Second pass: the photo with no cars
+
+=== Step 7: Selecting the photo with no cars
+
+Scan:: Same starting screen as Step 1 (new session state, previous result cleared from view once a
+new pick starts).
+
+Expect:: Grace picks the other seeded photo — a plain building/street with no car in it — expecting
+either "nothing happens" or some kind of message, since she has no mental model of what a
+"detection" app does with an image that doesn't match.
+
+Act:: Tap "Bild auswählen" → tap the building-photo thumbnail in the system picker. Screenshots
+grace-09.png, grace-10.png.
+
+Observe:: The photo loads as "Original," and a progress line appears: "Inpainting auf dem Gerät
+(75%)" (Inpainting on the device, 75%). Notably, the progress label jumped straight to the
+inpainting stage, not a detection stage — meaning the app appears to run its repair pass
+regardless of whether anything was actually detected to repair.
+
+Verdict:: SURPRISING (mildly) — severity Low.
+
+Note:: This is an internal-pipeline observation, not something Grace would consciously register —
+she'd just see a progress bar tick up, same as with her street photo. It's flagged here only
+because the scenario asks to record exactly what the app tells her at every step.
+
+=== Step 8: Result for the car-free photo
+
+Scan:: A full-width split image appears with the same centre drag-handle as before — but this time
+neither half carries a "VORHER"/"NACHHER" caption. Both halves show the identical building photo.
+Screenshot grace-11.png (zoomed crop grace-11-crop.png confirms no text overlay is present, even
+faintly).
+
+Expect:: n/a — observation step.
+
+Act:: none.
+
+Observe:: Compared to Step 3 (the car photo), the equivalent slider view is missing its "VORHER"/
+"NACHHER" labels this time.
+
+Verdict:: SURPRISING — severity Low.
+
+Note:: This is a real, screenshot-confirmed inconsistency: the same before/after slider component
+is captioned in one run and uncaptioned in the other. It doesn't block Grace's understanding here,
+because the very next scroll (Step 9) gives her an unambiguous text explanation — but taken alone,
+an unlabelled "here are two identical photos" slider could read as "did anything happen?"
+
+=== Step 9: The message Grace actually gets
+
+Scan:: Scrolling down reveals a smaller image (same building photo, no highlighting this time) with
+the caption directly underneath, in plain German: "Keine Fahrzeuge erkannt" (No vehicles
+detected). Below that, "Herunterladen" and "Bild teilen" are visibly greyed out/disabled again, as
+they were before any photo was chosen. Screenshots grace-12.png, grace-13.png.
+
+Expect:: n/a — observation step.
+
+Act:: none.
+
+Observe:: The exact, verbatim on-screen text is: "Keine Fahrzeuge erkannt". No red mask, no error
+icon, no dead end — just a short factual sentence in the same type style as the earlier "Erkannte
+Fahrzeuge (Masken-Vorschau)" caption. Both action buttons return to their disabled/grey state.
+
+Verdict:: EXPECTED — no severity issue (positive finding).
+
+Note:: This directly answers the second-pass question: Grace is told, in plain German and without
+any jargon, that no vehicles were found. She is not left thinking the app is broken — the message
+is short, sits right under the image she just looked at, and the greyed-out download/share buttons
+reinforce "there is nothing new to export" rather than inviting her to share an unchanged photo.
+
+== Outcome
+
+Goal achieved:: Yes (main run) — the before/after image reached the Android share sheet via a
+button Grace could identify on sight ("Bild teilen"). Second pass also succeeded in its own
+terms: Grace was clearly told nothing was found.
+
+Time / steps to goal:: About 6 taps from app launch to the share sheet appearing (Bild auswählen →
+pick photo → wait for auto-processing → scroll → Bild teilen → share sheet). No dead ends, no
+retries needed.
+
+Where the persona struggled or gave up:: Nowhere in the main run — she did not struggle or give up.
+In the second pass, the only rough edge was the unlabelled before/after slider (Step 8), which by
+itself might have caused a moment of "did anything happen?" — but it was immediately followed by
+the clear "Keine Fahrzeuge erkannt" text, so it did not derail her.
+
+== Findings (raw)
+
+- Positive: on first launch, primary actions ("Foto aufnehmen"/"Bild auswählen") are visually
+  distinct from disabled ones ("Herunterladen"/"Bild teilen" greyed out) — no ambiguity about what
+  to press first.
+- Positive: processing starts automatically on photo selection, with a visible, plain-German
+  progress label ("Erkenne Fahrzeuge (50%)") — no separate "start" step to discover.
+- Positive: after processing the street photo, the first thing shown (no scrolling) is the
+  finished before/after comparison, clearly captioned "VORHER"/"NACHHER" — not a mask or a
+  technical screen.
+- Positive: the detection/mask preview ("Erkannte Fahrzeuge (Masken-Vorschau)") is present but
+  lives below the finished result with an explanatory caption, so it doesn't compete with or
+  precede the actual answer.
+- Positive: "Bild teilen" is a plain, self-explanatory label; tapping it reached the Android share
+  sheet on the first try.
+- Positive (second pass): when no vehicles are found, the app states this in plain German —
+  "Keine Fahrzeuge erkannt" — directly under the image, and disables Herunterladen/Bild teilen
+  accordingly. Grace is not left guessing whether the app is broken.
+- Low severity: the before/after slider's "VORHER"/"NACHHER" captions were present for the
+  car photo but absent for the no-car photo (screenshots grace-04.png vs grace-11.png/
+  grace-11-crop.png) — a real, if minor, inconsistency in an otherwise identical component.
+- Low severity: on the no-car photo, the progress label jumped to "Inpainting auf dem Gerät" even
+  though nothing needed inpainting — invisible to Grace in practice, but worth a developer's
+  second look at whether the inpainting stage is skipped when the detection mask is empty.
+- Delight worth preserving: the whole main-run path (pick photo → auto-process with progress →
+  see finished before/after → share) required no jargon and no hunting; it matched Grace's
+  gallery-app-slider mental model closely.

@@ -1,0 +1,221 @@
+= Think-aloud report: Heidi — run 002
+:persona: Heidi
+:run-id: 002
+:date: 2026-09-28
+:scenario: scenarios/scenario-heidi.adoc
+:tool-type: android
+:device: emulator-5554 (720x1280, Android 14, app language en-US, fresh app data)
+:model: sonnet
+
+== Context
+
+Tool: AutoKorrektur, Version 2.0.0-18-gc739cf6 (read from the in-app "About & Licenses" screen,
+Step 13).
+Goal (from scenario): Heidi wants to photograph the street outside the school gate with the
+app's own camera — not pick an existing photo — and get a car-free version she can put on a
+worksheet. She will decline the camera permission first to see what happens, then grant it.
+How run: `adb -s emulator-5554 shell monkey -p de.konradvoelkel.android.autokorrektur -c
+android.intent.category.LAUNCHER 1` against fresh app data; all actions via `adb input tap` /
+`swipe`, coordinates confirmed with `uiautomator dump`; every step screenshotted with
+`screencap`.
+
+== Walkthrough
+
+Each step follows the think-aloud loop: scan → expect → act → observe → judge.
+
+=== Step 1 — fresh launch
+
+Scan:: The whole first screen, no scrolling needed: title "AutoKorrektur", a three-dot overflow
+menu top right, then two solid buttons — a camera icon with "Take Photo" and a picture icon with
+"Select Image" — and, greyed out below, "Download" and "Share image". (heidi-01)
+Expect:: "'Take Photo' is exactly what I want — that should open the camera, not the gallery."
+Act:: Looked, did not yet tap.
+Observe:: The label is unambiguous; "Take Photo" and "Select Image" are visually distinct and
+sit right at the top, before any explanation of what the app does or why it needs anything.
+Verdict:: EXPECTED — severity n/a
+Note:: No onboarding, no permission-priming screen, no "why we need this" text anywhere before
+the button. That absence becomes relevant in Step 2.
+
+=== Step 2 — tapping "Take Photo"
+
+Scan:: Same screen as Step 1; uiautomator confirms the button's exact bounds
+(`btnTakePhoto`, [44,385][676,517]).
+Expect:: "This should ask me for camera permission, since apps always do the first time."
+Act:: Tapped "Take Photo" (360,451).
+Observe:: The stock Android system permission sheet appeared immediately: a video-camera icon,
+"Allow AutoKorrektur to take pictures and record video?", with three choices — "While using the
+app", "Only this time", "Don't allow". (heidi-02)
+Verdict:: SURPRISING — severity Low
+Note:: This is the unmodified OS dialog with its generic OS wording ("take pictures and record
+video" — video is never mentioned again anywhere else in the app). Nothing from the app itself —
+no preceding screen, no subtitle, no rationale — told Heidi *why* AutoKorrektur wants the camera
+before this dialog appeared. As a cautious, first-time user of an app installed outside the Play
+Store, this is exactly the moment she wanted an explanation and didn't get one. It's not a
+broken flow — Android's own dialog is doing its job — but the app added nothing to it.
+
+=== Step 3 — denying the permission (deliberately)
+
+Scan:: The three-option system dialog from Step 2.
+Expect:: "I'll say no first and see what the app does — does it explain itself now, or does it
+just get stuck?"
+Act:: Tapped "Don't allow" (360,1027).
+Observe:: The dialog closed and a dark snackbar appeared at the bottom of the main screen:
+"Camera permission is required to take photos". (heidi-03) It faded away on its own after a few
+seconds, leaving the main screen exactly as in Step 1 — "Take Photo" still present and enabled.
+(heidi-04)
+Verdict:: EXPECTED — severity n/a (positive)
+Note:: This is the answer to the scenario's central question. The refusal path is not silent:
+Heidi gets a one-line, plain-English reason, and the app does not lock up, crash, or grey out
+the button. She is not stuck — she can simply try again.
+
+=== Step 4 — recovering and granting permission
+
+Scan:: Main screen, "Take Photo" button enabled as before.
+Expect:: "If I tap it again, either it asks me again, or I'm stuck and have to go into phone
+Settings myself."
+Act:: Tapped "Take Photo" again (360,451).
+Observe:: The same system dialog reappeared immediately (heidi-05) — one tap to get back to the
+decision point, no detour through Android Settings needed.
+Verdict:: EXPECTED — severity n/a (positive)
+Note:: Recovery from a decline took exactly one extra tap ("Take Photo" again) plus the second
+permission decision. That is about as cheap as this can be.
+
+=== Step 5 — granting "While using the app"
+
+Scan:: Same dialog as Step 2/4.
+Expect:: "'While using the app' sounds like the safer, more limited choice — that's what I'd
+pick as a cautious person."
+Act:: Tapped "While using the app" (360,696).
+Observe:: The system camera app opened directly into a live viewfinder showing the emulator's
+synthetic test scene (a blocky, colour-swatch "building" — expected, per the scenario's
+environment note, since this is the virtual camera). A shutter button and standard camera
+overflow controls were visible. (heidi-06)
+Verdict:: EXPECTED — severity n/a
+Note:: The transition from permission grant straight into the camera, with no extra tap needed,
+was smooth.
+
+=== Step 6 — taking the photo
+
+Scan:: The live camera viewfinder with a shutter button at bottom centre.
+Expect:: "Tapping the shutter takes the picture and probably shows me a preview to confirm."
+Act:: Tapped the shutter (360,1084).
+Observe:: A review screen appeared with the captured (still synthetic) frame and three controls:
+retake (curved arrow), confirm (checkmark), discard (X). (heidi-07)
+Verdict:: EXPECTED — severity n/a
+Note:: Standard camera-app review UI, not something AutoKorrektur controls, but worth noting it
+behaved normally.
+
+=== Step 7 — confirming the photo
+
+Scan:: Review screen from Step 6.
+Expect:: "The checkmark should hand this photo back to AutoKorrektur and start processing."
+Act:: Tapped the checkmark (360,1087).
+Observe:: Control returned to AutoKorrektur automatically. The captured photo appeared labelled
+"Original", and below it: "On-device inpainting (75%)" — a live progress readout. (heidi-08)
+Verdict:: EXPECTED — severity n/a (positive)
+Note:: A percentage-based progress indicator is real, useful feedback — Heidi can see the app is
+working, not stuck.
+
+=== Step 8 — waiting for the result
+
+Scan:: Processing screen with progress percentage.
+Expect:: "This should finish in a few seconds and show me a before/after."
+Act:: Waited ~3 seconds, screenshotted again.
+Observe:: A "BEFORE / AFTER" comparison slider appeared, draggable, showing the same synthetic
+scene on both sides (expected — no real cars were in view). (heidi-09)
+Verdict:: EXPECTED — severity n/a
+Note:: Processing was fast and the progress indicator meant the wait never looked like a hang.
+
+=== Step 9 — reading the outcome
+
+Scan:: Scrolled down past the before/after slider.
+Expect:: "Since there were no cars in the emulator's scene, I'd want the app to tell me plainly
+that it looked and found nothing — not just show me an unchanged photo and leave me guessing."
+Act:: Scrolled down (swipe 360,900 → 360,400).
+Observe:: Directly under the slider, a second, smaller copy of the image sits above the plain
+text label "No vehicles detected". (heidi-10)
+Verdict:: EXPECTED — severity n/a (delight)
+Note:: This is exactly the distinction the scenario cares about: Heidi can tell "the app looked
+and found nothing" apart from "the app broke," because it says so in plain words rather than
+just silently returning an unchanged photo.
+
+=== Step 10 — checking Download / Share
+
+Scan:: Scrolled further down: "Take Photo" and "Select Image" buttons are active again below
+the result; "Download" and "Share image" are visible but greyed out. (heidi-11)
+Expect:: "I'd like to save this to show I tried, even though nothing was removed — let's see if
+Download works."
+Act:: Tapped "Download" (360,930).
+Observe:: Nothing happened — no toast, no state change, no navigation. The button remained
+visibly disabled before and after the tap. (heidi-12)
+Verdict:: SURPRISING — severity Medium
+Note:: When no vehicles are found, the processed (identical-to-original) image cannot be
+downloaded or shared through the app, and nothing on screen explains why the buttons are
+disabled. A worksheet-minded teacher who wants to keep this shot (even an unedited one, as
+evidence the tool works, or simply because it's the photo she meant to keep) has no in-app way
+to do so and no explanation for the dead buttons. This did not block her stated goal — she saw
+the "no vehicles" outcome and understood it — but it is friction with no stated reason.
+
+=== Step 11 — checking the "..." menu for context
+
+Scan:: Overflow menu top right (content-desc "More options").
+Expect:: "This probably has settings or an about screen — let me check what version I'm running
+and confirm this app is really what it claims to be."
+Act:: Tapped the overflow icon (658,154), then "About & Licenses" (394,310).
+Observe:: A menu offered "Diagnostics" and "About & Licenses" (heidi-13). About & Licenses
+showed: "AutoKorrektur — Car-Free AR & Inpainting", "Version: 2.0.0-18-gc739cf6", "License: GNU
+AGPLv3", and an academic-research-foundation credit. (heidi-14)
+Verdict:: EXPECTED — severity n/a
+Note:: Reassuring for a cautious user installing outside the Play Store: clear versioning,
+license, and academic provenance, one tap away.
+
+== The permission refusal path
+
+Denying the camera permission (Step 3) produced an immediate, plain-English snackbar — "Camera
+permission is required to take photos" — and nothing else broke: the main screen returned to
+exactly its pre-tap state, "Take Photo" stayed enabled, and no other control locked up.
+Recovery took exactly one tap ("Take Photo" again), which re-triggered the identical system
+dialog (Step 4); from there granting "While using the app" took her straight into the camera
+with no further friction. Total cost of declining-then-granting: two taps on "Take Photo" plus
+one extra permission decision, versus the one tap it would have taken to grant it immediately.
+No step required leaving the app for Android Settings. The one gap in the whole permission story
+is upstream of the refusal itself: nothing in the app explained *why* it wants the camera before
+either the first or the second dialog appeared (Step 2) — the dialog Heidi saw was the stock OS
+wording, not anything AutoKorrektur added context to.
+
+== Outcome
+
+Goal achieved:: Yes. Heidi took a photo with the app's own camera (not the gallery), watched it
+process on-device with visible progress, and received a clear, honestly-worded result ("No
+vehicles detected") that she could tell apart from a failure.
+Time / steps to goal:: 11 steps / roughly 9 taps from fresh launch to reading the final result
+(2 taps to reach and decline the first dialog, 2 more to reach and grant the second, 1 shutter
+tap, 1 confirm tap, then scrolling to read the outcome) — no detours, no re-launches, no need to
+leave the app.
+Where the persona struggled or gave up:: She did not give up. The only two points of friction
+were: (1) no in-app rationale for the camera permission before either system dialog appeared,
+and (2) Download/Share staying disabled with no explanation once the "no vehicles detected"
+result appeared, leaving her unable to export the photo even though the app told her processing
+had completed successfully.
+
+== Findings (raw)
+
+- SURPRISING, Low: tapping "Take Photo" goes straight to the stock Android permission dialog
+  with no app-authored explanation beforehand or alongside it — a cautious, Play-Store-wary user
+  is left to trust the OS's generic "take pictures and record video" wording alone.
+- SURPRISING, Medium: once a photo is processed and no vehicles are found, "Download" and "Share
+  image" stay disabled with zero explanation on screen — tapping them produces no feedback at
+  all, and a user who wants to keep the (unchanged) photo for her records has no way to do so
+  through the app.
+- Delight: declining the camera permission produces an immediate, plain-English snackbar
+  ("Camera permission is required to take photos") and leaves the app in a fully usable state —
+  no silent failure, no lockup.
+- Delight: recovering from a decline costs exactly one extra tap; the permission dialog
+  re-appears identically and grants normally from there.
+- Delight: on-device processing shows a live percentage progress readout ("On-device inpainting
+  (75%)"), so the wait never reads as a hang.
+- Delight: the "no vehicles detected" result is stated in plain text next to the image, letting
+  the user clearly distinguish "looked and found nothing" from "something went wrong" — exactly
+  the distinction the scenario's environment note calls out as the honest expected outcome here.
+- Delight: version, license and academic provenance are all one tap away via the overflow menu's
+  "About & Licenses," which would reassure a user suspicious of a non-Play-Store install.

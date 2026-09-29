@@ -1,0 +1,32 @@
+= Scenario: Heidi
+:persona: Heidi
+:tool-type: android
+:run: 002
+:kind: new-ground
+
+== Persona
+
+Heidi is a 45-year-old secondary-school geography teacher preparing a lesson on urban space.
+Context / device: the installed app on a 720x1280 Android 14 phone (emulator-5554), English app language, fresh app data.
+Expertise: intermediate with phones, novice with this app. She is used to apps asking for the camera and knows she can say no.
+Mindset: cautious about permissions and a little suspicious of an app she installed outside the Play Store. She wants to understand why it needs the camera before she grants it, and she will try declining first to see what happens.
+
+== Goal
+
+Heidi wants to photograph the street outside the school gate with the app's own camera — not pick an existing photo — and get a car-free version she can put on a worksheet.
+
+== Starting point
+
+She opens the app with fresh app data and looks for a way to take a photo rather than choose one.
+
+== Success criteria
+
+She has taken a photo through the app and seen a result — or she can say what stopped her. Her handling of the camera permission, including what happens when she declines it first, is recorded either way.
+
+== Environment note
+
+The emulator's virtual camera renders a synthetic scene that contains no real parked cars,
+so the honest expected outcome of processing a camera shot is the "no vehicles found" path.
+That is not a defect — record what the app says and whether Heidi can tell the difference
+between "nothing was found" and "something went wrong". Do not substitute a gallery photo
+to force a nicer result; the camera path is the thing under test.

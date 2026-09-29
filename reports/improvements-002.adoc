@@ -1,0 +1,257 @@
+= UX improvements — run 002
+:run-id: 002
+:date: 2026-09-28
+
+Ranked, actionable improvements distilled from all think-aloud reports in run 002.
+Ranking = impact x frequency: goal-blocking and cross-persona issues rank highest.
+
+== Summary
+
+Scenarios executed:: 5 (frank on autokorrektur.org; grace, heidi, ivan on the `core` build; judy across both)
+Reports analyzed:: `2026-09-28-frank-002.adoc`, `2026-09-28-grace-002.adoc`, `2026-09-28-heidi-002.adoc`, `2026-09-28-ivan-002.adoc`, `2026-09-28-judy-002.adoc`
+Top issue:: Deleting the diagnostics data works correctly, but the dialog immediately shows a fresh install ID and a non-zero event count, so the one user who cares most concludes the deletion failed.
+
+Run 002 is a mixed pass: personas `frank` and `grace` re-walked the paths that run 001's
+UX-01 to UX-09 touched, and `heidi`, `ivan`, `judy` opened ground run 001 never reached
+(the camera path, diagnostics end to end, and a third-language device).
+
+*The run-001 fixes hold.* Every one of UX-01 to UX-09 was re-confirmed from a fresh
+persona's eyes, without the persona being told what had changed — see <<regression>>.
+None of the findings below is a regression; all are newly surfaced.
+
+Every finding was re-verified against the running app, the live site or the stored data before
+being ranked. One persona finding was raised as Critical and is *discarded* as a test artefact;
+see <<discarded>>, which also records the real defect that sat underneath it.
+
+== Ranked improvements
+
+=== 1. Deleting diagnostics data looks like it silently failed
+
+Severity:: High
+Problem:: Confirming "Delete all recorded diagnostics and the installation ID?" does exactly what it says — but because diagnostics is still switched on, `Telemetry.clear()` immediately mints a new install ID and writes a new `session_start`. Reopening the dialog seconds later shows "1 event · 0.2 KB · ID 8d49ed78…": a non-zero count and a brand-new ID, with nothing on screen explaining why. The user who chose to delete their data is told, in effect, that data is already back.
+Evidence:: `2026-09-28-ivan-002.adoc` — the persona concluded the delete was a no-op and reported it as a Critical bug. He was wrong about the mechanism but right about what the screen communicates, and he is exactly the audience this feature exists for. Verified directly: before the confirmed delete, `files/telemetry/events.jsonl` held 2 events under install ID `570a9891-…`; after, 1 fresh `session_start` under a new ID `8d49ed78-…`. So the old data and the old ID are genuinely destroyed. The re-minting is deliberate — `telemetry/Telemetry.kt:101-112`, commented "Keep the invariant enabled ⇒ install id exists".
+Recommendation:: Make the outcome legible. Either (a) turn the switch off as part of deleting, so the count goes to zero and stays there, which is what "delete everything" implies to a user; or (b) keep the invariant and say so in the confirmation and afterwards — "Deleted. Diagnostics is still on, so recording has started again under a new ID." Option (a) matches the user's intent more closely; whichever is chosen, the dialog must not show a fresh ID with no explanation.
+
+=== 2. You cannot read your own diagnostics data without exporting it to another app
+
+Severity:: High
+Problem:: The dialog shows only a count, a size and a truncated ID. To find out what was actually recorded, the user must tap Export, which opens a share sheet offering only apps that *consume* the file (Drive, Gmail, Quick Share) — no "open", "view" or "save to Files". The file itself is `.jsonl`: compact JSON Lines with `sdk_int`, `inpaint_ms` and epoch-millisecond timestamps. A privacy-conscious non-developer therefore cannot see what the app knows about them at all.
+Evidence:: `2026-09-28-ivan-002.adoc` (three findings merged: no in-app view; the export dead-ends in the share sheet; the format assumes technical literacy the persona explicitly lacks). Confirmed by reading the stored file directly — a `session_start` line is a single 300-character JSON object.
+Recommendation:: Add a plain in-app view: a scrollable list of the recorded events in human words and local time ("28 Sep, 13:59 — photo processed, 1 vehicle found, 1.7 s"). That answers the actual question without the user leaving the app or meeting JSON. Keep the raw export for people who want it, and consider `.txt` so more targets accept it.
+
+=== 3. After "no vehicles detected", Download and Share are dead with no explanation
+
+Severity:: Medium
+Problem:: When nothing is found, both result actions stay greyed out and tapping them produces no feedback whatsoever — no snackbar, no tooltip, nothing. A user who photographed something herself and wants to keep the image has no way to do so and no way to learn why.
+Evidence:: `2026-09-28-heidi-002.adoc` — she took the photo with the app's own camera, got the "no vehicles detected" message, and could not save it for her worksheet. Instructive contrast: `2026-09-28-grace-002.adoc` met the identical disabled state and read it as correct, because she had picked a photo she knew had cars in it and accepted that there was nothing to export. The difference is authorship — Heidi had just taken the picture, so "you can't save this" reads as the app losing her work.
+Recommendation:: Say why. One line under the disabled buttons, or a snackbar on tap: "Nothing was changed, so there is nothing to save." That is enough to close the question. Note this is the flip side of the UX-03 fix, which is working as intended — do not re-enable the buttons; explain them.
+
+=== 4. Every dialog's buttons come from the system, so they change language on their own
+
+Severity:: Medium
+Problem:: The app's dialogs use Android's built-in button strings, which follow the *device* language while the dialog's own text follows the *app* language. On a Turkish phone the About dialog is entirely English except for its button, which reads "Tamam"; the Diagnostics dialog is English with "İptal" sitting beside "Delete" and "Export". The result is a one-word language collision on every dialog in the app.
+Evidence:: `2026-09-28-judy-002.adoc` (two Medium findings; the persona identified it as systemic rather than a one-off). Confirmed in code — four call sites use system strings: `MainActivity.kt:68` (`android.R.string.ok`, the "Tamam" she saw), `ui/diagnostics/DiagnosticsDialog.kt:38` and `:82`, `ui/delegate/BatchUiDelegate.kt:38` (all `android.R.string.cancel`).
+Recommendation:: Replace those four with app-owned strings. `btn_delete` already exists and is app-owned, so the pattern is established and merely inconsistent: add `btn_ok` and `btn_cancel` to `values/strings.xml` and `values-de/strings.xml`. Four lines plus two string pairs, and every dialog then speaks one language. `StringResourceLocalizationTest` will hold the new keys to parity automatically.
+
+=== 5. "Was das heißt" lands on the install heading, not on the explanation it promises
+
+Severity:: Medium
+Problem:: The short risk note beside the download button links to a fuller explanation, but the anchor points at the *install* section heading, roughly 1.6 screenfuls above the paragraph it promised. A reader following it must scroll past signed-APK notes, a file table, the install steps and the whole SHA-256/apksigner block before reaching the text they asked for — and most will conclude the link was broken or that the install instructions were the answer.
+Evidence:: `2026-09-28-frank-002.adoc` (the persona followed the link specifically to find out how risky the build was). Verified in the deployed HTML, both languages: `site/index.html` line 29 links to `#android`, which is the `<h2>` at line 48, while the explanation is the `<p class="note">` at line 57; `site/en.html` has the identical shape at lines 27, 46 and 55. The explanation paragraph carries no `id`. Aggravating detail: `#android` is overloaded — the nav's "Herunterladen" / "Download" link points at the same target, so two links promising quite different things land in the same place.
+Recommendation:: Two lines per page: add `id="testbuild"` to that `<p class="note">` and point the risk link at `#testbuild`. Leave the nav's download link on `#android`. Then rebuild and deploy — the fix does not reach anyone until `site/deploy.sh` runs.
+
+=== 6. The diagnostics description undersells what is recorded
+
+Severity:: Medium
+Problem:: The dialog says diagnostics records "compute times, image sizes, modes, detection counts, error types and your device model". The stored data also contains manufacturer, RAM, core count, locale, app version, version code, build flavour and build type. Every one of those is defensible; leaving them off the list is what is not, because the person reading that sentence is deciding whether to trust it.
+Evidence:: `2026-09-28-ivan-002.adoc`. Confirmed against the real file: a `session_start` line carries `app_version`, `version_code`, `flavor`, `build_type`, `sdk_int`, `manufacturer`, `model`, `ram_gb`, `cores`, `locale`, `install_id`.
+Recommendation:: Extend the sentence to name the device and build details as a group — "...your device model, its memory and processor count, your language setting, and the app version". Six words closes the gap between the promise and the file, and this is the one text in the app whose accuracy the feature's whole value rests on.
+
+=== 7. "without data collection" in About sits against the diagnostics feature
+
+Severity:: Medium
+Problem:: The About dialog ends "100% On-Device AI processing without data collection." In the same app, one menu item away, is a feature that records structured data about the device and every pipeline run. Nothing is untrue — the data never leaves the phone unless the user exports it — but the unqualified phrasing is the kind a careful reader will hold against the project once they find the diagnostics screen.
+Evidence:: `2026-09-28-ivan-002.adoc` — the persona had just exercised diagnostics end to end when he read this sentence, and the tension was the note he ended on.
+Recommendation:: Qualify it to say what is actually guaranteed: "All processing happens on your device. Nothing is uploaded." That claim survives contact with the diagnostics screen, and is the stronger statement anyway.
+
+=== 8. Nothing explains why the app wants the camera before Android asks
+
+Severity:: Low
+Problem:: Tapping "Take Photo" goes straight to the stock system permission dialog. A user wary of an app installed from outside the Play Store gets only Android's generic "take pictures and record video" wording on which to decide.
+Evidence:: `2026-09-28-heidi-002.adoc`. Worth weighing against a genuine strength found in the same run: declining is handled well (see <<preserve>>), so this is about the first impression, not about recovery.
+Recommendation:: A one-line rationale before the system prompt, on the first ask only: "AutoKorrektur needs the camera to take the photo you want to edit. The photo stays on your phone."
+
+=== 9. The before/after captions disappear on a no-detection result
+
+Severity:: Low
+Problem:: On a normal result the comparison slider is captioned *VORHER* / *NACHHER*; on a result where nothing was detected, the same component shows two identical images with no captions at all.
+Evidence:: `2026-09-28-grace-002.adoc`, screenshots `grace-04.png` against `grace-11.png` / `grace-11-crop.png` (confirmed with a zoomed crop).
+Recommendation:: The mechanism is in `ui/BeforeAfterSliderView.kt:270-281`: each badge is drawn only when the divider is more than 40dp from its side, so both vanish when the divider sits at or near an edge. Check what the divider's initial position is on the no-detection path — if it starts at an extreme there, that is the cause and the fix is to centre it as on a normal result. Hiding the slider altogether when there is nothing to compare is the cleaner alternative; an uncaptioned pair of identical images is the least informative of the three options. No localization risk here: the badges already come from `badge_before` / `badge_after` string resources, so the `CLAUDE.md` bitmap-text bug has not resurfaced.
+
+=== 10. Inpainting still runs when the detection mask is empty
+
+Severity:: Low
+Problem:: Processing a photo with no vehicles still advances through an "Inpainting auf dem Gerät" progress stage, doing work on an empty mask. Invisible to the user beyond a slightly longer wait, but it is avoidable computation on a phone.
+Evidence:: `2026-09-28-grace-002.adoc` (second pass, the car-free photo).
+Recommendation:: Skip the inpaint stage when the mask has no detections, and take the progress label with it. This is a developer-facing note rather than a UX fix; it earns its place here only because the label claims work that has no purpose.
+
+=== 11. The install ID is truncated with no way to see or copy it
+
+Severity:: Low
+Problem:: The dialog shows "ID 570a9891…". The full value appears only inside the exported file, so a user who wants to quote their ID in a bug report has to export and open a `.jsonl` to get it.
+Evidence:: `2026-09-28-ivan-002.adoc`.
+Recommendation:: Make the summary line long-pressable to copy the full ID, or show it in full — it is a random UUID, so there is nothing to protect by shortening it.
+
+=== 12. The English contact address has to be decoded and retyped
+
+Severity:: Low
+Problem:: The English page gives the contact as "kontakt [at] autokorrektur [punkt] org" — not a `mailto:` link. A reader must work out the substitution, including the German word "punkt", and retype it by hand. On a phone that is a real deterrent to sending the bug report the page asks for.
+Evidence:: Found while verifying that run 001's UX-07 fix had deployed (it has — the address and the responsible person both appear on the live English page, twice). This is the residue of that fix, not a regression. It also briefly looked like a regression to an automated check for `kontakt@`, which is worth knowing for future runs.
+Recommendation:: Keep the anti-spam spelling if the obfuscation is wanted, but use "[dot]" rather than "punkt" on the English page. Better: a real `mailto:` behind the visible obfuscated text gives both spam resistance and one-tap contact.
+
+=== 13. Switching diagnostics on is itself the first thing it records
+
+Severity:: Low
+Problem:: Enabling the switch immediately writes a `session_start` event, so the count reads "1 event" before the user has done anything. Not wrong, and arguably correct, but not what the switch's label led the user to expect either.
+Evidence:: `2026-09-28-ivan-002.adoc`.
+Recommendation:: No code change needed if item 2 is done — an in-app view showing "Diagnostics switched on" as the first line explains it completely.
+
+=== 14. The overflow menu is an unlabelled icon
+
+Severity:: Low
+Problem:: The only route to Diagnostics and About is the toolbar overflow icon, which carries no visible label; its accessibility description follows the device language, so on a Turkish phone the icon's only name is "Diğer seçenekler" while the menu it opens is in English.
+Evidence:: `2026-09-28-judy-002.adoc`. Note this is standard Android and not a defect on its own; it is recorded because both features a cautious user goes looking for (item 1, item 2) live behind it.
+Recommendation:: Leave the icon as is, but supply the content description from the app's own strings so it matches the language of the menu it opens.
+
+=== 15. "4 GB RAM empfehlenswert" gives the reader no way to check
+
+Severity:: Low
+Problem:: The page recommends 4 GB of RAM without telling a non-technical reader how to find out how much their phone has.
+Evidence:: `2026-09-28-frank-002.adoc`. The persona was not blocked — the soft phrasing kept it from worrying him — which is why this ranks last.
+Recommendation:: Either add where to look ("Einstellungen → Über das Telefon"), or drop the number and keep the consequence, which is the part that matters: older phones take longer.
+
+[[regression]]
+== Regression check: run 001's fixes
+
+Re-walked by fresh personas who were not told what had changed. All hold.
+
+[cols="1,4"]
+|===
+| Item | Status
+
+| UX-01 result before mask
+| *Fixed.* The finished before/after comparison is the first thing on screen with no scrolling; the mask preview sits below it with an explanatory caption (`grace-002`, 720x1280).
+
+| UX-02 zero-detection message
+| *Fixed.* "Keine Fahrzeuge erkannt" / "No vehicles detected" appears in plain words beside the image. Both the German novice and the English camera persona could tell "looked and found nothing" from "broke" (`grace-002`, `heidi-002`). See item 3 for the one gap left.
+
+| UX-03 premature export buttons
+| *Fixed.* On first launch Download and Share are visibly disabled and the two photo actions carry the emphasis (`grace-002`).
+
+| UX-04 share control
+| *Fixed.* "Bild teilen" / "Share image" reached the Android share sheet on the first tap; no guessing (`grace-002`).
+
+| UX-05 risk warning near the button
+| *Fixed and deployed.* The warning is in the same first screen as the download button, 0 screenfuls below it (`frank-002`). See item 5 for the link out of it.
+
+| UX-06 plain-language install route
+| *Fixed.* "Schritt für Schritt installieren", and the steps themselves are plain enough that the novice persona could repeat them back. "Sideloading" survives only as an aside (`frank-002`).
+
+| UX-07 English contact
+| *Fixed and deployed.* The responsible person and the address appear on the live English page, twice. See item 12 for the residue.
+
+| UX-08 verification commands
+| *Fixed and deployed.* `sha256sum`, `shasum -a 256`, `certutil -hashfile` and the `build-tools/<version>/apksigner` location are all present.
+
+| UX-09 "in zwei Tipps"
+| *Fixed.* Now "in wenigen Tipps" / "in a few taps".
+
+| UX-10 `/download/` 404
+| *Still open.* Owner/infra, not re-tested this run.
+|===
+
+[[discarded]]
+== Findings raised but discarded
+
+Recorded so the same false leads are not re-investigated next run.
+
+* *"Diagnostics delete is a no-op" (raised Critical, `ivan-002`).* Delete works. Re-tested by
+  tapping the button at its `uiautomator` bounds: the two stored events and the install ID
+  `570a9891-…` were both destroyed and replaced by a single fresh `session_start` under a new ID
+  `8d49ed78-…`. `Telemetry.clear()` and `TelemetryStore.clear()` are correct. The persona's tap had
+  landed on the confirmation dialog's *title*, which is a non-clickable `TextView` reading "Delete"
+  — the same word as the button below it, and the same word as the outer dialog's neutral button,
+  so "Delete" appears three times across the two dialogs. A human is unlikely to tap a dialog
+  title, so this is not ranked; but it is worth knowing that the wording repeats, and it is why an
+  automated walkthrough mis-measured the feature. The genuine defect underneath is item 1.
+* *Mixed languages in the Android share sheet and photo picker (raised Medium, `judy-002`).*
+  Android's own UI follows the device language, not the app's. Run 001 discarded the same class of
+  finding and the ruling stands. The *app's own* dialog buttons are a different matter and are
+  ranked as item 4.
+* *"Two taps needed a retry" (raised Low, `judy-002`).* `adb input tap` flake on a shared emulator,
+  not app behaviour.
+* *"No vehicles found" on camera shots (`heidi-002`).* The emulator's virtual camera renders a
+  synthetic scene with no cars, so this is the honest expected outcome and was scoped as such in
+  the scenario. Not a defect.
+* *No in-app language switch (raised Low, `judy-002`).* Considered and not ranked: Android 13+
+  exposes a per-app language control in system settings, and the app ships only German and English.
+  Duplicating the OS control would not have helped this persona, since neither language is one she
+  reads comfortably.
+
+[[preserve]]
+== Notes
+
+* *Worth preserving — do not "fix" these.*
+** The whole main flow now matches a novice's mental model with no jargon and no hunting: pick a photo, watch a plain-language percentage, see the before/after, tap share. Both novice personas completed it without a wrong turn (`grace-002`, and `judy-002` completed it *without reading English at all*, on icons and images alone).
+** Declining the camera permission is handled properly: an immediate plain snackbar, the app still fully usable, and recovery costs exactly one tap (`heidi-002`). Silent failure on a refused permission is the common defect here and this app does not have it.
+** Diagnostics really is off by default, and the description "stays on this device… nothing is uploaded" held up under an adversarial reading (`ivan-002`). Item 7 is about a sentence in About, not about this claim.
+** "About & Licenses" names AGPLv3, both bachelor theses, the university and the per-component licences — more than most apps disclose, and it reassured the two personas suspicious of a non-Play-Store install (`ivan-002`, `heidi-002`).
+** On-device progress is reported as a live percentage, so no wait reads as a hang (`heidi-002`, `grace-002`).
+** The website's German/English switch is in the first place a reader looks — top nav, above the fold, on both versions — and switches cleanly with no mixed-language leftovers (`judy-002`).
+** The fuller reliability paragraph is specific rather than hedged: it says the app ran on real hardware once and crashed, and that the bug is fixed in the build offered. The journalist persona in run 001 trusted the project *because* of this honesty; keep that register when updating it (`frank-002`).
+
+* *Cross-persona agreement.* The recurring theme of run 002 is narrower and different from
+  run 001's. Run 001 found a site written for a more technical reader than the one it was aimed at;
+  that is largely resolved. Run 002's theme is *the app states an outcome but not its consequence*:
+  it says "no vehicles detected" but not why Download is therefore dead (item 3); it says the
+  diagnostics were deleted but not why a new ID appeared (item 1); it says what diagnostics records
+  but not all of it (item 6); the site says "what that means" but lands somewhere else (item 5).
+  All four are wording or one-line-of-feedback fixes, not redesigns.
+
+* *Process note — the repo under-reports its own deployment state.* `TODO.md` (line ~65) and commit
+  `534500c`'s message both say the site fixes reach users only at the next `site/deploy.sh` run. A
+  deploy has since happened: the live `index.html` and `en.html` are byte-identical to `site/dist/`,
+  and UX-05 to UX-09 are all verifiably live. This is the mirror image of run 001's finding 3 — the
+  same class of defect (a stale claim about the project's own state), pointing the other way, and
+  harmless only by luck. Worth correcting `TODO.md` when item 5 is deployed.
+
+* *Isolation, and what was done to the test devices.* Run 001 lost a persona to a shared emulator's
+  contaminated gallery. This run: prior `AutoKorrektur_*.jpg` outputs, `*_mask.png` files and
+  fixture leftovers were moved to `/sdcard/ux002-quarantine` on both devices, and each persona got
+  a `pm clear` plus its own per-app locale. The gallery was seeded with exactly two photos under
+  deliberately neutral names — `IMG_20260927_083104.jpg` (a street with cars) and
+  `IMG_20260927_084512.png` (none) — so that a persona could not shortcut the task by reading a
+  filename. Personas ran on two devices: `grace` then `heidi` on emulator-5554 (720x1280),
+  `ivan` then `judy` on emulator-5556 (1344x2992), both on build `2.0.0-18-gc739cf6`.
+  For `judy`, emulator-5556's *system* locale was set to `tr-TR` and the device rebooted, so the
+  app's real fallback was under test rather than a per-app override. Pre-run file listings are kept
+  as `snapshot-emulator-5554.txt` and `snapshot-emulator-5556.txt`. A dedicated AVD per run would
+  still be cheaper to trust than cleaning a shared one.
++
+Both devices were restored afterwards and their media trees verified identical to those snapshots,
+and emulator-5556's system locale was returned to `en-US`. Two changes could *not* be reverted and
+are disclosed here: app data was cleared on both devices (that was the point — each persona needed a
+first-run state), and emulator-5556's app was upgraded from `core-alpha-20260903-11-g0f5dce9` to
+the build under test, since the old APK is not available to reinstall. Six fixture images that had
+existed in *both* `DCIM/Camera` and `Pictures` were collapsed to one copy each by the quarantine
+step and were restored from `app/src/androidTest/assets/`, so the file set matches but those twelve
+files are fresh copies rather than the originals.
+
+* *Method.* Scenario design and this distillation ran on the stronger model; all five walkthroughs
+  ran as subagents pinned to Sonnet, so the friction recorded is a lower bound on what a person
+  would hit. Each persona was denied access to the repository — including `TODO.md` and the
+  scenario files' own regression notes — so that the regression check in <<regression>> is a blind
+  one. One methodological limitation: `frank-002`'s browser click automation hung, so the download
+  was verified by `href` and a network trace (HTTP 200 for the APK) rather than by observing the
+  download dialog. His anchor finding (item 5) is independently verified from the HTML and is
+  unaffected.
