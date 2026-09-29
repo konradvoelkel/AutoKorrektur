@@ -6,7 +6,7 @@
 #   /privacy-en    privacy-en.html from PRIVACY_POLICY.en.md (minus its italic maintainers' note)
 #   /download/     the signed `core` release APK (arm64-v8a) named with the versionName, plus
 #                  SHA256SUMS -- the sideload route while the Play listing is not live
-# Then precompresses text files (brotli if installed, zstd, gzip) for Caddy's `precompressed`.
+# Then precompresses text files (brotli, zstd, gzip) for Caddy's `precompressed`.
 # Same shape as Laberampel's site/build.sh, without the browser app. Needs: pandoc, zstd, git.
 # Deploying is site/deploy.sh. Nothing here touches the network.
 #
@@ -25,7 +25,7 @@ repo="$(cd "$(dirname "$0")/.." && pwd)"
 out="${1:-$repo/site/dist}"
 case "$out" in /*) ;; *) out="$PWD/$out" ;; esac
 
-for tool in pandoc zstd git; do
+for tool in pandoc zstd brotli git; do
   command -v "$tool" >/dev/null || { echo "build.sh: $tool not installed" >&2; exit 1; }
 done
 # versionName the way app/build.gradle.kts computes it (git describe --tags --always).
@@ -138,7 +138,7 @@ done
 # --- precompress (Caddy: file_server precompressed br zstd gzip) ---------------------------------
 find "$out" -type f \( -name '*.html' -o -name '*.css' -o -name '*.svg' -o -name '*.txt' \) -print0 |
   xargs -0 -r -P "$(nproc)" -I{} sh -c '
-    command -v brotli >/dev/null && brotli -kf "$1"
+    brotli -kf "$1"
     zstd -q -kf -19 "$1"
     gzip -kf -9 "$1"' _ {}
 
