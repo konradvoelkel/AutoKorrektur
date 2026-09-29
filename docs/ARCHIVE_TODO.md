@@ -1,6 +1,11 @@
 # 🏛️ AutoKorrektur: Completed Development Milestones Archive
 
-This document archives all historically completed and verified development milestones, bug fixes, and architectural implementations for AutoKorrektur up to Version 1.0.0.
+Completed, verified work moved out of `TODO.md`, which carries only what is still open.
+Sections 1 and 2 are the 1.0 milestones and hardening phases; sections 3 to 5 are the 2.0
+repository move, the two usability runs, and the release plumbing that is finished.
+
+Findings and decisions are summarised here — the full record stays where it was written:
+`reports/` and `scenarios/` for the usability runs, the git log for everything else.
 
 ---
 
@@ -54,3 +59,61 @@ This document archives all historically completed and verified development miles
 - [x] **L8 (Privacy by Design)**: Cleaned `data_extraction_rules.xml` to explicitly exclude private cache and ML weights from cloud backup.
 - [x] **M7 (Tile Inpainting Optimization)**: Cleaned `ProgressiveTileInpainter.kt` `createFeatheredMask` by removing dead Mat allocations.
 - [x] **L3 (Unit Test Suite Expansion)**: Added academic validation tests verifying resolution modes, shadow expansion, pedestrian protection, and boundary continuity.
+
+---
+
+## 3. AutoKorrektur 2.0: repository move (Milestone 0, 2026-09-24)
+
+- [x] **REPO-01. Slim the repository** — binaries, owner-only notes and the cloud backend out; a clone is ~13 MB, the tracked tree under 3 MB.
+- [x] **REPO-02. Rebrand to 2.0** — README lineage, changelog headings, version fallback, store listing and website. The [browser version by Benjamin Beckers](https://github.com/BenB2/AutoKorrektur) is 1.0; this native rewrite is 2.0.
+- [x] **REPO-03. Canonical repository is `konradvoelkel/AutoKorrektur`** — a fork of the unmaintained `xamde/AutoKorrektur`, which receives no further pushes. The fork marker costs nothing new, since that repo was already a fork of the 1.0 browser version.
+- [x] **REPO-04. Actions enabled** — lint, unit tests, the instrumented emulator suite and the release bundle all run on the canonical repo.
+
+`REPO-05` (asking GitHub Support to garbage-collect the fork network, so pre-rewrite objects stop
+being reachable by SHA) is still open and stays in `TODO.md`.
+
+---
+
+## 4. Usability runs 001 and 002 (UX-01 to UX-25, 2026-09-28/29)
+
+Two think-aloud runs, five fictional personas each, walking the live site and the `core` build.
+The full record — scenarios, per-persona step-by-step reports, ranked findings, and the findings
+that were **discarded** as test-environment artefacts — is in `scenarios/` and `reports/`
+(`reports/improvements-001.adoc`, `reports/improvements-002.adoc`). Everything below shipped.
+
+**Run 001 (UX-01 to UX-10)** — the app showed its working instead of its result, and the site
+addressed a more technical reader than the one it was written for.
+
+- [x] **UX-01, UX-02, UX-03, UX-04 (app)** — the result screen led with the red mask preview and the novice shared *that*; zero detections produced no message at all, under a caption asserting the opposite; Download and Share were loud primary buttons before there was anything to export; and "Für Instagram exportieren" was the only share control anywhere. Now: comparison first, mask demoted, "Keine Fahrzeuge erkannt", actions disabled until there is a result, and a plain "Bild teilen".
+- [x] **UX-05, UX-06, UX-07, UX-08, UX-09 (site)** — the crash-risk warning sat 4.8 screens below the download button at 375 px; the install route was labelled "Sideloading, Prüfsumme, Zertifikat"; the English path dead-ended in a German-only Impressum; the verification instructions named `apksigner` without saying where it comes from; and "in zwei Tipps" was measured at four taps plus a scroll.
+- [x] **UX-10. `/download/` returned 404** while the files under it were fine — it met exactly the reader who trims a URL to look for the checksum. Fixed in the infrastructure repo (`~/files/work/server`, `ef3be16`, item B13): `browse` on a matcher for exactly `/download` and `/download/`, deliberately not `/download/*`, so one intentionally public directory lists itself and no other path does.
+
+**Run 002 (UX-11 to UX-25)** — a narrower theme: *the app stated an outcome but not its
+consequence*. Run 001's nine fixes were re-confirmed blind, by fresh personas denied access to the
+repository, including `TODO.md` and the scenarios' own regression notes.
+
+- [x] **UX-11. Deleting diagnostics looked like it had failed.** It worked, but left the switch on, so `clear()` immediately minted a new install id and wrote a new `session_start` — a non-zero count and a brand-new id, seconds after the user confirmed "delete everything". Now: switch off first, then clear, and a dialog says both happened. The persona filed this as a no-op Critical; he was wrong about the mechanism and right about what the screen told him.
+- [x] **UX-12, UX-21, UX-23. Diagnostics was unreadable from inside the app** — a count, a size, a truncated id, and a `.jsonl` export the share sheet offers no way to open. Now the dialog lists events in words and local time, and the install id is shown in full and long-press-copyable.
+- [x] **UX-13, UX-19, UX-20. The no-detection result.** Disabled actions said nothing when tapped; the slider compared a photo with itself, sometimes without even its badges; and inpainting still ran on an empty mask (measured 1090 ms → 3 ms once skipped).
+- [x] **UX-14, UX-16, UX-17, UX-18, UX-24. Wording and language.** Dialog buttons came from `android.R.string` and so followed the *device* language while the body followed the *app* language ("Tamam" under an English dialog on a Turkish phone); the diagnostics description named six fields fewer than the file carries; "100% … without data collection" sat against the diagnostics feature; nothing explained why the app wanted the camera; and the overflow icon was described in the device's language.
+- [x] **UX-15, UX-22, UX-25 (site).** "Was das heißt" pointed at the *install* heading rather than the explanation it promised; the English contact made an English reader decode the German word "punkt"; and a RAM figure came with no way to check your own phone.
+
+Two lessons from the fixing, not the finding. Adding the event list made the diagnostics dialog
+taller than a 720x1280 screen and pushed **its own Delete button off the bottom** — the control
+UX-11 is about, unreachable on the screen size the run used, and invisible in code review; the body
+is a height-capped `ScrollView` now and Delete sits in it rather than in the button row. And
+`TODO.md` had claimed run 001's site fixes were awaiting a deploy when they had already shipped —
+the repo under-reporting its own state, which is run 001's finding 3 in reverse.
+
+Worth preserving, confirmed by run 002 and not to be "fixed": the declined-camera-permission path
+(plain snackbar, app still usable, one-tap recovery); diagnostics genuinely off by default, with a
+description that held up under an adversarial reading; live percentage progress on every stage; the
+thoroughness of About & Licenses; and the site's German/English switch. The novice flow completes
+with no wrong turns — the Turkish-locale persona finished it without reading any English at all.
+
+---
+
+## 5. Release plumbing (Milestone 2, completed parts)
+
+- [x] **REL-02. Privacy policy hosting** — live since 2026-09-21 at https://autokorrektur.org/privacy (`/privacy-en` in English), redeployed by `site/deploy.sh`. Pasting the URL into Play Console → App content is still a manual step and belongs to `REL-01`.
+- [x] **REL-04. Direct APK download on autokorrektur.org** (since 2026-09-28) — `/download/` serves the signed `core` release APK (arm64-v8a) named with its versionName, plus `SHA256SUMS`. `site/build.sh` copies it out of `app/build/outputs/apk/core/release/` and **refuses to publish one that is stale, x86_64 (`-PscreenshotAbi`) or debug-signed**; `DOWNLOAD_VERSION`, `APK_BUILD_DATE` and `deploy.sh KEEP_DOWNLOAD=1` allow a pages-only deploy that leaves published bytes alone. The rule those guards exist for: **never republish different bytes under a name people have checksummed** — a new version gets a new filename, and the old one is deleted rather than overwritten.
