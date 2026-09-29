@@ -44,6 +44,9 @@ class StringResourceLocalizationTest {
         "app_name", "first_fragment_label", "start", "start_btn", "label_original",
         "loading_status", "video_progress_zero", "btn_share_instagram", "engine_cloud",
         "export_ratio_story", "export_title", "diagnostics_install_id_label",
+        // "OK" is "OK" in both languages; it exists as an app string at all so that dialog
+        // buttons follow the app's language rather than the device's (UX-14).
+        "btn_ok",
         // string-arrays whose items are model names / megapixel counts
         "yolo_model_options",
     )

@@ -97,6 +97,14 @@ object Telemetry {
 
     fun sizeBytes(): Long = store?.sizeBytes() ?: 0L
 
+    /**
+     * The recorded lines, oldest first, for the Diagnostics dialog's in-app view. Until
+     * usability run 002 (UX-12) the only way to see what had been recorded was to export the
+     * `.jsonl` to another app, which a non-developer cannot read — so the dialog now renders
+     * these in plain words.
+     */
+    fun readLines(): List<String> = store?.readLines() ?: emptyList()
+
     /** Deletes every recorded event and the install id (a new one is made if re-enabled). */
     fun clear() {
         store?.clear()

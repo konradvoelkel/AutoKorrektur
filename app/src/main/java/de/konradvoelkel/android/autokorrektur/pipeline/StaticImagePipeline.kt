@@ -172,6 +172,16 @@ class StaticImagePipeline(
             val isServer = (qualityMode == InpaintingQualityMode.CLOUD_SDXL) || useServerSdxl
             stageStartNs = System.nanoTime()
             val inpaintedBitmap = when {
+                // An empty mask has nothing to paint over: MI-GAN (or the server) would spend the
+                // time and hand back the input. The progress label still claimed "Inpainting auf
+                // dem Gerät" while it happened, which is work the user waits for and no one needs
+                // (usability run 002, UX-20). The unchanged photo *is* the result here, and the
+                // UI says so via PipelineResult.detectionCount == 0.
+                detectionCount == 0 -> {
+                    onProgressUpdate?.invoke(PipelineStage.COMPLETED, 100)
+                    MatScaler.createDisplayBitmap(processedImage.originalMat)
+                }
+
                 isServer -> {
                     onProgressUpdate?.invoke(PipelineStage.INPAINTING_CLOUD, 75)
                     serverSdxlApi.processWithSdxl(

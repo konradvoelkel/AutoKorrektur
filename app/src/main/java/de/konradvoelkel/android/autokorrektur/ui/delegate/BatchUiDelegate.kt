@@ -35,7 +35,7 @@ class BatchUiDelegate(
                     onMessage(context.getString(R.string.csv_export_failed))
                 }
             }
-            .setNegativeButton(android.R.string.cancel, null)
+            .setNegativeButton(R.string.btn_cancel, null)
             .show()
     }
 }

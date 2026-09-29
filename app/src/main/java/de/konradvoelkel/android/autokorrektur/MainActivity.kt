@@ -65,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
             .setTitle(R.string.about_dialog_title)
             .setMessage(getString(R.string.about_dialog_content, BuildConfig.VERSION_NAME))
-            .setPositiveButton(android.R.string.ok, null)
+            .setPositiveButton(R.string.btn_ok, null)
             .show()
     }
 

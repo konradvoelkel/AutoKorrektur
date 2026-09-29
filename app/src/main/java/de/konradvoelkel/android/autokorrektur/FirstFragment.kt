@@ -32,9 +32,11 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import de.konradvoelkel.android.autokorrektur.ar.ArCameraActivity
 import de.konradvoelkel.android.autokorrektur.manager.ConsentManager
+import de.konradvoelkel.android.autokorrektur.manager.PreferencesConstants
 import de.konradvoelkel.android.autokorrektur.manager.QuotaManager
 import de.konradvoelkel.android.autokorrektur.databinding.FragmentFirstBinding
 import de.konradvoelkel.android.autokorrektur.ui.model.MainUiProperties
@@ -217,6 +219,7 @@ class FirstFragment : Fragment() {
         when (state) {
             is MainUiState.Idle -> {
                 binding.beforeAfterSliderView.visibility = View.GONE
+                binding.tvNothingToSave.visibility = View.GONE
                 binding.imagesContainer.visibility = View.VISIBLE
                 setResultActionsEnabled(false)
                 updateInferenceButtonState(viewModel.properties.value)
@@ -241,6 +244,7 @@ class FirstFragment : Fragment() {
                 binding.fileSelect.isEnabled = false
                 binding.batchMode.isEnabled = false
                 setResultActionsEnabled(false)
+                binding.tvNothingToSave.visibility = View.GONE
 
                 if (state.intermediateInpaintedBitmap != null && !viewModel.properties.value.isBatchMode) {
                     val displayAfter = BitmapMemoryUtils.createScaledBitmapForDisplay(
@@ -486,7 +490,7 @@ class FirstFragment : Fragment() {
                 val intent = Intent(requireContext(), ArCameraActivity::class.java)
                 startActivity(intent)
             } else {
-                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                requestCameraPermission()
             }
         }
 
@@ -589,8 +593,34 @@ class FirstFragment : Fragment() {
         ) {
             launchCamera()
         } else {
-            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            requestCameraPermission()
         }
+    }
+
+    /**
+     * Asks for the camera, saying why first. Tapping "Foto aufnehmen" used to jump straight to
+     * Android's stock prompt, which only offers its own generic "take pictures and record video"
+     * wording — thin grounds for a user wary of an app installed outside the Play Store
+     * (usability run 002, UX-18). Shown on the first ask only; after that the system dialog is
+     * the faster path, and the refusal route already explains itself with a snackbar.
+     */
+    private fun requestCameraPermission() {
+        val prefs = requireContext().getSharedPreferences(
+            PreferencesConstants.PREFS_NAME, android.content.Context.MODE_PRIVATE
+        )
+        if (prefs.getBoolean(PreferencesConstants.KEY_CAMERA_RATIONALE_SHOWN, false)) {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            return
+        }
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.camera_rationale_title)
+            .setMessage(R.string.camera_rationale_message)
+            .setPositiveButton(R.string.btn_ok) { _, _ ->
+                prefs.edit().putBoolean(PreferencesConstants.KEY_CAMERA_RATIONALE_SHOWN, true).apply()
+                cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+            .setNegativeButton(R.string.btn_cancel, null)
+            .show()
     }
 
     private fun launchCamera() {
@@ -707,7 +737,6 @@ class FirstFragment : Fragment() {
         displayAfterBmp = displayAfter
 
         binding.beforeAfterSliderView.setBitmaps(displayBefore, displayAfter)
-        binding.beforeAfterSliderView.visibility = View.VISIBLE
 
         // Render intermediate vehicle mask preview with a semi-transparent red overlay
         val overlay = MaskOverlayUtils.createRedOverlayBitmap(
@@ -733,6 +762,17 @@ class FirstFragment : Fragment() {
             getString(if (foundNothing) R.string.label_mask_none else R.string.label_mask)
         )
         binding.imagesContainer.visibility = View.VISIBLE
+
+        // With no detections the two halves of the comparison are the same photo, so the slider
+        // has nothing to compare: it showed two identical images and, because both badges are
+        // suppressed near the edges, sometimes without even the VORHER/NACHHER labels
+        // (usability run 002, UX-19). Hide it and let the unchanged photo speak for itself.
+        binding.beforeAfterSliderView.visibility = if (foundNothing) View.GONE else View.VISIBLE
+
+        // The two result actions are correctly disabled here, but saying nothing at all when
+        // they are tapped read as lost work to the persona who had just taken the photo (UX-13).
+        binding.tvNothingToSave.visibility = if (foundNothing) View.VISIBLE else View.GONE
+
         if (foundNothing) {
             showSnackbar(getString(R.string.msg_no_vehicles_detected))
         }

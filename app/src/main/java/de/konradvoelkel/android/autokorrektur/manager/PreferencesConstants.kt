@@ -11,4 +11,7 @@ object PreferencesConstants {
     const val KEY_USED_COUNT = "sdxl_quota_used"
     const val KEY_TELEMETRY_ENABLED = "telemetry_enabled"
     const val KEY_TELEMETRY_INSTALL_ID = "telemetry_install_id"
+
+    /** Set once the camera rationale (UX-18) has been shown, so it is a first-ask-only dialog. */
+    const val KEY_CAMERA_RATIONALE_SHOWN = "camera_rationale_shown"
 }

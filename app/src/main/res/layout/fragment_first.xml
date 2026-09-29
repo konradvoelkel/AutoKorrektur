@@ -248,6 +248,25 @@
             app:layout_constraintTop_toBottomOf="@id/download"
             app:layout_constraintWidth_percent="0.9" />
 
+        <!-- Why "Herunterladen" / "Bild teilen" are dead after a run that found nothing
+             (usability run 002, UX-13). The buttons were already correctly disabled; tapping
+             them just said nothing at all, and the persona who had taken the photo herself read
+             that as the app losing her work. GONE unless the last run found no vehicles. -->
+        <TextView
+            android:id="@+id/tvNothingToSave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center_horizontal"
+            android:text="@string/msg_nothing_to_save"
+            android:textAppearance="?attr/textAppearanceBodySmall"
+            android:textColor="?android:attr/textColorSecondary"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/exportInstagram"
+            app:layout_constraintWidth_percent="0.9" />
+
         <!-- Live AR Car Removal Button -->
         <Button
             android:id="@+id/arLiveModeButton"
@@ -261,7 +280,7 @@
             app:iconGravity="textStart"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/exportInstagram"
+            app:layout_constraintTop_toBottomOf="@id/tvNothingToSave"
             app:layout_constraintWidth_percent="0.7" />
 
         <!-- Options Button -->

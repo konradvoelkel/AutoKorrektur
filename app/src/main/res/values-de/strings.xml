@@ -2,7 +2,7 @@
     <string name="app_name">AutoKorrektur</string>
     <string name="action_about">Über &amp; Lizenzen</string>
     <string name="about_dialog_title">Über AutoKorrektur</string>
-    <string name="about_dialog_content">AutoKorrektur – Autofreie Visionen &amp; AR\n\nVersion: %1$s\nLizenz: GNU AGPLv3\n\nWissenschaftliche Grundlagen:\n• Till Schellscheidt: Bachelorarbeit \"Autokorrektur – Automatisierte Objektersetzung in Fotos\" (HHU Düsseldorf, 2024)\n• Ben Beckers: Bachelorarbeit \"Autokorrektur – Inpainting auf mobilen Endgeräten\" (HHU Düsseldorf, 2025)\n• Dr. Konrad Völkel: Betreuung, native Android-Architektur &amp; AR-Pipeline\n\nOpen-Source-Komponenten:\n• YOLOv11-seg: GNU AGPLv3 (Ultralytics)\n• MI-GAN: MIT License (Picsart AI Research)\n• OpenCV Android SDK 5: Apache 2.0\n• ONNX Runtime / TFLite: MIT / Apache 2.0\n• CameraX &amp; Jetpack: Apache 2.0\n\n100%% On-Device KI-Verarbeitung ohne Datensammlung.</string>
+    <string name="about_dialog_content">AutoKorrektur – Autofreie Visionen &amp; AR\n\nVersion: %1$s\nLizenz: GNU AGPLv3\n\nWissenschaftliche Grundlagen:\n• Till Schellscheidt: Bachelorarbeit \"Autokorrektur – Automatisierte Objektersetzung in Fotos\" (HHU Düsseldorf, 2024)\n• Ben Beckers: Bachelorarbeit \"Autokorrektur – Inpainting auf mobilen Endgeräten\" (HHU Düsseldorf, 2025)\n• Dr. Konrad Völkel: Betreuung, native Android-Architektur &amp; AR-Pipeline\n\nOpen-Source-Komponenten:\n• YOLOv11-seg: GNU AGPLv3 (Ultralytics)\n• MI-GAN: MIT License (Picsart AI Research)\n• OpenCV Android SDK 5: Apache 2.0\n• ONNX Runtime / TFLite: MIT / Apache 2.0\n• CameraX &amp; Jetpack: Apache 2.0\n\nDie gesamte Verarbeitung passiert auf deinem Gerät. Nichts wird hochgeladen.</string>
     <string name="first_fragment_label">AutoKorrektur</string>
     <string name="next">Weiter</string>
     <string name="previous">Zurück</string>
@@ -185,15 +185,15 @@
     <string name="action_diagnostics">Diagnosedaten</string>
     <string name="diagnostics_title">Diagnosedaten</string>
     <string name="diagnostics_switch">Diagnosedaten auf diesem Gerät aufzeichnen</string>
-    <string name="diagnostics_description">Standardmäßig aus. Wenn aktiv, schreibt die App Rechenzeiten, Bildgrößen, Modi, Anzahl erkannter Fahrzeuge, Fehlertypen und dein Gerätemodell in eine Datei, die auf diesem Gerät bleibt. Nie Bilder, Dateinamen, Standorte oder persönliche Daten. Nichts wird hochgeladen – du entscheidest, ob du die Datei an die Entwickler weitergibst.</string>
-    <string name="diagnostics_install_id_label">ID %1$s…</string>
+    <string name="diagnostics_description">Standardmäßig aus. Wenn aktiv, schreibt die App Rechenzeiten, Bildgrößen, Modi, Anzahl erkannter Fahrzeuge und Fehlertypen sowie Angaben zu deinem Telefon und dieser App (Modell, Arbeitsspeicher, Prozessorkerne, Spracheinstellung, App-Version) in eine Datei, die auf diesem Gerät bleibt. Nie Bilder, Dateinamen, Standorte oder persönliche Daten. Nichts wird hochgeladen – du entscheidest, ob du die Datei an die Entwickler weitergibst.</string>
+    <string name="diagnostics_install_id_label">ID %1$s</string>
     <string name="diagnostics_export">Exportieren</string>
     <string name="diagnostics_export_subject">AutoKorrektur-Diagnosedaten</string>
     <string name="diagnostics_export_chooser">Diagnosedatei teilen</string>
     <string name="diagnostics_export_empty">Noch keine Diagnosedaten aufgezeichnet</string>
     <string name="diagnostics_delete">Löschen</string>
     <string name="diagnostics_delete_confirm">Alle aufgezeichneten Diagnosedaten und die Installations-ID löschen?</string>
-    <string name="diagnostics_deleted">Diagnosedaten gelöscht</string>
+    <string name="diagnostics_deleted">Diagnosedaten gelöscht und die Aufzeichnung ausgeschaltet.</string>
     <plurals name="diagnostics_event_count">
         <item quantity="one">%1$d Ereignis</item>
         <item quantity="other">%1$d Ereignisse</item>
@@ -203,4 +203,38 @@
     <string name="badge_before">VORHER</string>
     <string name="badge_after">NACHHER</string>
     <string name="badge_car_free">AUTOFREI</string>
+
+    <!-- Dialogknöpfe, die der App gehören und nicht Android: die System-Strings folgen der
+         *Geräte*-Sprache, der Dialogtext aber der *App*-Sprache – auf einem türkischen Telefon
+         stand deshalb "Tamam" unter einem ansonsten englischen Dialog (Usability-Lauf 002, UX-14). -->
+    <string name="btn_ok">OK</string>
+    <string name="btn_cancel">Abbrechen</string>
+
+    <!-- Diagnosedaten: was gespeichert ist, in Worten (Usability-Lauf 002, UX-12/UX-21/UX-23) -->
+    <string name="diagnostics_deleted_title">Gelöscht</string>
+    <string name="diagnostics_events_heading">Was aufgezeichnet wurde</string>
+    <string name="diagnostics_events_empty">Noch nichts aufgezeichnet.</string>
+    <string name="diagnostics_event_session_start">App gestartet, Version %1$s</string>
+    <string name="diagnostics_event_pipeline_run">Foto verarbeitet: %1$s, %2$s s</string>
+    <string name="diagnostics_event_crash">Absturz: %1$s</string>
+    <string name="diagnostics_event_generic">Aufgezeichnet: %1$s</string>
+    <string name="diagnostics_event_time_format">d. MMM, HH:mm</string>
+    <string name="diagnostics_install_id_hint">Zum Kopieren der Installations-ID lang drücken</string>
+    <string name="diagnostics_install_id_copied">Installations-ID kopiert</string>
+    <plurals name="diagnostics_event_vehicles">
+        <item quantity="one">%d Fahrzeug gefunden</item>
+        <item quantity="other">%d Fahrzeuge gefunden</item>
+    </plurals>
+
+    <!-- Warum die beiden Ergebnis-Aktionen nach einem Lauf ohne Fund aus sind (UX-13) -->
+    <string name="msg_nothing_to_save">Es wurde nichts verändert – es gibt also nichts zu speichern.</string>
+
+    <!-- Wird vor Androids Kamera-Abfrage gezeigt, nur beim ersten Mal (UX-18) -->
+    <string name="camera_rationale_title">Kamera benutzen?</string>
+    <string name="camera_rationale_message">AutoKorrektur braucht die Kamera, um das Foto aufzunehmen, das du bearbeiten willst. Das Foto bleibt auf deinem Telefon.</string>
+
+    <!-- Überschreibt AppCompats eigene Beschreibung des Überlauf-Symbols, damit es in der
+         Sprache der App benannt ist und nicht in der des Geräts (UX-24). -->
+    <string name="abc_action_menu_overflow_description">Weitere Optionen</string>
+
 </resources>
