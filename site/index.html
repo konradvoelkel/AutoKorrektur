@@ -10,7 +10,27 @@
      mit script-src 'none' (Server-Repo ~/files/work/server, Rolle autokorrektur). -->
 <link rel="stylesheet" href="site.css">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="alternate" hreflang="en" href="en.html">
+<link rel="canonical" href="__BASE_URL__/">
+<link rel="alternate" hreflang="de" href="__BASE_URL__/">
+<link rel="alternate" hreflang="en" href="__BASE_URL__/en.html">
+<link rel="alternate" hreflang="x-default" href="__BASE_URL__/">
+<!-- Open Graph / Twitter: what a chat app, a Mastodon post or a messenger shows when someone
+     shares the link. Absolute URLs are required -- a scraper resolves no relative path --
+     and __BASE_URL__ comes from site/site.env via site/build.sh. The card image carries no
+     text on purpose, so one file serves both languages. -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AutoKorrektur">
+<meta property="og:locale" content="de_DE">
+<meta property="og:locale:alternate" content="en_GB">
+<meta property="og:url" content="__BASE_URL__/">
+<meta property="og:title" content="AutoKorrektur – deine Straße ohne Autos">
+<meta property="og:description" content="Entfernt parkende Autos aus deinen Fotos. Die KI rechnet komplett auf deinem Smartphone – ohne Konto, ohne Tracking, ohne Upload.">
+<meta property="og:image" content="__BASE_URL__/img/og-card.jpg">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Dieselbe Straße zweimal: links mit parkenden Autos, rechts ohne.">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 <body>
 <header class="site">
