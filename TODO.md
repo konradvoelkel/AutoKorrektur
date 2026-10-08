@@ -6,9 +6,11 @@
 > the privacy posture and CI are all implemented and green, and two usability runs have been
 > acted on in full (UX-01 to UX-25, archived). On 2026-10-08 the whole instrumented suite ran on
 > real arm64 hardware for the first time — 114 tests on a Pixel 10 Pro, no ML or native failure —
-> so the *technical* arm64 risk is retired. **What is left of FT-01 is the human half**: real
-> street photos, and a judgement on inpainting quality. Migrating the UI to Jetpack Compose began
-> the same day (decision 2026-10-08).  
+> so the *technical* arm64 risk is retired. The owner's field tests the same day answered the
+> other half: the output is good enough to view on a phone and to choose by — good enough to pick
+> the shot worth handing to a graphics designer, not itself the finished image. **The remaining
+> gap is FT-01c**: the *release* build has still never run on a phone. Migrating the UI to Jetpack
+> Compose began the same day (decision 2026-10-08).  
 > **Archive**: [docs/ARCHIVE_TODO.md](docs/ARCHIVE_TODO.md) — completed milestones M1–M8,
 > Phases 1–4, the repository move, both usability runs, and the release plumbing that is done.
 
@@ -29,16 +31,21 @@ What is automated here is now done; what is left needs a person and a street.
       the costume of assertions about the app. The menu blind spot that produced `a7f59c5` is
       closed too (`de9abdc`, `TESTING.md` §4), and that suite passes on the phone.
       Device-run preconditions: `TESTING.md` §5.
-- [ ] **FT-01b. Walk real streets.** The part a test cannot do. Real urban environments —
-      residential street, commercial parking, mixed bike/pedestrian zones — per
-      [docs/FIELD_TESTING_AND_DATA_COLLECTION.md](docs/FIELD_TESTING_AND_DATA_COLLECTION.md).
-  - Judge inpainting quality at full size, not on a phone screen: the generated patch is a 512 px
-    upscale (`ARCHITECTURE.md` §4) and can leave a visible ghost. If that shows on most shots
-    rather than a minority, `core` needs the progressive path before it goes public. **This is now
-    the open question about the app** — the runtimes work; whether the output is good enough on
-    real photographs is unanswered.
-  - The website calls this an early test build *because* this item is open. Rewrite that note —
-    do not delete it — once a phone has genuinely been walked.
+- [x] **FT-01b. Walk real streets.** Done by the owner over numerous field tests (reported
+      2026-10-08). **Verdict: it works well enough, with a specific shape worth keeping straight.**
+      The output is good enough to view on a phone and to *choose* by — good enough to decide which
+      shot is worth taking to a graphics designer for a high-quality version. It is not itself the
+      high-quality version. That matches `ARCHITECTURE.md` §4 exactly: MI-GAN always generates at
+      512 px, so on a 2040 px photo the patch is a 4x upscale and a removed car can leave a soft or
+      iridescent ghost while the untouched background stays sharp — visible at full size, not at
+      phone size.
+  - **A gate this clears:** the ghost shows on a minority of shots, not most, so `core` does **not**
+    need the progressive path before going public. That was the condition on this line and it is
+    answered; `HIGH_RES_PROGRESSIVE` stays a `plus`-and-up feature rather than a release blocker.
+  - **Still owed:** the website's "early test build" note was written partly because this item was
+    open. Rewrite it — do not delete it — to say what the owner found, including the honest limit
+    (phone-viewing and selection, not a finished high-quality image). Outward-facing, so it is a
+    deliberate edit plus a `site/deploy.sh` run.
 - [ ] **FT-01c. Smoke-test the *release* build on the phone.** `RELEASE_CHECKLIST.md` §5 asks for
       `:app:installCoreRelease` on physical hardware. FT-01a used the **full debug** build, which
       is a different flavor *and* a different build type: R8, the `core` feature flags and release
