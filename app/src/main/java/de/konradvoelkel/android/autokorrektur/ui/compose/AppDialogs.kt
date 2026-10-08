@@ -107,7 +107,14 @@ fun AboutDialog(onDismiss: () -> Unit) {
 @Composable
 fun DiagnosticsDialog(onDismiss: () -> Unit) {
     val context = LocalContext.current
-    val maxBodyHeight = (LocalConfiguration.current.screenHeightDp * 0.5f).dp
+    val configuration = LocalConfiguration.current
+    val maxBodyHeight = (configuration.screenHeightDp * 0.5f).dp
+
+    // Read at composition time, not inside the gesture callback: `LocalContext.current` is not
+    // invalidated by a Configuration change while `stringResource` is (lint:
+    // LocalContextGetResourceValueCall). This app switches language at runtime, so that is not a
+    // theoretical case here.
+    val clipLabel = stringResource(R.string.diagnostics_title)
 
     // Telemetry is a process-wide object, not observable state; this counter is what makes the
     // dialog recompose after a switch, a delete, or anything else that changes the store.
@@ -119,7 +126,10 @@ fun DiagnosticsDialog(onDismiss: () -> Unit) {
     val eventCount = remember(revision) { Telemetry.eventCount() }
     val sizeKb = remember(revision) { Telemetry.sizeBytes() / 1024.0 }
     val installId = remember(revision) { Telemetry.installId }
-    val events = remember(revision) { readableEvents(context) }
+    // `configuration` as a second key: readableEvents() reads resources and lint cannot see
+    // through the call. Without it the event lines would stay in the old language after a
+    // language switch, because remember(revision) alone would not re-run.
+    val events = remember(revision, configuration) { readableEvents(context) }
 
     AlertDialog(
         modifier = Modifier.testTag(DialogTags.DIAGNOSTICS),
@@ -181,11 +191,7 @@ fun DiagnosticsDialog(onDismiss: () -> Unit) {
                                 val id = installId ?: return@detectTapGestures
                                 val clipboard = context
                                     .getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                                clipboard.setPrimaryClip(
-                                    ClipData.newPlainText(
-                                        context.getString(R.string.diagnostics_title), id
-                                    )
-                                )
+                                clipboard.setPrimaryClip(ClipData.newPlainText(clipLabel, id))
                                 Toast.makeText(
                                     context,
                                     R.string.diagnostics_install_id_copied,
