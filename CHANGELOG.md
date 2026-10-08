@@ -14,6 +14,7 @@ app's own internal numbering.
 ## [Unreleased] — towards 2.0.0
 
 ### Added
+- `scripts/publish_release.sh`: every tagged release gets its signed `core` APK and `SHA256SUMS` as a GitHub release, published from the laptop so the keystore stays out of CI; the annotated tag's message is the release note. `scripts/stage_release_apk.sh` vets and names the APK for it and for `site/build.sh`, so autokorrektur.org and GitHub serve identical bytes. `git describe` now matches `v*` tags only, so a future `assets-v2` tag on `main` cannot become the version name.
 - `CLAUDE.md`: orientation for anyone (or any agent) picking the repository up — the invariants that are easy to break (assets are not in git, Gradle tasks need a flavor prefix, `core` has no network permission, the localization contract, derived colours), plus the layout and conventions.
 - Store assets regenerated from the brand palette in `media/play_store_assets/`: icons, a new feature graphic (`feature_graphic.svg` → PNG) and four screenshots from a real `core` run — start, detection mask, before/after slider, save & share.
 - Opt-in, on-device diagnostics (`telemetry/`, "Diagnostics" in the menu): JSON-Lines events (stage timings, image size, detections, outcome, AR frame rate, crash class) in a 2 MB-capped private file. Never uploaded — export via the share sheet or delete. Off by default; see `PRIVACY_POLICY.md` §5.

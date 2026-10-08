@@ -47,7 +47,7 @@ goes there the same day.
 | `app/src/main/java/.../ml/` | engines, mask maths, pre/post-processing, the optional server client |
 | `app/src/main/java/.../ar/` | live AR viewfinder (`full` only) |
 | `app/src/main/java/.../telemetry/` | opt-in, on-device diagnostics; never transmits |
-| `scripts/` | `fetch_assets.sh` + `assets.manifest` |
+| `scripts/` | `fetch_assets.sh` + `assets.manifest`; `publish_release.sh` puts a tag's signed `core` APK on a GitHub release, via `stage_release_apk.sh`, which `site/build.sh` shares |
 | `site/` | autokorrektur.org — `build.sh` renders the privacy policy, `deploy.sh` ships it |
 
 Documentation map: `docs/INDEX.md`. Architecture and the mask-polarity contract: `ARCHITECTURE.md`.

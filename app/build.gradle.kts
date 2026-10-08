@@ -22,7 +22,9 @@ android {
     }
 
     val gitVersionNameProvider = providers.exec {
-        commandLine("git", "describe", "--tags", "--always")
+        // Only the v* tags name a build: assets-vN and the historical tags sit on main too, and
+        // without --match the nearest of those would become the versionName.
+        commandLine("git", "describe", "--tags", "--match", "v[0-9]*", "--always")
         isIgnoreExitValue = true
     }.standardOutput.asText.map { text ->
         // Tags are written v2.0.0; the version name users see should not carry the "v".

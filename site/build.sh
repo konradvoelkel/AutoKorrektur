@@ -10,10 +10,10 @@
 # Same shape as Laberampel's site/build.sh, without the browser app. Needs: pandoc, zstd, git.
 # Deploying is site/deploy.sh. Nothing here touches the network.
 #
-# The APK is whatever `./gradlew :app:assembleCoreRelease` last produced -- `core`, because that is
-# "the app" (docs/PRODUCT_TIERS.md), signed with the release keystore (keystore.properties, local
-# only: without it Gradle falls back to the debug key and the check below refuses to publish it).
-# Never pass -PscreenshotAbi when building it, or the download is an x86_64 APK no phone can run.
+# The APK is whatever `./gradlew :app:assembleCoreRelease` last produced, vetted and named by
+# scripts/stage_release_apk.sh -- the script the GitHub release of a tag goes through as well, so
+# autokorrektur.org and GitHub serve byte-identical files. It must carry this version, contain
+# arm64 code and be signed with the release key, or the build stops.
 #
 # DOWNLOAD_VERSION overrides the version the pages *claim* to serve, for a pages-only change (an
 # Impressum fix) that must not force a rebuild the source has moved past; pair it with deploy.sh
@@ -32,8 +32,9 @@ case "$out" in /*) ;; *) out="$PWD/$out" ;; esac
 for tool in pandoc zstd brotli git; do
   command -v "$tool" >/dev/null || { echo "build.sh: $tool not installed" >&2; exit 1; }
 done
-# versionName the way app/build.gradle.kts computes it (git describe --tags --always).
-source_version=$(git -C "$repo" describe --tags --always 2>/dev/null || echo unknown)
+# versionName the way app/build.gradle.kts computes it: git describe against the v* tags only, so
+# an assets-vN tag on main cannot name a build.
+source_version=$(git -C "$repo" describe --tags --match 'v[0-9]*' --always 2>/dev/null || echo unknown)
 version="${DOWNLOAD_VERSION:-$source_version}"
 # app/build.gradle.kts strips the leading "v" from the tag for the versionName users see; the APK
 # filename and the metadata check below use that form, the pages print it too.
@@ -41,32 +42,15 @@ apk_version="${version#v}"
 built=$(git -C "$repo" log -1 --format=%cd --date=short 2>/dev/null || date -u +%Y-%m-%d)
 
 # --- the APK the download page will serve --------------------------------------------------------
-apkdir="$repo/app/build/outputs/apk/core/release"
-apk_src="$apkdir/app-core-release.apk"
-[ -f "$apk_src" ] || { echo "build.sh: $apk_src missing; run ./gradlew :app:assembleCoreRelease" >&2; exit 1; }
-# Refuse a stale APK: the build's own metadata must carry the version this site claims to serve.
-# With DOWNLOAD_VERSION that is the published one, so the check still bites -- it just compares
-# against the release instead of against HEAD.
-grep -q "\"versionName\": \"$apk_version\"" "$apkdir/output-metadata.json" ||
-  { echo "build.sh: $apkdir/output-metadata.json is not version $apk_version; rebuild${DOWNLOAD_VERSION:+ or correct DOWNLOAD_VERSION}" >&2; exit 1; }
-# Refuse an arm64-less APK: -PscreenshotAbi=x86_64 is routine for emulator work and would otherwise
-# leak an APK no phone can run into the download.
-# Command substitution, not `unzip -l | grep -q`: -q closes the pipe, unzip dies of SIGPIPE and
-# `set -o pipefail` turns a *passing* check into a failed build (the same trap as rsync | grep).
-if [ -z "$(unzip -Z1 "$apk_src" 'lib/arm64-v8a/*' 2>/dev/null)" ]; then
-  echo "build.sh: $apk_src has no lib/arm64-v8a/; it was built with -PscreenshotAbi" >&2; exit 1
-fi
-# Refuse a debug-signed APK. minSdk 29 means AGP signs with v2/v3 only, so there is no
-# META-INF/CERT.RSA to inspect -- but the signer certificate sits in the APK signing block as raw
-# bytes, so the release CN is greppable and the debug key's "CN=Android Debug" is not there. A
-# positive assertion, not a blocklist: no keystore.properties means Gradle silently falls back to
-# the debug key, and that APK must never be published (users could not take a Play update, and
-# anyone can sign an "update" for it). Needs no Android SDK.
-if ! grep -qa 'Konrad Voelkel' "$apk_src"; then
-  echo "build.sh: $apk_src is not signed with the release key (keystore.properties missing?)" >&2; exit 1
-fi
+# Staged (and vetted: this version, arm64, release key) before the old output is removed, so a
+# refused APK leaves the previous build intact. With DOWNLOAD_VERSION the version check compares
+# against the published release instead of against HEAD, so it still bites.
+stage=$(mktemp -d); trap 'rm -rf "$stage"' EXIT
+apk_path=$("$repo/scripts/stage_release_apk.sh" "$apk_version" "$stage")
+apk_name=$(basename "$apk_path")
 
 rm -rf "$out"; mkdir -p "$out/icons" "$out/img" "$out/download"
+mv "$stage/$apk_name" "$stage/SHA256SUMS" "$out/download/"
 cp -p "$repo"/site/{index.html,en.html,impressum.html,site.css,robots.txt} "$out/"
 cp -p "$repo"/site/icons/* "$out/icons/"
 cp -p "$repo/media/image_1_with_car_640x640.png" "$out/img/before.png"
@@ -140,15 +124,12 @@ render_policy "$repo/PRIVACY_POLICY.en.md" "$out/privacy-en.html" en "AutoKorrek
   "Applies to the Android app; the German <a href=\"privacy\" lang=\"de\">Datenschutzerklärung</a> is the binding text. Hosting of this website: <a href=\"impressum\">Impressum</a> (German). Text as of app version $version." \
   privacy-en en_GB "What the AutoKorrektur app stores and what it does not: all image processing stays on the device, with no account and no tracking."
 
-# --- /download/ -----------------------------------------------------------------------------------
-apk_name="autokorrektur-$apk_version-arm64-v8a.apk"
-cp -p "$apk_src" "$out/download/$apk_name"
-(cd "$out/download" && sha256sum "$apk_name" > SHA256SUMS)
+# --- /download/ (staged above) --------------------------------------------------------------------
 apk_mb=$(( ($(stat -c%s "$out/download/$apk_name") + 524288) / 1048576 ))
 # The page's "built" date describes the APK that is *published*, which is not always the local
 # rebuild: a pages-only deploy (DOWNLOAD_VERSION + deploy.sh KEEP_DOWNLOAD=1) leaves /download/ as
-# it is on the server, so the date must be overridable.
-apk_date=${APK_BUILD_DATE:-$(date -u -r "$apk_src" +%Y-%m-%d)}
+# it is on the server, so the date must be overridable. The staged copy keeps the build's mtime.
+apk_date=${APK_BUILD_DATE:-$(date -u -r "$out/download/$apk_name" +%Y-%m-%d)}
 
 # --- placeholders ---------------------------------------------------------------------------------
 for page in index.html en.html impressum.html; do

@@ -4,7 +4,7 @@ Engineering-side checklist for building, signing and publishing **AutoKorrektur*
 `core` is the flavor that goes to the Store (see [docs/PRODUCT_TIERS.md](docs/PRODUCT_TIERS.md));
 the owner keeps the account-side steps (keystore backup, Console forms) in a private note.
 
-Status as of 2026-09-25.
+Status as of 2026-10-09.
 
 ---
 
@@ -21,7 +21,8 @@ Status as of 2026-09-25.
 ## 2. Metadata & versioning
 - [x] `versionCode` / `versionName` are derived from git (`rev-list --count`, `describe --tags`); nothing to hand-edit.
 - [ ] **Tag the release** (`git tag -a v2.0.0 …`) before building, or the version name reads `<old-tag>-N-gsha`. This bites every time: an untagged build names itself `2.0.0-8-g37ab9d2`, and Play shows users that string.
-- [x] `targetSdk = 36`, `compileSdk = 37` — re-check against Play's current minimum at upload time.
+      Annotated (`-a`): the tag message is the GitHub release note (`scripts/publish_release.sh`).
+- [x] `targetSdk = 37`, `compileSdk = 37` — re-check against Play's current minimum at upload time.
 - [x] Strings are complete in German and English; `StringResourceLocalizationTest` fails CI if they drift.
 - [x] App icon carries the brand colour (`app/src/main/res/drawable/ic_launcher_*`, regenerated 2026-09-24).
 
@@ -45,8 +46,15 @@ Status as of 2026-09-25.
       and check each result at full size first: MI-GAN can leave a visible ghost where the car was
       (`ARCHITECTURE.md` §4, "Inpainting resolution").
 
-## 5. Build, test, upload
+## 5. Build, test, publish
 - [ ] `scripts/fetch_assets.sh` first — the models are not in git (see `scripts/assets.manifest`).
-- [ ] `./gradlew :app:bundleCoreRelease` → `app/build/outputs/bundle/coreRelease/app-core-release.aab`.
-- [ ] Smoke-test the release build on a physical device (`:app:installCoreRelease`; `core` is arm64-only).
-- [ ] Upload to the **Internal Testing** track, read the Pre-launch Report, then promote to **Production**.
+- [ ] Tag (§2), then `./gradlew :app:assembleCoreRelease` → `app/build/outputs/apk/core/release/app-core-release.apk`
+      and `./gradlew :app:bundleCoreRelease` → `app/build/outputs/bundle/coreRelease/app-core-release.aab`.
+- [ ] Smoke-test **that APK** on a physical device (`adb install -r …`; `core` is arm64-only). What ran on
+      the phone is what gets published, never a rebuild of it: R8 output is not reproducible.
+- [ ] `scripts/publish_release.sh vX.Y.Z` — pushes the tag and creates the GitHub release with the APK and
+      `SHA256SUMS`. It refuses a wrong version, an x86_64 or debug-signed APK, and new bytes under a
+      published name; `DRY_RUN=1` shows what it would post.
+- [ ] `site/deploy.sh` — the same APK to autokorrektur.org/download (same staging script, same bytes).
+- [ ] Play: upload the AAB to the **Internal Testing** track, read the Pre-launch Report, then promote to
+      **Production**.

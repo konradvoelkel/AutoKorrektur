@@ -7,7 +7,9 @@
 # assets on a GitHub release of this repo:
 #   https://github.com/konradvoelkel/AutoKorrektur/releases/tag/assets-v1
 # To publish new versions, upload to a new `assets-vN` release and update the hashes here in the
-# same commit that needs them — manifest and code then move together.
+# same commit that needs them — manifest and code then move together. Create that release with
+# `gh release create assets-vN --prerelease`, so it never shows as the repository's "Latest"
+# release in place of the app's (scripts/publish_release.sh).
 #
 # Format (whitespace-separated; '#' starts a comment):
 #   kind     dest                              sha256   url                      [extra tar args]

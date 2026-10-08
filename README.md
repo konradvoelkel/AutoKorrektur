@@ -87,7 +87,9 @@ onto the website by `site/build.sh` so the hosted text cannot drift.
 
 AutoKorrektur is distributed as a signed APK from
 [autokorrektur.org](https://autokorrektur.org/en.html#android), with a `SHA256SUMS` file and the
-signing certificate's fingerprint next to it; every release is signed with the same certificate.
+signing certificate's fingerprint next to it; the same file is attached to the matching
+[GitHub release](https://github.com/konradvoelkel/AutoKorrektur/releases). Every release is signed
+with the same certificate.
 Google Play (package `de.konradvoelkel.android.autokorrektur`) comes later — it needs a beta-test
 programme first. If you would like to take part, with your local transport-transition initiative for
 example, [get in touch](https://www.konradvoelkel.com/pages/contact).
