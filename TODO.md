@@ -46,10 +46,16 @@ What is automated here is now done; what is left needs a person and a street.
     open. Rewrite it — do not delete it — to say what the owner found, including the honest limit
     (phone-viewing and selection, not a finished high-quality image). Outward-facing, so it is a
     deliberate edit plus a `site/deploy.sh` run.
-- [ ] **FT-01c. Smoke-test the *release* build on the phone.** `RELEASE_CHECKLIST.md` §5 asks for
-      `:app:installCoreRelease` on physical hardware. FT-01a used the **full debug** build, which
-      is a different flavor *and* a different build type: R8, the `core` feature flags and release
-      signing are all untested on arm64. Cheap to do and it belongs before REL-03.
+- [ ] **FT-01c. Smoke-test the *current* release on the phone.** Narrower than it first looked:
+      a release build has run on hardware plenty — the owner's field tests (FT-01b) used
+      `2.0.0-21-g2e25a9e`, installed from `/download/`, and `site/build.sh` refuses to publish
+      anything debug-signed, so everything the site has ever served is release-built and
+      release-signed. R8, the `core` flags and release signing are therefore **not** untested on
+      arm64; that earlier framing was wrong.
+      What is actually untested is **this** release. `2.0.0-25-gddaed40` is the published build and
+      carries every UX-11..UX-25 change plus the Compose dialogs, and the only hardware run since
+      has been `full` *debug* (FT-01a). `:app:installCoreRelease` on the phone, open both menu
+      entries, process one photo. Ten minutes, and it belongs before REL-03.
 - [ ] **FT-02. Batch telemetry and CSV metric collection.** Run multi-photo batches across varied
       lighting and export execution CSVs. Since 2026-09-21 every flavor (`core` included) also has
       opt-in on-device diagnostics: menu → Diagnostics → switch on, use the app, Export. Off by
