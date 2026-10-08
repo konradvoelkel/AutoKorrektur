@@ -1,7 +1,10 @@
 # AutoKorrektur — Active Roadmap & Next Milestones
 
-> **Current version**: `2.0.0-25-gddaed40`, published 2026-09-29 as a direct download on
-> autokorrektur.org. Not on the Play Store yet — that is Milestone 2.  
+> **Current version**: `2.0.0-37-g8f6c882`, published 2026-10-08 as a direct download on
+> autokorrektur.org — the first published build whose UI is partly Jetpack Compose, and the
+> first that was smoke-tested on real arm64 hardware *before* publishing (FT-01c). The APK
+> served is byte-identical to the one that ran on the phone (`c50e0c13…`).
+> Not on the Play Store yet — that is Milestone 2.  
 > **Status**: the ML pipeline, the AR viewfinder, the video pipeline, progressive tile inpainting,
 > the privacy posture and CI are all implemented and green, and two usability runs have been
 > acted on in full (UX-01 to UX-25, archived). On 2026-10-08 the whole instrumented suite ran on
@@ -66,6 +69,10 @@ batch and export work.
   - The phone is left on `2.0.0-37`, which is **newer than the published `2.0.0-25`**. Harmless
     and now the better-tested build; restoring the published one is `adb install -r` of
     `site/dist/download/autokorrektur-2.0.0-25-gddaed40-arm64-v8a.apk` if the owner prefers.
+**Beides betrifft nur `beta`/`full`, nicht den ausgelieferten `core`** — dort stehen
+`FEATURE_BATCH_PROCESSING`, `FEATURE_VIDEO_SNIPPETS` und `FEATURE_EXTRA_EXPORT_LAYOUTS` auf
+`false`. Keiner der beiden Punkte blockiert also REL-01/REL-03.
+
 - [ ] **FT-02. Batch telemetry and CSV metric collection.** Run multi-photo batches across varied
       lighting and export execution CSVs. Since 2026-09-21 every flavor (`core` included) also has
       opt-in on-device diagnostics: menu → Diagnostics → switch on, use the app, Export. Off by
