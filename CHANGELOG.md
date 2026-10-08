@@ -43,6 +43,7 @@ app's own internal numbering.
 - `core`/`plus` no longer request `INTERNET`, `READ_MEDIA_VIDEO` or `READ_MEDIA_AUDIO` — the published app has no network permission at all.
 - Owner-only notes (`TODO-for-human.md`, `HUMAN_RELEASE_CHECKLIST.md`, `BRANDING.md`) and the stale Play screenshots and feature graphic, which advertised features `core` does not have.
 - Dead `useFP16` code path and the unused fp16 model (~20 MB).
+- The usability-run working files (`scenarios/`, `reports/`, two runs with five personas each): their findings are summarised in `docs/ARCHIVE_TODO.md` §4 and all 25 shipped, so the tree keeps the summary and git history (`c739cf6`, `ddaed40`) the full record. Also `.gemini/rules/` (every rule in it is in `docs/IMAGE_PIPELINE_SPECIFICATION.md` or `ARCHITECTURE.md`) and the last tracked `.idea/` files — the IDE folder is ignored as a whole now.
 
 ### Fixed
 - `StringResourceLocalizationTest.kt` contained a literal NUL byte where a space was meant (a separator in `joinToString`), which made every text tool treat the file as binary — grep silently found nothing in it. Replaced, and the repo scanned for others.

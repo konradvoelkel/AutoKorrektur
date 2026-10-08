@@ -1,12 +1,6 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
 .DS_Store
 /build
 /captures
@@ -22,11 +16,7 @@ local.properties
 /native/
 /kotlin-profile/
 opencv-sdk
-.idea/deploymentTargetSelector.xml
-.idea/androidTestResultsUserPreferences.xml
 /.kotlin/sessions/
-/.idea/markdown.xml
-/.idea/migrations.xml
 
 # Python virtual environments & caches
 .venv
@@ -42,11 +32,8 @@ __pycache__/
 *.keystore
 *.jks
 
-
 # autokorrektur.org build output (site/build.sh)
 /site/dist
-/.idea/planningMode.xml
-/.idea/deviceManager.xml
 /site/deploy.local.env
 
 # Large build inputs (ML models, instrumented-test fixtures): not in git, fetched by
@@ -70,7 +57,5 @@ __pycache__/
 # Owner-only release checklist, not for the public repo
 /HUMAN_RELEASE_CHECKLIST.md
 
-# IDE state: only the shared code style and inspection profile are tracked
-/.idea/*
-!/.idea/codeStyles/
-!/.idea/inspectionProfiles/
+# IDE state (Android Studio / IntelliJ): nothing from it is tracked
+/.idea/

@@ -5,7 +5,10 @@ Sections 1 and 2 are the 1.0 milestones and hardening phases; sections 3 to 5 ar
 repository move, the two usability runs, and the release plumbing that is finished.
 
 Findings and decisions are summarised here — the full record stays where it was written:
-`reports/` and `scenarios/` for the usability runs, the git log for everything else.
+the git log. The usability runs' scenarios and reports were removed from the working tree on
+2026-10-09 and live in history: `git show c739cf6:reports/improvements-001.adoc`,
+`git show ddaed40:reports/improvements-002.adoc`; `git ls-tree -r --name-only ddaed40 reports scenarios`
+lists the rest.
 
 ---
 
@@ -78,8 +81,9 @@ being reachable by SHA) is still open and stays in `TODO.md`.
 
 Two think-aloud runs, five fictional personas each, walking the live site and the `core` build.
 The full record — scenarios, per-persona step-by-step reports, ranked findings, and the findings
-that were **discarded** as test-environment artefacts — is in `scenarios/` and `reports/`
-(`reports/improvements-001.adoc`, `reports/improvements-002.adoc`). Everything below shipped.
+that were **discarded** as test-environment artefacts — is in git history, not in the tree
+(`git show c739cf6:reports/improvements-001.adoc`, `git show ddaed40:reports/improvements-002.adoc`;
+the per-persona reports and scenarios sit next to them in those commits). Everything below shipped.
 
 **Run 001 (UX-01 to UX-10)** — the app showed its working instead of its result, and the site
 addressed a more technical reader than the one it was written for.
