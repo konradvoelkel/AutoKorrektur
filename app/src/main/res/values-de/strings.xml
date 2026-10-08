@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">AutoKorrektur</string>
     <string name="action_about">Über &amp; Lizenzen</string>
     <string name="about_dialog_title">Über AutoKorrektur</string>
@@ -235,6 +235,6 @@
 
     <!-- Überschreibt AppCompats eigene Beschreibung des Überlauf-Symbols, damit es in der
          Sprache der App benannt ist und nicht in der des Geräts (UX-24). -->
-    <string name="abc_action_menu_overflow_description">Weitere Optionen</string>
+    <string name="abc_action_menu_overflow_description" tools:ignore="PrivateResource">Weitere Optionen</string>
 
 </resources>

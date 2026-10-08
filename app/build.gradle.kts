@@ -35,7 +35,7 @@ android {
     defaultConfig {
         applicationId = "de.konradvoelkel.android.autokorrektur"
         minSdk = 29
-        targetSdk = 36
+        targetSdk = 37
         versionCode = gitCommitCountProvider.getOrElse(170)
         versionName = gitVersionNameProvider.getOrElse("2.0.0")
 
@@ -207,6 +207,8 @@ dependencies {
     implementation(libs.opencv)
     implementation(libs.okhttp)
     implementation(libs.androidx.work.runtime.ktx)
+    // The version the instrumented tests compile against must be the one the app ships (catalog note).
+    implementation(libs.kotlinx.coroutines.android)
 
     // JVM unit tests
     testImplementation(libs.junit)

@@ -285,8 +285,8 @@ class MainViewModel(
         _uiState.value = MainUiState.Idle
     }
 
+    // No super call: lifecycle 2.11 marks ViewModel.onCleared @EmptySuper, and lint flags it.
     override fun onCleared() {
-        super.onCleared()
         pipeline.close()
     }
 

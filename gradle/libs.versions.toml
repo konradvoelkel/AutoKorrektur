@@ -1,31 +1,39 @@
 [versions]
-agp = "9.3.2"
-kotlin = "2.4.10"
+# 9.4.x is held back on purpose (2026-10-09): its new instrumented-test runner looks up each device's
+# verdict by raw adb serial while JUnit encodes the ":" of a wireless-debugging serial as "%3A", so a
+# phone on wireless debugging always ends in "There were failing tests" with every test green
+# (TESTING.md 5). USB and emulators are unaffected. Re-test that before moving past 9.3.x.
+agp = "9.3.3"
+kotlin = "2.4.21"
 detekt = "1.23.8"
-coreKtx = "1.19.0"
+coreKtx = "1.19.1"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
-appcompat = "1.7.1"
+appcompat = "1.8.0"
 material = "1.14.0"
 constraintlayout = "2.2.2"
-navigationFragmentKtx = "2.9.8"
-navigationUiKtx = "2.9.8"
-onnxruntimeAndroid = "1.22.0"
+navigationFragmentKtx = "2.10.2"
+navigationUiKtx = "2.10.2"
+onnxruntimeAndroid = "1.28.0"
 opencvVersion = "5.0.0.1"
 tensorflowLite = "2.17.0"
-okhttp = "5.4.0"
+okhttp = "5.5.0"
 mockk = "1.14.11"
-workRuntime = "2.11.2"
-mockwebserver = "5.4.0"
-exifinterface = "1.3.6"
-camera = "1.6.1"
-testOrchestrator = "1.5.0"
+workRuntime = "2.12.0"
+mockwebserver = "5.5.0"
+exifinterface = "1.4.2"
+camera = "1.6.2"
+testOrchestrator = "1.6.1"
 # Compose. The compiler plugin takes version.ref = "kotlin" on purpose: AGP 9 brings its own
 # built-in Kotlin, and the plugin must match the version the buildscript pins (PLAYBOOK §3.1).
 composeBom = "2026.09.00"
-activityCompose = "1.12.0"
-lifecycleViewmodelCompose = "2.9.4"
+activityCompose = "1.13.0"
+lifecycleViewmodelCompose = "2.11.0"
+# Declared in the app, not only in the tests: an androidTest-only newer coroutines compiled the test
+# APK against runBlockingK, which the 1.9.0 the app resolved transitively lacks -- 44 NoSuchMethodErrors
+# on the phone, green everywhere else (2026-10-09; PLAYBOOK 3.2). The catalog says what resolves.
+coroutines = "1.11.0"
 
 [libraries]
 androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "workRuntime" }
@@ -48,7 +56,8 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 mockkandroid = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
 mockwebserver = { group = "com.squareup.okhttp3", name = "mockwebserver", version.ref = "mockwebserver" }
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version = "1.8.0" }
+kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutines" }
 androidx-test-orchestrator = { module = "androidx.test:orchestrator", version.ref = "testOrchestrator" }
 androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "camera" }
 androidx-camera-camera2 = { module = "androidx.camera:camera-camera2", version.ref = "camera" }

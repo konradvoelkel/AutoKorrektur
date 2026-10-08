@@ -145,6 +145,14 @@ on the applicationId and force its removal.
 **Never pass `-PscreenshotAbi=x86_64` for a phone.** It is for emulator work; on arm64 it strips
 the libraries the ML path needs.
 
+**AGP 9.4.x reports "There were failing tests" on a wireless-debugging phone with every test green**
+(found 2026-10-09 with 9.4.1; this is why the catalog holds AGP at 9.3.x). Its new instrumented-test
+runner builds the JUnit `UniqueId` from the adb serial, which encodes the `:` of `ip:port` as `%3A`,
+then looks the device's verdict up under the raw serial, finds nothing and counts the device as
+failed. The HTML report, the XML and `am instrument` itself all say passed. USB serials and emulators
+have no colon and are unaffected, and the old UTP runner cannot be switched back on. Before moving
+past 9.3.x: run one test class over wireless debugging and check the exit code, not the report.
+
 ## 6. Hardware caveat
 
 x86_64 emulators software-emulate NNAPI and translate arm64 code, so delegate fallback and native

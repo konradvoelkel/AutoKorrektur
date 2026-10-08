@@ -14,7 +14,7 @@ Gradle tasks need a flavor prefix, the localization contract).
 ## Technology Stack
 
 - **Language**: Kotlin
-- **Platform**: Android (minSdk 29, targetSdk 36)
+- **Platform**: Android (minSdk 29, targetSdk 37)
 - **Build System**: Gradle with Kotlin DSL
 - **Java Version**: JDK 21 (`jvmToolchain(21)`)
 - **Key Libraries**:
@@ -24,7 +24,7 @@ Gradle tasks need a flavor prefix, the localization contract).
     - ONNX Runtime Android (with NNAPI EP support)
     - TensorFlow Lite (with NNAPI Delegate support)
     - OpenCV for Android
-    - OkHttp 4.x (for the optional server SDXL API, `beta`/`full` only)
+    - OkHttp 5.x (for the optional server SDXL API, `beta`/`full` only)
 
 ### Machine Learning Models
 

@@ -10,7 +10,8 @@ local.properties
 /.tmp/
 /caches/
 */daemon/
-/gradle/
+# No `/gradle/` here: that is a GRADLE_USER_HOME rule, and in a project it hid
+# gradle/gradle-daemon-jvm.properties from git for weeks (the pin existed only on one machine).
 /wrapper/
 /daemon/
 /native/

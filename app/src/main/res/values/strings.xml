@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">AutoKorrektur</string>
     <string name="action_about">About &amp; Licenses</string>
     <string name="about_dialog_title">About AutoKorrektur</string>
@@ -240,6 +240,6 @@
 
     <!-- Overrides AppCompat's own overflow description so the icon is named in the app's
          language rather than the device's (UX-24). -->
-    <string name="abc_action_menu_overflow_description">More options</string>
+    <string name="abc_action_menu_overflow_description" tools:ignore="PrivateResource">More options</string>
 
 </resources>

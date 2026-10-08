@@ -7,8 +7,12 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+# Every action is pinned by commit SHA with its tag in a comment (PLAYBOOK §3.2): a moving major
+# tag let a runner-image change turn a green sibling workflow red with zero repo changes. Bump by
+# resolving the new tag with `gh api repos/<owner>/<repo>/git/ref/tags/<tag>` and reading its
+# release notes; all of these declare `runs.using: node24`, so no FORCE_JAVASCRIPT_ACTIONS_TO_NODE24.
+# gradle/actions stays on the v5 line on purpose: v6 moved its caching into a proprietary
+# component whose Terms of Use one accepts by upgrading -- that is the owner's call, not a bump.
 
 jobs:
   build-test-verify:
@@ -17,13 +21,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       # The ML models and the test fixtures live on a GitHub release, not in git
       # (scripts/assets.manifest). Cache them keyed by the manifest so a run only downloads when
       # a hash actually changes; every Gradle task needs them.
       - name: Cache large build assets
-        uses: actions/cache@v4
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: .assets-cache
           key: assets-${{ hashFiles('scripts/assets.manifest') }}
@@ -31,14 +35,16 @@ jobs:
       - name: Fetch large build assets
         run: scripts/fetch_assets.sh
 
+      # The same major as gradle/gradle-daemon-jvm.properties pins, so Gradle's daemon runs on
+      # this JDK instead of looking for a download.
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           distribution: 'temurin'
           java-version: '21'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@0723195856401067f7a2779048b490ace7a47d7c # v5.0.2
         with:
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
 
@@ -55,7 +61,7 @@ jobs:
 
       - name: Upload Test & Coverage Reports
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: test-and-coverage-reports
           path: |
@@ -71,7 +77,7 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Run Headless Android Emulator Instrumented Tests
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@a421e43855164a8197daf9d8d40fe71c6996bb0d # v2.38.0
         with:
           api-level: 34
           target: google_apis
@@ -81,12 +87,22 @@ jobs:
           disable-animations: true
           script: ./gradlew connectedFullDebugAndroidTest
 
+      # A red emulator run is unreadable from the log alone (Laberampel §52.1); the HTML report
+      # names the test and the assertion.
+      - name: Upload Instrumented Test Report
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: instrumented-test-report
+          path: app/build/reports/androidTests/
+          if-no-files-found: ignore
+
       - name: Build Production Release App Bundle (AAB)
         run: ./gradlew :app:bundleCoreRelease
 
       - name: Upload Release App Bundle
         if: success()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: release-app-bundle
           path: app/build/outputs/bundle/coreRelease/*.aab
