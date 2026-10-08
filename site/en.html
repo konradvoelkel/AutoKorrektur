@@ -36,7 +36,7 @@
 <main>
   <section class="hero">
     <h1>Your street without cars. Computed on your own device.</h1>
-    <p class="lede">AutoKorrektur finds the parked cars in your photo and makes them disappear – the AI runs entirely on the phone. No account, no upload, no tracking. A before/after image ready to share, in a few taps.</p>
+    <p class="lede">AutoKorrektur finds the parked cars in your photo and makes them disappear – the AI runs entirely on the phone. No account, no upload, no tracking. A before/after image ready to share, with one click.</p>
     <div class="actions">
       <a class="button primary" href="download/__APK_FILE__">Download for Android<small>APK · __APK_MB__ MB · version __APK_VERSION__</small></a>
       <a class="button secondary" href="#android">Install it step by step<small>guide, checksum, certificate</small></a>
@@ -57,13 +57,13 @@
     <div class="card"><h3>Before / after</h3><p>A slider shows the difference. The finished split card (“BEFORE / CAR-FREE”) goes out through Android's ordinary share sheet – Instagram, Signal, mail, whatever you pick.</p></div>
     <div class="card"><h3>For the mobility transition</h3><p>Made for activists, urban planners and anyone who wants to show how much room a street has once the metal is gone. Free, open source (AGPLv3).</p></div>
   </div>
-  <p>The models ship inside the app, which is why the install file is __APK_MB__ MB – and why it needs no internet connection after installing. The result is a sketch, not a print-quality montage: shadows, reflections and hidden details are invented plausibly, not always correctly.</p>
+  <p>The models ship inside the app, which is why the install file is __APK_MB__ MB – and why it needs no internet connection after installing. The result is a preview, not a print-quality montage: the AI does not always invent shadows and hidden details plausibly or beautifully.</p>
 
   <h2>Hasn't this existed for ages?</h2>
   <p>Surely this is just the magic eraser! Yes and no – plenty of companies, Apple, Google and Samsung among them, offer a feature that retouches any object out of a picture, but that computing happens wholly or partly in the cloud, and so it costs money that somebody has to carry (if only through advertising – which AutoKorrektur can do without).</p>
   <p>My hypothesis, in fact, is that limiting it to cars is not merely a limitation but makes the app more useful: you never have to select the vehicles one by one – you get a car-free vision without having to think about it.</p>
 
-  <h2>Privacy, in one paragraph</h2>
+  <h2>Privacy</h2>
   <p>Detection and inpainting run on your device's own processor; your photos never leave it. There is no account, no advertising, no analytics service. Whatever you share goes only through the Android share sheet to the app you choose there. Optionally you can switch on anonymous diagnostics in the settings (compute times, device model – never images), recorded on the device and exported only by you; it is off by default. <a href="privacy-en">Full privacy policy</a> (the <a href="privacy" lang="de">German version</a> is the binding one).</p>
 
   <h2 id="android">Android: download and install</h2>
@@ -76,6 +76,7 @@
   <p>Version __APK_VERSION__, built __APK_DATE__. The file's SHA-256 is in <a href="download/SHA256SUMS">SHA256SUMS</a>. Every release is signed with the same certificate; its SHA-256 fingerprint is <span class="mono sum">10:0a:d8:62:bb:84:19:45:42:76:5f:4e:30:33:47:e8:4f:fc:14:af:e9:c6:bb:3a:8b:20:1c:bc:97:98:38:9f</span> – check it with <code>apksigner verify --print-certs</code>.</p>
   <p>To do it yourself: <code>sha256sum &lt;file&gt;</code> (Linux), <code>shasum -a 256 &lt;file&gt;</code> (macOS) or <code>certutil -hashfile &lt;file&gt; SHA256</code> (Windows) — the output must match the line in <a href="download/SHA256SUMS">SHA256SUMS</a>. <code>apksigner</code> ships with the Android SDK build-tools (<code>build-tools/&lt;version&gt;/apksigner</code>); without the SDK the checksum on its own already tells you a lot.</p>
   <p class="note">Version __VERSION__, as of __DATE__. The source code is on <a href="https://github.com/konradvoelkel/AutoKorrektur">GitHub</a>.</p>
+  <p>To get the app into the Play Store we need a beta-testing programme. If you would like to take part — with your local transport-transition initiative, for example — get in touch with <a href="https://www.konradvoelkel.com/pages/contact">Konrad</a>.</p>
 
   <h2>Who is behind this</h2>
   <p>AutoKorrektur 2.0 is the native Android rewrite of Benjamin Beckers' <a href="https://github.com/BenB2/AutoKorrektur">browser version (1.0)</a> and a private project by Konrad Völkel in Düsseldorf. It builds on two bachelor theses at Heinrich Heine University Düsseldorf (Till Schellscheidt 2024, “Autokorrektur – Automatisierte Objektersetzung in Fotos”; Ben Beckers 2025, “Autokorrektur – Inpainting auf mobilen Endgeräten”). Questions and bug reports: Konrad Völkel, Universitätsstr. 1, 40225 Düsseldorf, kontakt [at] autokorrektur [dot] org — the full <a href="impressum">Impressum</a> is in German.</p>
