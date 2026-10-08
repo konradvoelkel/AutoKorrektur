@@ -92,7 +92,31 @@ adb shell am broadcast -a android.intent.action.MEDIA_SCANNER_SCAN_FILE \
   -d file:///sdcard/Download/<name>.png
 ```
 
-## 4. Hardware caveat
+## 4. The options menu
+
+`OverflowMenuSmokeTest` (instrumented) opens every entry of `menu_main.xml` and walks what it
+opens. It exists because the menu was untested surface until 2026-10-08, and that is where the
+published APK died on its first contact with a phone: `about_dialog_content` carried an unescaped
+`%`, so `getString(id, versionName)` threw `UnknownFormatConversionException` the moment
+"About & Licenses" was tapped (`a7f59c5`).
+
+Two things about it are deliberate.
+
+- `overflowMenu_hasExactlyTheEntriesThisSuiteCovers` asserts the live toolbar menu holds exactly
+  the ids the suite walks. Add a third entry and the suite fails until it is covered here too,
+  rather than quietly testing two of three.
+- Both negative controls were run before the suite was committed, because a checker that has never
+  rejected anything is not known to work. Re-arming the `%` in `about_dialog_content` fails
+  `aboutEntry_opensAndRendersItsFormattedBody` with the original
+  `UnknownFormatConversionException: Conversion = 'O'`; removing the `Telemetry.setEnabled(false)`
+  from the delete path fails `diagnosticsDelete_turnsRecordingOffAndAcknowledgesIt` with the switch
+  still checked. If you change this suite, re-arm them.
+
+The `%` is now caught twice over — `StringResourceLocalizationTest` check 5 covers the string, this
+suite covers the path — which is the point: a format bug present in both locales agrees with itself
+perfectly in any parity check, and only opening the screen proves the screen opens.
+
+## 5. Hardware caveat
 
 x86_64 emulators software-emulate NNAPI and translate arm64 code, so delegate fallback and native
 crashes behave differently there than on real hardware — the TFLite interpreter, for instance,
@@ -100,7 +124,7 @@ segfaults under arm64 translation on the Pixel AVD. Model-execution changes need
 device before release; every Espresso suite additionally asserts that no error Snackbar appears on
 launch, which catches initialization failures that would otherwise pass silently.
 
-## 5. Proposed: config-matrix screenshots and accessibility checks
+## 6. Proposed: config-matrix screenshots and accessibility checks
 
 Field testing surfaced "lots of minor issues, too much to report" — presentation bugs across
 locale × theme × width, which no one sweeps by hand. Two cheap additions would catch them:
