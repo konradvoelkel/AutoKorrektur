@@ -116,7 +116,36 @@ The `%` is now caught twice over — `StringResourceLocalizationTest` check 5 co
 suite covers the path — which is the point: a format bug present in both locales agrees with itself
 perfectly in any parity check, and only opening the screen proves the screen opens.
 
-## 5. Hardware caveat
+## 5. Running on a physical device
+
+Two things that cost a suite each on 2026-10-08, the first full arm64 walk (FT-01).
+
+**Unlock the phone, and keep it awake.** Behind a keyguard no activity reaches RESUMED, so every
+Espresso interaction fails with `NoActivityResumedException` — a message that blames the test and
+says nothing about the device. Worse, it is *intermittent*: it depends on whether the screen
+timeout fires mid-run. The Pixel 10 Pro has a 30-second timeout and connects over wireless
+debugging, so `stay_on_while_plugged_in` never applies; a 14-minute suite produced exactly one
+such failure. `UnlockedDeviceRule` now turns that into a precondition failure that names itself,
+on every Espresso class. It deliberately does not try to unlock anything — a secured keyguard
+needs its owner.
+
+```
+adb -s <serial> shell settings put system screen_off_timeout 1800000   # restore afterwards
+# then unlock the device by hand; a secured keyguard cannot be dismissed by adb
+```
+
+**Pin one device.** A phone on wireless debugging can be attached over two transports at once
+(`adb devices` shows both), and Gradle fans out to all of them — the second install then fails
+with `INSTALL_FAILED_DUPLICATE_PACKAGE`. Use `ANDROID_SERIAL`.
+
+**Flavor.** `connectedFullDebugAndroidTest` installs `…autokorrektur.full`, which coexists with a
+sideloaded `core` release. Testing `core` on a phone that carries the published APK would collide
+on the applicationId and force its removal.
+
+**Never pass `-PscreenshotAbi=x86_64` for a phone.** It is for emulator work; on arm64 it strips
+the libraries the ML path needs.
+
+## 6. Hardware caveat
 
 x86_64 emulators software-emulate NNAPI and translate arm64 code, so delegate fallback and native
 crashes behave differently there than on real hardware — the TFLite interpreter, for instance,
@@ -124,7 +153,7 @@ segfaults under arm64 translation on the Pixel AVD. Model-execution changes need
 device before release; every Espresso suite additionally asserts that no error Snackbar appears on
 launch, which catches initialization failures that would otherwise pass silently.
 
-## 6. Proposed: config-matrix screenshots and accessibility checks
+## 7. Proposed: config-matrix screenshots and accessibility checks
 
 Field testing surfaced "lots of minor issues, too much to report" — presentation bugs across
 locale × theme × width, which no one sweeps by hand. Two cheap additions would catch them:

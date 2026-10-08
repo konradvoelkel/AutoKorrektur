@@ -3,12 +3,14 @@ package de.konradvoelkel.android.autokorrektur
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
+import androidx.test.espresso.action.ViewActions.scrollTo
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.hamcrest.CoreMatchers.not
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -16,18 +18,26 @@ import org.junit.runner.RunWith
 @LargeTest
 class RigorousGuiFlowInstrumentedTest {
 
+    /** Espresso cannot drive a locked screen; fail with that reason, not NoActivityResumedException. */
+    @get:Rule
+    val unlockedDevice = de.konradvoelkel.android.autokorrektur.shared.UnlockedDeviceRule()
+
     @Test
     fun testGuiElementsAndSdxlToggleVisibility() {
         val scenario = ActivityScenario.launch(MainActivity::class.java)
         scenario.onActivity { }
 
-        // Verify select image button is displayed
-        onView(withId(R.id.fileSelect)).check(matches(isDisplayed()))
+        // scrollTo() before every isDisplayed(): the whole screen lives in a NestedScrollView, so
+        // `isDisplayed()` on its own asserts "this fits on *this* device's screen", not "this
+        // exists and is visible". That is a screen-size assertion in disguise, and it is what made
+        // this test pass on a 1080x2410 Pixel 10 Pro and fail on a 720x1280 emulator on the same
+        // commit (2026-10-08): startInference sits at y=1074 and is simply below the fold there.
+        onView(withId(R.id.fileSelect)).perform(scrollTo()).check(matches(isDisplayed()))
 
         // startInference is hidden when this tier offers no engine choice (inference auto-starts
         // instead — see FirstFragment.autoStartInferenceEnabled).
         if (BuildConfig.FEATURE_HIGH_RES_PROGRESSIVE || BuildConfig.FEATURE_CLOUD_SDXL) {
-            onView(withId(R.id.startInference)).check(matches(isDisplayed()))
+            onView(withId(R.id.startInference)).perform(scrollTo()).check(matches(isDisplayed()))
         } else {
             onView(withId(R.id.startInference)).check(matches(not(isDisplayed())))
         }
@@ -40,7 +50,7 @@ class RigorousGuiFlowInstrumentedTest {
         // stub ever since — that assertion could never have passed against the current layout,
         // confirmed unrelated to any change in this session.
         if (BuildConfig.FEATURE_HIGH_RES_PROGRESSIVE || BuildConfig.FEATURE_CLOUD_SDXL) {
-            onView(withId(R.id.chipGroupQuality)).check(matches(isDisplayed()))
+            onView(withId(R.id.chipGroupQuality)).perform(scrollTo()).check(matches(isDisplayed()))
         } else {
             onView(withId(R.id.chipGroupQuality)).check(matches(not(isDisplayed())))
         }

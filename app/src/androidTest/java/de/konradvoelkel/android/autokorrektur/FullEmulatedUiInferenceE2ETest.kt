@@ -33,6 +33,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Assume.assumeTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.File
@@ -46,6 +47,10 @@ import java.io.FileOutputStream
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class FullEmulatedUiInferenceE2ETest : AndroidInstrumentedBaseTest() {
+
+    /** Espresso cannot drive a locked screen; fail with that reason, not NoActivityResumedException. */
+    @get:Rule
+    val unlockedDevice = de.konradvoelkel.android.autokorrektur.shared.UnlockedDeviceRule()
 
     private val tempFiles = mutableListOf<File>()
 

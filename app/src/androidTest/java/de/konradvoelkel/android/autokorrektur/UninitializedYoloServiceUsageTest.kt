@@ -17,6 +17,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -26,6 +27,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class UninitializedYoloServiceUsageTest : AndroidInstrumentedBaseTest() {
+
+    /** Espresso cannot drive a locked screen; fail with that reason, not NoActivityResumedException. */
+    @get:Rule
+    val unlockedDevice = de.konradvoelkel.android.autokorrektur.shared.UnlockedDeviceRule()
 
     @org.junit.Before
     fun setUp() {

@@ -21,6 +21,7 @@ import de.konradvoelkel.android.autokorrektur.telemetry.Telemetry
 import org.hamcrest.CoreMatchers.allOf
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -45,6 +46,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class OverflowMenuSmokeTest {
+
+    /** Espresso cannot drive a locked screen; fail with that reason, not NoActivityResumedException. */
+    @get:Rule
+    val unlockedDevice = de.konradvoelkel.android.autokorrektur.shared.UnlockedDeviceRule()
 
     @After
     fun tearDown() {

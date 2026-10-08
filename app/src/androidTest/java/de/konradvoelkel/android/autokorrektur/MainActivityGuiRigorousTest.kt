@@ -13,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.hamcrest.CoreMatchers.not
 import org.junit.After
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -23,6 +24,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class MainActivityGuiRigorousTest {
+
+    /** Espresso cannot drive a locked screen; fail with that reason, not NoActivityResumedException. */
+    @get:Rule
+    val unlockedDevice = de.konradvoelkel.android.autokorrektur.shared.UnlockedDeviceRule()
 
     @Test
     fun testMainScreenButtonsDisplayedAndClickable() {

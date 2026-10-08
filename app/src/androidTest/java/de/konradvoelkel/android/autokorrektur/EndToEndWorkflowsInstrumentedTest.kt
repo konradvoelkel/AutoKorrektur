@@ -17,6 +17,7 @@ import de.konradvoelkel.android.autokorrektur.shared.AndroidInstrumentedBaseTest
 import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.not
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -26,6 +27,10 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 class EndToEndWorkflowsInstrumentedTest : AndroidInstrumentedBaseTest() {
+
+    /** Espresso cannot drive a locked screen; fail with that reason, not NoActivityResumedException. */
+    @get:Rule
+    val unlockedDevice = de.konradvoelkel.android.autokorrektur.shared.UnlockedDeviceRule()
 
     @Before
     fun setUp() {

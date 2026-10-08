@@ -9,11 +9,16 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import de.konradvoelkel.android.autokorrektur.R
 import de.konradvoelkel.android.autokorrektur.shared.AndroidInstrumentedBaseTest
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 class ArCameraActivityInstrumentedTest : AndroidInstrumentedBaseTest() {
+
+    /** Espresso cannot drive a locked screen; fail with that reason, not NoActivityResumedException. */
+    @get:Rule
+    val unlockedDevice = de.konradvoelkel.android.autokorrektur.shared.UnlockedDeviceRule()
 
     @Test
     fun testArCameraActivity_viewsDisplayedAndInteractions() {
