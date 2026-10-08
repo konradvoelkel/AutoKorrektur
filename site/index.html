@@ -46,13 +46,15 @@
       <a class="button primary" href="download/__APK_FILE__">Für Android herunterladen<small>APK · __APK_MB__ MB · Version __APK_VERSION__</small></a>
       <a class="button secondary" href="#android">Schritt für Schritt installieren<small>Anleitung, Prüfsumme, Zertifikat</small></a>
     </div>
-    <p class="note">Früher Testbuild: Abstürze sind möglich, und die Bildqualität kann schlechter ausfallen als in den Beispielen. <a href="#testbuild">Was das heißt</a>.</p>
   </section>
 
   <div class="pair">
     <figure><img src="img/before.png" alt="Straße mit parkendem Auto" width="640" height="640"><figcaption>Vorher: Originalaufnahme</figcaption></figure>
     <figure><img src="img/after.png" alt="Dieselbe Straße, das Auto ist entfernt" width="640" height="640"><figcaption>Nachher: Autofreie Vision</figcaption></figure>
   </div>
+
+  <h2>Wofür das gut ist</h2>
+  <p>Du gehst durch deine Stadt, durch dein Viertel, und siehst Orte voller stehender Fahrzeuge – Orte, die ohne die Masse an Autos schöner und lebenswerter sein könnten. Weil wir uns das so schlecht vorstellen können, brauchen wir Bilder einer möglichen Zukunft. Beim Finden geeigneter Motive hilft diese App: Sie erstellt direkt auf dem Handy eine Vorschau, wie der Ort ohne Autos aussehen könnte. Die besten Motive teilst du dann über Instagram oder Signal – oder gibst sie einem Profi, der daraus mit menschlicher Arbeit und gegen Geld eine hochwertige Visualisierung macht, mit der sich zum Beispiel ein Informationsabend gestalten lässt.</p>
 
   <h2>Was die App macht</h2>
   <div class="cards">
@@ -61,6 +63,10 @@
     <div class="card"><h3>Für die Mobilitätswende</h3><p>Gemacht für Aktivist:innen, Stadtplaner:innen und alle, die zeigen wollen, wie viel Platz eine Straße ohne Blech hat. Kostenlos, Open Source (AGPLv3).</p></div>
   </div>
   <p>Die KI-Modelle stecken in der App; deshalb ist die Installationsdatei __APK_MB__ MB groß, dafür braucht die App nach der Installation kein Internet. Das Ergebnis ist eine Skizze, keine Fotomontage in Druckqualität: Schatten, Spiegelungen und verdeckte Details erfindet das Netz plausibel, aber nicht immer richtig.</p>
+
+  <h2>Gibt es das nicht längst?</h2>
+  <p>Das ist doch der magische Radierer! Ja und nein – viele Unternehmen, zum Beispiel Apple, Google und Samsung, bieten eine Funktion an, mit der sich beliebige Objekte aus Bildern retuschieren lassen, aber das rechnet ganz oder teilweise in der Cloud und verursacht damit Kosten, die irgendwer tragen muss (und sei es mit Werbung – worauf AutoKorrektur verzichten kann).</p>
+  <p>Meine Hypothese ist sogar, dass die Beschränkung auf Autos nicht nur eine Einschränkung ist, sondern die App funktionaler macht: Man muss die Fahrzeuge nicht einzeln auswählen, sondern bekommt ohne groß nachzudenken eine autofreie Vision.</p>
 
   <h2>Datenschutz, in einem Absatz</h2>
   <p>Objekterkennung und Inpainting laufen auf dem Prozessor deines Geräts; deine Fotos verlassen es nicht. Die App hat kein Konto, keine Werbung, keine Analyse-Dienste. Was du teilst, geht ausschließlich über das Android-Teilen-Menü an die App, die du dort auswählst. Optional kannst du in den Einstellungen anonyme Diagnosedaten (Rechenzeiten, Gerätemodell – nie Bilder) auf dem Gerät mitschreiben lassen und selbst exportieren; standardmäßig ist das aus. <a href="privacy">Vollständige Datenschutzerklärung</a>.</p>
@@ -74,7 +80,6 @@
   <p>Installieren („Sideloading“): Datei auf dem Telefon herunterladen, sie in der Benachrichtigung oder im Ordner <em>Downloads</em> antippen und dem Browser erlauben, unbekannte Apps zu installieren, wenn Android danach fragt. Den Rest prüft Android selbst.</p>
   <p>Version __APK_VERSION__, gebaut am __APK_DATE__. Die SHA-256-Summe der Datei steht in <a href="download/SHA256SUMS">SHA256SUMS</a>. Jede Veröffentlichung ist mit demselben Zertifikat signiert; sein SHA-256-Fingerprint ist <span class="mono sum">10:0a:d8:62:bb:84:19:45:42:76:5f:4e:30:33:47:e8:4f:fc:14:af:e9:c6:bb:3a:8b:20:1c:bc:97:98:38:9f</span> – nachprüfbar mit <code>apksigner verify --print-certs</code>.</p>
   <p>Selbst nachrechnen: <code>sha256sum &lt;Datei&gt;</code> (Linux), <code>shasum -a 256 &lt;Datei&gt;</code> (macOS) oder <code>certutil -hashfile &lt;Datei&gt; SHA256</code> (Windows) – die Ausgabe muss mit der Zeile in <a href="download/SHA256SUMS">SHA256SUMS</a> übereinstimmen. <code>apksigner</code> gehört zu den Build-Tools des Android-SDK (<code>build-tools/&lt;Version&gt;/apksigner</code>); ohne SDK ist die Prüfsumme allein schon aussagekräftig.</p>
-  <p class="note" id="testbuild">Dies ist ein früher Testbuild: gerechnet wurde fast nur im Emulator. Auf einem echten Telefon lief die App bisher ein einziges Mal, und dabei stürzte sie gleich beim ersten geöffneten Menüpunkt ab; dieser Fehler ist in der hier angebotenen Version behoben. Alles Übrige ist auf echter Hardware weiterhin ungetestet: Rechenzeiten und Bildqualität können deutlich schlechter ausfallen als in den Beispielbildern oben, und ein Absturz ist möglich. Fehlermeldungen sind ausdrücklich willkommen: siehe <a href="impressum">Impressum</a>.</p>
   <p class="note">Version __VERSION__, Stand __DATE__. Der Quellcode liegt auf <a href="https://github.com/konradvoelkel/AutoKorrektur">GitHub</a>.</p>
 
   <h2>Wer dahinter steht</h2>
