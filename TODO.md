@@ -1,8 +1,9 @@
 # AutoKorrektur — Roadmap
 
-> **Current version**: `2.0.0-37-g8f6c882`, published 2026-10-08 as a direct download on
-> autokorrektur.org; the APK served is the one that was smoke-tested on the phone. Not on the Play
-> Store yet — that is Milestone 2.  
+> **Current version**: `2.0.1` (tag `v2.0.1`, "early alpha"), published 2026-10-09 as a
+> [GitHub release](https://github.com/konradvoelkel/AutoKorrektur/releases/tag/v2.0.1) and as the
+> direct download on autokorrektur.org; both serve the APK that was smoke-tested on the Pixel 10 Pro
+> (`d1fd7be8…`). Not on the Play Store yet — that is Milestone 2.  
 > **Archive**: [docs/ARCHIVE_TODO.md](docs/ARCHIVE_TODO.md) — everything finished, including the
 > 1.0 milestones, the repository move, both usability runs, the release plumbing that is done and
 > the field testing on real hardware (FT-01).
@@ -30,6 +31,21 @@ stays green through the interop.
 - [ ] **UI-02. Light/dark, locale and width are an untested axis.** The theme's dark branch first
       rendered on the owner's phone, by luck. Paparazzi golden screenshots across theme × locale ×
       width, as proposed in `TESTING.md` §7, plus `AccessibilityChecks` on the Espresso suite.
+
+### Bugs found on hardware
+
+- [ ] **BUG-01. A 20 MP progressive JPEG decodes to a solid cyan square and "no vehicles".**
+      Found 2026-10-09 during the 2.0.1 smoke test with `app/src/androidTest/assets/highrescar.jpg`
+      (8160×6144, progressive DCT, GIMP sRGB ICC profile, a white station wagon filling the frame)
+      picked through the photo picker on the Pixel 10 Pro (Android 17): the mask preview shows a
+      uniform cyan square, YOLO finds nothing, no crash, done in 8 s. The published 2.0.0-37 behaves
+      identically after a clean install, so it is not a regression of 2.0.1; `example2.png`
+      (867×1146) processes normally. Suspects, in order: the `ImageDecoder` path with
+      `setTargetSampleSize` on a progressive JPEG with an ICC profile (`UriLoader.kt`,
+      `loadBitmapFromContentProvider`), then `ensureStandardSoftwareArgb8888`'s canvas copy of a
+      bitmap whose colour space is not sRGB. `HighResImageTests` loads the same file by `file://`
+      URI and only asserts "does not crash", so the suite cannot see this. Reproduce first on the
+      emulator with the same file through the picker; then write the assertion the test lacks.
 
 ### Milestone 2: Google Play Store release
 
