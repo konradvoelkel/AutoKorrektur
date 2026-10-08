@@ -1,8 +1,9 @@
 # 🏛️ AutoKorrektur: Completed Development Milestones Archive
 
 Completed, verified work moved out of `TODO.md`, which carries only what is still open.
-Sections 1 and 2 are the 1.0 milestones and hardening phases; sections 3 to 5 are the 2.0
-repository move, the two usability runs, and the release plumbing that is finished.
+Sections 1 and 2 are the 1.0 milestones and hardening phases; sections 3 to 6 are the 2.0
+repository move, the two usability runs, the release plumbing that is finished, and the field
+testing on real hardware.
 
 Findings and decisions are summarised here — the full record stays where it was written:
 the git log. The usability runs' scenarios and reports were removed from the working tree on
@@ -121,3 +122,36 @@ with no wrong turns — the Turkish-locale persona finished it without reading a
 
 - [x] **REL-02. Privacy policy hosting** — live since 2026-09-21 at https://autokorrektur.org/privacy (`/privacy-en` in English), redeployed by `site/deploy.sh`. Pasting the URL into Play Console → App content is still a manual step and belongs to `REL-01`.
 - [x] **REL-04. Direct APK download on autokorrektur.org** (since 2026-09-28) — `/download/` serves the signed `core` release APK (arm64-v8a) named with its versionName, plus `SHA256SUMS`. `site/build.sh` copies it out of `app/build/outputs/apk/core/release/` and **refuses to publish one that is stale, x86_64 (`-PscreenshotAbi`) or debug-signed**; `DOWNLOAD_VERSION`, `APK_BUILD_DATE` and `deploy.sh KEEP_DOWNLOAD=1` allow a pages-only deploy that leaves published bytes alone. The rule those guards exist for: **never republish different bytes under a name people have checksummed** — a new version gets a new filename, and the old one is deleted rather than overwritten.
+
+---
+
+## 6. Field testing on real hardware (Milestone 1, FT-01, 2026-10-08)
+
+Three questions, all answered on a Pixel 10 Pro (Android 17) in one day. What was left of the
+milestone, FT-02 and FT-03, tests `beta`/`full` features and moved to the deferred section of
+`TODO.md`.
+
+- [x] **FT-01a. The instrumented suite on arm64.** `connectedFullDebugAndroidTest` ran natively for
+      the first time — TFLite and ONNX Runtime included, the 50-image pipeline benchmark, mask
+      quality, YOLO, MI-GAN — with no ML or native failure. The one failure was a locked screen,
+      fixed in `e24ef1d`; an emulator baseline failed a *different* GUI test, and both were
+      assertions about the device dressed as assertions about the app. The options-menu blind spot
+      behind `a7f59c5` is closed by `OverflowMenuSmokeTest` (`de9abdc`, `TESTING.md` §4).
+      Device-run preconditions: `TESTING.md` §5.
+- [x] **FT-01b. Real streets.** The owner's verdict after numerous field tests: the output is good
+      enough to view on a phone and to *choose* by — to pick the shot worth handing to a graphics
+      designer — and is not itself the finished image. That is `ARCHITECTURE.md` §4 exactly: MI-GAN
+      generates at 512 px, so on a 2040 px photo the patch is a 4× upscale and a removed car can
+      leave a soft or iridescent ghost at full size that is invisible at phone size. **Gate
+      cleared:** the ghost shows on a minority of shots, so `core` goes public without the
+      progressive path; `HIGH_RES_PROGRESSIVE` stays `plus`-and-up. The website says the same
+      honest limit ("a preview, not a print-quality montage") since `6fa7081`/`8f6c882`.
+- [x] **FT-01c. The release build on the phone.** `2.0.0-37-g8f6c882`, `core`, release-built and
+      release-signed (`run-as` refused it as not debuggable). Both menu entries, the delete flow
+      end to end, a street photo processed, no crash. First coverage of the **Compose dialogs on
+      arm64, R8-minified**: About & Licenses opened without `UnknownFormatConversionException`, the
+      regression behind `a7f59c5`; UX-11 and UX-01 held. Found by doing it: the phone runs dark
+      mode and every emulator pass had been light, so the theme's dark branch rendered for the
+      first time here — correct, by luck rather than coverage (now `UI-02` in `TODO.md`).
+      Published as the byte-identical APK that ran on the phone (`3f41163`), not a rebuild: R8 is
+      not reproducible, and a new version gets a new filename.
