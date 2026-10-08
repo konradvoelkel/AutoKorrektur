@@ -20,4 +20,12 @@
 
     <include layout="@layout/content_main" />
 
+    <!-- Hosts the app's global dialogs (About, Diagnostics) in Compose while the rest of the
+         screen is still Views. Zero-sized on purpose: a Compose `AlertDialog` opens in its own
+         window, so this view only needs to exist in the hierarchy, not to occupy it. -->
+    <androidx.compose.ui.platform.ComposeView
+        android:id="@+id/dialogHost"
+        android:layout_width="0dp"
+        android:layout_height="0dp" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
