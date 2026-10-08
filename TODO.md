@@ -20,7 +20,9 @@
 
 ### 🏙️ Milestone 1: Field testing on real hardware
 
-What is automated here is now done; what is left needs a person and a street.
+FT-01 is complete: the suite runs on real arm64 hardware, the owner has walked real streets, and
+the current release has been smoke-tested on the phone. What is left in this milestone is the
+batch and export work.
 
 - [x] **FT-01a. The suite on real arm64 hardware.** Done 2026-10-08 on a Pixel 10 Pro (Android 17,
       1080x2410): `connectedFullDebugAndroidTest`, **114 tests, zero ML or native failures**, 10½
@@ -46,16 +48,24 @@ What is automated here is now done; what is left needs a person and a street.
     open. Rewrite it — do not delete it — to say what the owner found, including the honest limit
     (phone-viewing and selection, not a finished high-quality image). Outward-facing, so it is a
     deliberate edit plus a `site/deploy.sh` run.
-- [ ] **FT-01c. Smoke-test the *current* release on the phone.** Narrower than it first looked:
-      a release build has run on hardware plenty — the owner's field tests (FT-01b) used
-      `2.0.0-21-g2e25a9e`, installed from `/download/`, and `site/build.sh` refuses to publish
-      anything debug-signed, so everything the site has ever served is release-built and
-      release-signed. R8, the `core` flags and release signing are therefore **not** untested on
-      arm64; that earlier framing was wrong.
-      What is actually untested is **this** release. `2.0.0-25-gddaed40` is the published build and
-      carries every UX-11..UX-25 change plus the Compose dialogs, and the only hardware run since
-      has been `full` *debug* (FT-01a). `:app:installCoreRelease` on the phone, open both menu
-      entries, process one photo. Ten minutes, and it belongs before REL-03.
+- [x] **FT-01c. Smoke-test the *current* release on the phone.** Done 2026-10-08 on the Pixel 10
+      Pro with `2.0.0-37-g8f6c882` — `core`, **release-built and release-signed** (confirmed
+      incidentally: `run-as` refused it as not debuggable). Both menu entries opened, the delete
+      flow walked end to end, and a street photo processed. No crash anywhere.
+      What this covered that nothing had before: the **Compose dialogs on arm64**, R8-minified,
+      in the release build. About & Licenses opened without
+      `UnknownFormatConversionException` — the direct regression for `a7f59c5`, which is the crash
+      this whole item existed for. UX-11 held: "Diagnosedaten gelöscht und die Aufzeichnung
+      ausgeschaltet", then 0 events, no install-ID line, switch off. UX-01 held: before/after
+      first with VORHER/NACHHER, mask preview demoted below it, Download enabled only afterwards.
+  - **Found by doing it: the theme's dark branch had never run anywhere.** The phone is in dark
+    mode and every emulator pass was light, so `AutoKorrekturTheme`'s `darkColorScheme` rendered
+    for the first time here. It is correct — dark brand surface, orange accents, error-coloured
+    Delete — but that was luck rather than coverage. Light/dark is an untested axis across the
+    whole UI (`TESTING.md` §7 proposes Paparazzi over exactly these).
+  - The phone is left on `2.0.0-37`, which is **newer than the published `2.0.0-25`**. Harmless
+    and now the better-tested build; restoring the published one is `adb install -r` of
+    `site/dist/download/autokorrektur-2.0.0-25-gddaed40-arm64-v8a.apk` if the owner prefers.
 - [ ] **FT-02. Batch telemetry and CSV metric collection.** Run multi-photo batches across varied
       lighting and export execution CSVs. Since 2026-09-21 every flavor (`core` included) also has
       opt-in on-device diagnostics: menu → Diagnostics → switch on, use the app, Export. Off by
