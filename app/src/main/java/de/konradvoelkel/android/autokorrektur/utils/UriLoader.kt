@@ -21,19 +21,32 @@ class UriLoader(private val context: Context) {
         private const val MEGAPIXEL = 1_000_000f
     }
 
+    /** A decoded bitmap, and whether the decoder has already applied the EXIF orientation. */
+    private class Decoded(val bitmap: Bitmap, val exifOrientationApplied: Boolean)
+
     /**
      * Loads a [Bitmap] from a given [Uri], applying safe downsampling to fit [maxMegapixels]
      * and correcting orientation based on EXIF metadata.
+     *
+     * The orientation is applied exactly once. [ImageDecoder] applies it while decoding;
+     * [BitmapFactory] does not, so only bitmaps from that path are turned here. Turning the
+     * ImageDecoder result a second time made every portrait photo (EXIF `ROTATE_90`) a landscape
+     * one with the cars on their side — and the camera and the photo picker both hand over
+     * content:// URIs, which take the ImageDecoder path.
      */
     @Throws(IOException::class)
     fun loadRotatedBitmap(imageUri: Uri, maxMegapixels: Float): Bitmap {
-        val loaded = when (val scheme = imageUri.scheme?.lowercase()) {
+        val decoded = when (val scheme = imageUri.scheme?.lowercase()) {
             "file" -> loadBitmapFromFile(imageUri, maxMegapixels)
             "content" -> loadBitmapFromContentProvider(imageUri, maxMegapixels)
             else -> throw IOException("Unsupported URI scheme: $scheme")
         }
-        val rotated = rotateBitmapIfRequired(loaded, imageUri)
-        return ensureStandardSoftwareArgb8888(rotated)
+        val upright = if (decoded.exifOrientationApplied) {
+            decoded.bitmap
+        } else {
+            rotateBitmapIfRequired(decoded.bitmap, imageUri)
+        }
+        return ensureStandardSoftwareArgb8888(upright)
     }
 
     private fun ensureStandardSoftwareArgb8888(bitmap: Bitmap): Bitmap {
@@ -52,6 +65,7 @@ class UriLoader(private val context: Context) {
         return standard
     }
 
+    /** Turns a bitmap whose decoder ignored the EXIF orientation tag ([BitmapFactory]). */
     private fun rotateBitmapIfRequired(bitmap: Bitmap, uri: Uri): Bitmap {
         val inputStream = try {
             when (uri.scheme?.lowercase()) {
@@ -86,6 +100,14 @@ class UriLoader(private val context: Context) {
             ExifInterface.ORIENTATION_ROTATE_270 -> matrix.postRotate(270f)
             ExifInterface.ORIENTATION_FLIP_HORIZONTAL -> matrix.postScale(-1f, 1f)
             ExifInterface.ORIENTATION_FLIP_VERTICAL -> matrix.postScale(1f, -1f)
+            ExifInterface.ORIENTATION_TRANSPOSE -> {
+                matrix.postRotate(90f)
+                matrix.postScale(-1f, 1f)
+            }
+            ExifInterface.ORIENTATION_TRANSVERSE -> {
+                matrix.postRotate(270f)
+                matrix.postScale(-1f, 1f)
+            }
             else -> return bitmap
         }
 
@@ -102,7 +124,7 @@ class UriLoader(private val context: Context) {
         return rotated
     }
 
-    private fun loadBitmapFromFile(uri: Uri, maxMegapixels: Float): Bitmap {
+    private fun loadBitmapFromFile(uri: Uri, maxMegapixels: Float): Decoded {
         val path = uri.path ?: throw IOException("File path is null for URI: $uri")
         val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(path, options)
@@ -122,10 +144,10 @@ class UriLoader(private val context: Context) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             bmp.gainmap = null
         }
-        return bmp
+        return Decoded(bmp, exifOrientationApplied = false)
     }
 
-    private fun loadBitmapFromContentProvider(uri: Uri, maxMegapixels: Float): Bitmap {
+    private fun loadBitmapFromContentProvider(uri: Uri, maxMegapixels: Float): Decoded {
         try {
             val source = ImageDecoder.createSource(context.contentResolver, uri)
             val bmp = ImageDecoder.decodeBitmap(source) { decoder, info, _ ->
@@ -140,7 +162,8 @@ class UriLoader(private val context: Context) {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
                 bmp.gainmap = null
             }
-            return bmp
+            // ImageDecoder has already turned the pixels as the EXIF orientation tag asks.
+            return Decoded(bmp, exifOrientationApplied = true)
         } catch (e: Exception) {
             AppLogger.warn("UriLoader: ImageDecoder failed for $uri, falling back. ${e.message}")
         }
@@ -154,8 +177,9 @@ class UriLoader(private val context: Context) {
                     calculateInSampleSize(options.outWidth, options.outHeight, maxMegapixels)
                 inPreferredConfig = Bitmap.Config.ARGB_8888
             }
-            return BitmapFactory.decodeFileDescriptor(pfd.fileDescriptor, null, decodeOptions)
+            val bmp = BitmapFactory.decodeFileDescriptor(pfd.fileDescriptor, null, decodeOptions)
                 ?: throw IOException("BitmapFactory.decodeFileDescriptor failed for URI: $uri")
+            return Decoded(bmp, exifOrientationApplied = false)
         } ?: throw IOException("Could not get FileDescriptor for URI: $uri")
     }
 

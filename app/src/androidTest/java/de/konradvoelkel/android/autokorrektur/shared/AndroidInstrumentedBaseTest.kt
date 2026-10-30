@@ -1,6 +1,12 @@
 package de.konradvoelkel.android.autokorrektur.shared
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.Matrix
+import android.net.Uri
+import android.os.Environment
+import androidx.core.content.FileProvider
+import androidx.exifinterface.media.ExifInterface
 import androidx.test.platform.app.InstrumentationRegistry
 import org.junit.BeforeClass
 import java.io.File
@@ -81,6 +87,27 @@ open class AndroidInstrumentedBaseTest {
         val hasDetections = result.detections.isNotEmpty()
         result.mask.release()
         return hasDetections
+    }
+
+    /**
+     * Stores [upright] the way a phone camera stores a portrait shot — pixel grid turned 90°
+     * counter-clockwise, EXIF `ORIENTATION_ROTATE_90` telling viewers to turn it back — in the
+     * directory the app's own camera capture writes to, and returns the content:// URI the app's
+     * FileProvider hands out for it. That is the URI shape FirstFragment passes to the pipeline.
+     */
+    protected fun cameraStylePortraitJpegUri(upright: Bitmap, fileName: String): Uri {
+        val turned = Matrix().apply { postRotate(-90f) }
+        val stored = Bitmap.createBitmap(upright, 0, 0, upright.width, upright.height, turned, true)
+        val dir = appContext.getExternalFilesDir(Environment.DIRECTORY_PICTURES) ?: appContext.cacheDir
+        val file = File(dir, fileName)
+        baseTempFiles.add(file)
+        java.io.FileOutputStream(file).use { stored.compress(Bitmap.CompressFormat.JPEG, 95, it) }
+        if (stored !== upright) stored.recycle()
+        ExifInterface(file.absolutePath).apply {
+            setAttribute(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_ROTATE_90.toString())
+            saveAttributes()
+        }
+        return FileProvider.getUriForFile(appContext, "${appContext.packageName}.fileprovider", file)
     }
 
     @org.junit.After

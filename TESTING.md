@@ -57,6 +57,12 @@ reference for the exact thresholds.
 - **Lifecycle and failure paths** — `RotationLifecycleInferenceTest` (rotation mid-inference keeps
   the result, runs inference once), `ServerSdxlApiFallbackTest` (network failure preserves the
   daily quota).
+- **EXIF orientation is applied exactly once** — `UriLoaderInstrumentedTest`,
+  `PortraitCameraPhotoTest`: a portrait photo behind a `content://` URI (the URI shape the camera and
+  the photo picker hand over) comes out portrait and its car is detected. `ImageDecoder` turns the
+  pixels itself, `BitmapFactory` does not; until 2026-10-30 the loader turned the `ImageDecoder` result
+  a second time, so every portrait photo was processed sideways. The `file://` test could not see it,
+  because that path decodes with `BitmapFactory`.
 - **Localization contract** — `StringResourceLocalizationTest`: `values/strings.xml` is English and
   complete, `values-de/` a complete override, no `values-en/`, placeholders match. Strict since
   2026-09-21; it exists because the two files once covered complementary halves of the key space,
