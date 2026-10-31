@@ -140,6 +140,22 @@ adb -s <serial> shell settings put system screen_off_timeout 1800000   # restore
 # then unlock the device by hand; a secured keyguard cannot be dismissed by adb
 ```
 
+**Pair before connecting.** Wireless debugging refuses `adb connect <ip>:<port>` from a laptop it
+has not been paired with and says only `failed to connect`, while the port answers on TCP. Pairing
+needs the code *and the pairing port* from the phone's "Pair device with pairing code" dialog, a
+different port from the connect port. `adb mdns services` listed nothing here (2026-10-31);
+`avahi-browse` found it:
+
+```bash
+avahi-browse -rpt _adb-tls-pairing._tcp | grep '^=' | awk -F';' '{print $8":"$9}'
+```
+
+```bash
+adb pair <ip>:<pairing-port> <code>
+```
+
+Then `adb connect <ip>:<connect-port>`; the pairing persists, the ports change per session.
+
 **Pin one device.** A phone on wireless debugging can be attached over two transports at once
 (`adb devices` shows both), and Gradle fans out to all of them — the second install then fails
 with `INSTALL_FAILED_DUPLICATE_PACKAGE`. Use `ANDROID_SERIAL`.
