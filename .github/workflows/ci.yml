@@ -22,10 +22,10 @@ jobs:
     steps:
       # The emulator allocates a 7.2 GB userdata partition up front and dies at once without it
       # ("FATAL | Not enough space to create userdata partition"), after which the action polls
-      # adb for its full boot timeout and reports a boot timeout. The margin is thin and moves
-      # without a repo change: run 41194371047, a docs-only commit, was 2.1 GB short. Everything
-      # removed here is a toolchain this job never uses; /usr/local/lib/android stays, the
-      # emulator lives there.
+      # adb for its full boot timeout and reports a boot timeout. Free space differs wildly from
+      # runner to runner: run 41194371047, a docs-only commit, had 5.2 GB left at that point, run
+      # 42132520606 had 93 GB. This step buys 14 GB for the bad case. Everything removed here is
+      # a toolchain this job never uses; /usr/local/lib/android stays, the emulator lives there.
       - name: Free runner disk space
         run: |
           df -h /
