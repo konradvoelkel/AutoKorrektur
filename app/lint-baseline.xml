@@ -225,21 +225,21 @@
         id="Aligned16KB"
         message="The native library `x86_64/libtensorflowlite_jni.so` (from `com.google.ai.edge.litert:litert:1.0.1`) is not 16 KB aligned">
         <location
-            file="$GRADLE_USER_HOME/caches/9.8.1/transforms/603494d3abb76bc7c45dfc1bb71e02d0/transformed/litert-1.0.1/jni/x86_64/libtensorflowlite_jni.so"/>
+            file="$GRADLE_USER_HOME/caches/9.9.1/transforms/86d85e5e789cbb9a7f74d462468613b9/transformed/litert-1.0.1/jni/x86_64/libtensorflowlite_jni.so"/>
     </issue>
 
     <issue
         id="Aligned16KB"
         message="The native library `x86_64/libtensorflowlite_jni.so` (from `com.google.ai.edge.litert:litert:1.0.1`) is not 16 KB aligned">
         <location
-            file="$GRADLE_USER_HOME/caches/9.8.1/transforms/603494d3abb76bc7c45dfc1bb71e02d0/transformed/litert-1.0.1/jni/x86_64/libtensorflowlite_jni.so"/>
+            file="$GRADLE_USER_HOME/caches/9.9.1/transforms/86d85e5e789cbb9a7f74d462468613b9/transformed/litert-1.0.1/jni/x86_64/libtensorflowlite_jni.so"/>
     </issue>
 
     <issue
         id="Aligned16KB"
         message="The native library `x86_64/libtensorflowlite_jni.so` (from `com.google.ai.edge.litert:litert:1.0.1`) is not 16 KB aligned">
         <location
-            file="$GRADLE_USER_HOME/caches/9.8.1/transforms/603494d3abb76bc7c45dfc1bb71e02d0/transformed/litert-1.0.1/jni/x86_64/libtensorflowlite_jni.so"/>
+            file="$GRADLE_USER_HOME/caches/9.9.1/transforms/86d85e5e789cbb9a7f74d462468613b9/transformed/litert-1.0.1/jni/x86_64/libtensorflowlite_jni.so"/>
     </issue>
 
     <issue
