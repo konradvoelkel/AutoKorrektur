@@ -19,7 +19,7 @@ navigationUiKtx = "2.10.2"
 # SDK that writes mat-debug-<pid>.log on OrtEnvironment init, and setTelemetry(false) does not stop
 # it (checked up to 1.30.0 on 2026-10-09; PLAYBOOK, onnxruntime checks). Not a bump to take blind.
 onnxruntimeAndroid = "1.28.0"
-opencvVersion = "5.0.0.1"
+opencvVersion = "5.1.0"
 tensorflowLite = "2.17.0"
 okhttp = "5.5.1"
 mockk = "1.14.12"
