@@ -61,6 +61,19 @@ stays green through the interop.
     the two interchangeable. The certificate fingerprint is printed on the website, so it is a
     promise to users either way.
 
+### Website: Google Search Console
+
+- [ ] **WEB-01. Verify `sc-domain:autokorrektur.org`.** Added 2026-11-17 as a Domain property in
+      Konrad's Search Console; it is **not verified yet**. autokorrektur.org is its own domain, so
+      nothing is inherited from `konradvoelkel.com`: the zone in `~/files/work/server`
+      (`dns/zones/autokorrektur.org.yml`) needs the TXT record
+      `@ TXT google-site-verification=1sAwpyRhW1LbgkbCYlBS8tPOTnPA8bmzjqCrzuo3cds` (there, not
+      here; klimawendehammer.de has the same shape). Once `dig +short TXT autokorrektur.org` shows
+      it, press Verify on the property.
+- [ ] **WEB-02. Sitemap.** Not submitted. The site is indexable (`robots.txt` allows everything,
+      no `noindex`, no `X-Robots-Tag`), but `site/build.sh` writes no `sitemap.xml` (404 on
+      2026-11-17). Generate one in the build, then submit it once WEB-01 is verified.
+
 ### Milestone 0: repository move — one item left
 
 - [ ] **REPO-05. Ask GitHub Support to garbage-collect the fork network.** Pre-rewrite objects are
