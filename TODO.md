@@ -44,8 +44,12 @@ stays green through the interop.
       `setTargetSampleSize` on a progressive JPEG with an ICC profile (`UriLoader.kt`,
       `loadBitmapFromContentProvider`), then `ensureStandardSoftwareArgb8888`'s canvas copy of a
       bitmap whose colour space is not sRGB. `HighResImageTests` loads the same file by `file://`
-      URI and only asserts "does not crash", so the suite cannot see this. Reproduce first on the
-      emulator with the same file through the picker; then write the assertion the test lacks.
+      URI and only asserts "does not crash", so the suite cannot see this.
+      `HighResProgressiveJpegTest` now takes the same file through a FileProvider `content://` URI
+      and asserts both that the decode is not flat and matches the `file://` decode, and that YOLO
+      finds the car. It passes on the emulator (Android 14, 2026-10-31 and 2026-11-17), so the bug
+      does not reproduce there. Next: run that class on the Pixel (Android 17) over wireless
+      debugging; if it fails there, the suspects above apply to that platform version.
 
 ### Milestone 2: Google Play Store release
 
