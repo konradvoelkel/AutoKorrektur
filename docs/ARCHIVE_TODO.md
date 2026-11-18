@@ -1,9 +1,9 @@
 # 🏛️ AutoKorrektur: Completed Development Milestones Archive
 
 Completed, verified work moved out of `TODO.md`, which carries only what is still open.
-Sections 1 and 2 are the 1.0 milestones and hardening phases; sections 3 to 6 are the 2.0
-repository move, the two usability runs, the release plumbing that is finished, and the field
-testing on real hardware.
+Sections 1 and 2 are the 1.0 milestones and hardening phases; sections 3 to 7 are the 2.0
+repository move, the two usability runs, the release plumbing that is finished, the field
+testing on real hardware and the website's Search Console property.
 
 Findings and decisions are summarised here — the full record stays where it was written:
 the git log. The usability runs' scenarios and reports were removed from the working tree on
@@ -155,3 +155,11 @@ milestone, FT-02 and FT-03, tests `beta`/`full` features and moved to the deferr
       first time here — correct, by luck rather than coverage (now `UI-02` in `TODO.md`).
       Published as the byte-identical APK that ran on the phone (`3f41163`), not a rebuild: R8 is
       not reproducible, and a new version gets a new filename.
+
+## 7. Website: Google Search Console (2026-11-17/18)
+
+- [x] **WEB-01. Domain property `sc-domain:autokorrektur.org`.** Added 2026-11-17 in Konrad's
+      Search Console, verified 2026-11-18 by DNS ("Domain name provider"). autokorrektur.org is
+      its own domain and inherits nothing from `konradvoelkel.com`, so it needs its own TXT record
+      `google-site-verification=1sAwpy…`, kept in `~/files/work/server`
+      (`dns/zones/autokorrektur.org.yml`, `d69d6fb`). Removing that record loses the verification.
