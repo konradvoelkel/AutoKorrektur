@@ -74,13 +74,8 @@ WEB-01).
       no `noindex`, no `X-Robots-Tag`), but `site/build.sh` writes no `sitemap.xml` (404 on
       2026-11-17). Generate one in the build, then submit it in the Search Console.
 
-Google's Modern Web Guidance (audit at commit `64a6d70`): the deviations are fixed in `site/`
-(CHANGELOG, 2026-11-22) and checked on a local build, not yet live. The header wishes are with the
-server repo (its TODO B51).
-
-- [ ] **WEB-03. Deploy the Modern Web Guidance fixes.** Commit, then `site/deploy.sh` on Konrad's
-      word. Afterwards check on the live site that the images arrive as AVIF and that the CSP leaves
-      the pages unchanged; the local test server sent no CSP.
+Google's Modern Web Guidance (audit at commit `64a6d70`): the deviations are fixed and live
+(CHANGELOG, 2026-11-22). The header wishes are with the server repo (its TODO B51).
 
 Deliberately different, unless Konrad decides otherwise:
 - Nothing that needs a script, because the CSP has `script-src 'none'`. That rules out the popover

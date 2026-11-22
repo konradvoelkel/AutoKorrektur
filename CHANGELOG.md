@@ -27,7 +27,7 @@ app's own internal numbering.
 - `ARCHITECTURE.md` — mask polarity, colour spaces, coordinate transforms and JNI lifecycle rules.
 
 ### Changed
-- **autokorrektur.org follows Google's Modern Web Guidance** (audited at commit `64a6d70`, fixed 2026-11-22).
+- **autokorrektur.org follows Google's Modern Web Guidance** (audited at commit `64a6d70`, fixed and deployed 2026-11-22).
   - Text follows the reader's font size: rem instead of px, wrapping nets, and a scroll region for the download table. Every page now stays within 375 px and 320 px at twice the default size; before, a phone scrolled sideways.
   - The before/after pair ships as AVIF/WebP in `<picture>` (about 92 KB instead of 1 MB of PNG). `site/build.sh` encodes them with ImageMagick, which is now a build requirement.
   - `color-scheme` meta, a captioned table with header scopes, `lang="de"` on German inside the English pages, page-first titles, logical properties and `text-wrap: balance`.
