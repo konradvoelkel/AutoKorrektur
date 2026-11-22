@@ -65,13 +65,45 @@ stays green through the interop.
     the two interchangeable. The certificate fingerprint is printed on the website, so it is a
     promise to users either way.
 
-### Website: Google Search Console
+### Website (autokorrektur.org)
 
-The property `sc-domain:autokorrektur.org` is verified (2026-11-18, archived as WEB-01).
+The Search Console property `sc-domain:autokorrektur.org` is verified (2026-11-18, archived as
+WEB-01).
 
 - [ ] **WEB-02. Sitemap.** Not submitted. The site is indexable (`robots.txt` allows everything,
       no `noindex`, no `X-Robots-Tag`), but `site/build.sh` writes no `sitemap.xml` (404 on
       2026-11-17). Generate one in the build, then submit it in the Search Console.
+
+Google's Modern Web Guidance (audit at commit `64a6d70`): the deviations are fixed in `site/`
+(CHANGELOG, 2026-11-22) and checked on a local build, not yet live. The header wishes are with the
+server repo (its TODO B51).
+
+- [ ] **WEB-03. Deploy the Modern Web Guidance fixes.** Commit, then `site/deploy.sh` on Konrad's
+      word. Afterwards check on the live site that the images arrive as AVIF and that the CSP leaves
+      the pages unchanged; the local test server sent no CSP.
+
+Deliberately different, unless Konrad decides otherwise:
+- Nothing that needs a script, because the CSP has `script-src 'none'`. That rules out the popover
+  navbar (three links that wrap) and speculation rules in a script tag.
+- Critical CSS is not inlined: the CSP has no `'unsafe-inline'`, and the one 5 KB sheet is cached
+  across all pages.
+- No skip link: there are four header links, and `main` plus the headings already let readers
+  skip them.
+- No view transitions or other motion.
+- Dark mode uses `prefers-color-scheme` tokens instead of `light-dark()`.
+- One `*` rule for box-sizing, and no cascade layers in a short stylesheet.
+- Two tested h1 sizes instead of `clamp()`.
+- The APK link has two names on purpose: the button ("Für Android herunterladen") and the file name
+  in the table. So does `#android`, as "Download" in the nav and "Schritt für Schritt installieren"
+  on the button.
+
+Konrad decides:
+- **Browser support policy.** Proposal: anything the page needs in order to work must be Baseline
+  Widely available. Newer features come only as progressive enhancement that keeps the same
+  content (`fetchpriority`, `text-wrap`, `<meta name="text-scale">`), and nothing may need a
+  polyfill.
+- **`<meta name="text-scale" content="scale">`.** It works only in Chrome and Edge 146+. The
+  stylesheet is ready for it now that body text is in rem.
 
 ### Milestone 0: repository move — one item left
 

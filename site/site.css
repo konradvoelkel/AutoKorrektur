@@ -7,10 +7,8 @@
   --brand: oklch(0.52 0.12 55);          /* #9c5313 -- white on it is 5.7:1 */
   --primary: oklch(0.52 0.12 55);
   --on-primary: #fff;
-  --primary-container: oklch(0.95 0.03 55);
   --bg: oklch(0.985 0.008 55);
   --surface: #fff;
-  --surface-2: oklch(0.95 0.03 55);
   --ink: oklch(0.25 0.06 55);
   --muted: oklch(0.48 0.04 55);
   --outline: oklch(0.86 0.04 55);
@@ -20,15 +18,16 @@
 }
 @media (prefers-color-scheme: dark) {
   :root { --primary: oklch(0.75 0.12 55); --on-primary: oklch(0.25 0.06 55);
-    --primary-container: oklch(0.38 0.09 55);
-    --bg: oklch(0.18 0.02 55); --surface: oklch(0.22 0.025 55); --surface-2: oklch(0.26 0.03 55);
+    --bg: oklch(0.18 0.02 55); --surface: oklch(0.22 0.025 55);
     --ink: oklch(0.93 0.02 55); --muted: oklch(0.75 0.02 55);
     --outline: oklch(0.35 0.03 55); --accent: oklch(0.75 0.12 55); }
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 18px/1.55 var(--font); }
+/* rem, not px: the body follows the reader's own default font size (18 px at the usual 16). */
+body { margin: 0; background: var(--bg); color: var(--ink); font: 1.125rem/1.55 var(--font);
+  overflow-wrap: break-word; /* the net for long words at a doubled font size; inert otherwise */ }
 a { color: var(--accent); }
-a:focus-visible, .button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+a:focus-visible, .button:focus-visible, .table-wrap:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 main, header.site, footer.site { max-width: 44rem; margin-inline: auto; padding-inline: 1.25rem; }
 /* flex-wrap, and a nav that drops to its own full-width row once it no longer fits beside the
    name: without it the three nav links pushed the header to 480 px and every page scrolled
@@ -36,15 +35,15 @@ main, header.site, footer.site { max-width: 44rem; margin-inline: auto; padding-
 header.site { display: flex; align-items: center; gap: .75rem; padding-block: 1rem; flex-wrap: wrap; }
 header.site img { width: 44px; height: 44px; border-radius: 10px; }
 header.site .name { font-weight: 700; font-size: 1.25rem; color: var(--accent); text-decoration: none; }
-header.site nav { margin-left: auto; font-size: .95rem; display: flex; flex-wrap: wrap; gap: 0 1rem; }
-header.site nav a { margin-left: 0; }
-@media (max-width: 26rem) { header.site nav { margin-left: 0; width: 100%; } }
+header.site nav { margin-inline-start: auto; font-size: .95rem; display: flex; flex-wrap: wrap; gap: 0 1rem; }
+@media (max-width: 26rem) { header.site nav { margin-inline-start: 0; width: 100%; } }
 .hero { padding: 2rem 0 1rem; }
 .hero h1 { font-size: 2.4rem; line-height: 1.15; margin: 0 0 .5rem; color: var(--accent); }
 .hero .lede { font-size: 1.2rem; color: var(--muted); margin: 0 0 1.5rem; max-width: 34rem; }
 .actions { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1rem 0; }
 .button { display: inline-block; padding: .75rem 1.25rem; border-radius: 999px; font-weight: 600;
-  text-decoration: none; border: 2px solid var(--primary); }
+  text-decoration: none; border: 2px solid var(--primary);
+  overflow-wrap: anywhere; hyphens: auto; /* "herunterladen" at a doubled font size */ }
 .button.primary { background: var(--primary); color: var(--on-primary); }
 .button.secondary { color: var(--primary); background: transparent; }
 .button small { display: block; font-weight: 400; font-size: .8rem; opacity: .85; }
@@ -54,16 +53,19 @@ h3 { font-size: 1.05rem; margin: 1.25rem 0 .25rem; }
    pushed /privacy 5 px wide. hyphens: auto breaks them at syllables where the browser has the
    dictionary (the pages carry lang=de/en); break-word is only the net that keeps the page from
    scrolling sideways when it does not, and the smaller headings below keep it from firing. */
-h1, h2, h3 { overflow-wrap: break-word; hyphens: auto; }
+h1, h2, h3 { overflow-wrap: break-word; hyphens: auto; text-wrap: balance; }
 p, li { margin: .6rem 0; }
-.note { border-left: 4px solid var(--accent); padding: .25rem 0 .25rem 1rem; color: var(--muted); }
-.cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); margin: 1rem 0; }
+.note { border-inline-start: 4px solid var(--accent); padding-block: .25rem; padding-inline-start: 1rem; color: var(--muted); }
+/* min(100%, 14rem): with a large default font 14rem is wider than a phone, and a bare
+   minmax(14rem, 1fr) then pushed the page sideways (375 px phone, 32 px root: 570 px). */
+.cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); margin: 1rem 0; }
 .card { background: var(--surface); border: 1px solid var(--outline); border-radius: 14px; padding: 1rem 1.1rem; }
 .card h3 { margin-top: 0; }
 .card p { margin: .4rem 0; font-size: .97rem; }
 /* before/after pair from media/ */
-.pair { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); margin: 1.25rem 0; }
+.pair { display: grid; gap: .75rem; grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr)); margin: 1.25rem 0; }
 .pair figure { margin: 0; }
+.pair picture { display: block; }
 .pair img { width: 100%; height: auto; border-radius: 14px; border: 1px solid var(--outline); display: block; }
 .pair figcaption { font-size: .9rem; color: var(--muted); text-align: center; margin-top: .35rem; }
 /* overflow-wrap: the package name is one 38-character token and pushed the landing pages past
@@ -72,9 +74,17 @@ code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monosp
   overflow-wrap: anywhere; }
 .sum { word-break: break-all; }
 table { border-collapse: collapse; width: 100%; font-size: .95rem; margin: .75rem 0; }
-th, td { text-align: left; padding: .4rem .5rem; border-bottom: 1px solid var(--outline); vertical-align: top; }
-footer.site { margin-top: 3rem; padding-block: 1.5rem; border-top: 1px solid var(--outline); color: var(--muted); font-size: .9rem; }
-footer.site a { margin-right: 1rem; }
+/* At a doubled font size three columns of words no longer fit a phone; the table then scrolls in
+   its own focusable region (data tables are exempt from WCAG 1.4.10 Reflow) instead of the page. */
+.table-wrap { overflow-x: auto; margin: .75rem 0; }
+.table-wrap table { margin: 0; }
+caption { text-align: start; font-weight: 600; padding-block-end: .25rem; }
+th, td { text-align: start; padding: .4rem .5rem; border-bottom: 1px solid var(--outline); vertical-align: top; }
+/* flex + gap, not margins on inline links: the links touch in the markup (</a><a>), so as inline
+   boxes they had no break opportunity and ran off the edge at a doubled font size. */
+/* anywhere: flex items keep their min-content width, and break-word does not lower it. */
+header.site .name, header.site nav a, footer.site a { overflow-wrap: anywhere; }
+footer.site { display: flex; flex-wrap: wrap; gap: 0 1rem; margin-top: 3rem; padding-block: 1.5rem; border-top: 1px solid var(--outline); color: var(--muted); font-size: .9rem; }
 /* privacy*.html are pandoc output: give their title the hero look */
 .doc h1 { font-size: 2rem; line-height: 1.2; margin: 1.5rem 0 .5rem; color: var(--accent); }
 .doc h2 { font-size: 1.3rem; }
