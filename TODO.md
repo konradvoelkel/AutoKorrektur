@@ -70,9 +70,10 @@ stays green through the interop.
 The Search Console property `sc-domain:autokorrektur.org` is verified (2026-11-18, archived as
 WEB-01).
 
-- [ ] **WEB-02. Sitemap.** `site/build.sh` now writes `sitemap.xml` (five pages, de/en
-      alternates, lastmod from git) and names it in `robots.txt`; checked on a local build. Open:
-      commit, deploy, then submit `https://autokorrektur.org/sitemap.xml` in the Search Console.
+- [ ] **WEB-02. Sitemap: check that Google reads it.** Submitted 2026-11-26. The Search Console
+      shows "Couldn't fetch" with no "Last read" date, so Google has not tried yet. The server
+      answers a Googlebot user agent with 200 and `text/xml`. Look again in a few days. If the status
+      stays, run URL inspection on `https://autokorrektur.org/sitemap.xml`.
 
 Google's Modern Web Guidance (audit at commit `64a6d70`): the deviations are fixed and live
 (CHANGELOG, 2026-11-22). The header wishes are with the server repo (its TODO B51).
