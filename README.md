@@ -24,9 +24,12 @@ to share, in two taps. Android app, free software (AGPLv3).
 
 You walk through your neighbourhood and see places full of parked vehicles — places that would be
 nicer and more liveable without the mass of cars. Because that is so hard to picture, we need images
-of a possible future. This app helps you find the shots worth making: it produces a preview, right on
-the phone, of how the place could look without the cars. The best ones you share on Instagram or
-Signal, or hand to a professional who turns them into a high-quality visualisation.
+of a possible future — and such images do change minds: in two survey studies with 3,129 people in
+the US, seeing AI-generated pictures of car-free streets raised support for a hypothetical
+sustainable-transport bill ([Dubey et al. 2024](https://doi.org/10.1038/s41893-024-01299-6)). This
+app helps you find the shots worth making: it produces a preview, right on the phone, of how the
+place could look without the cars. The best ones you share on Instagram or Signal, or hand to a
+professional who turns them into a high-quality visualisation.
 
 Made for mobility activists, urban planners and anyone who wants to show how much room a street has
 once the metal is gone. The "magic eraser" features of Apple, Google and Samsung retouch any object
@@ -162,6 +165,12 @@ supervised by Konrad Völkel:
   YOLOv11-seg model-size trade-off on Mapillary Vistas, MI-GAN 512×512 for sub-5-second inpainting,
   and the mask scaling and shadow-downshift transformations the Android app started from.
 
+The case for such images comes from Dubey, Hardy, Griffiths and Bhui (2024): in two survey studies
+(N = 3,129), photorealistic AI re-imaginations of car-free US streets raised support for a
+sustainable-transport bill more than the plain description or cartoon illustrations did. They
+generated whole scenes with a cloud text-to-image model (DALL·E 2); AutoKorrektur removes the cars
+from your own photo, on the phone.
+
 ```bibtex
 @bachelorthesis{schellscheidt2024autokorrektur,
   author = {Till Schellscheidt},
@@ -175,6 +184,14 @@ supervised by Konrad Völkel:
   school = {Heinrich-Heine-Universit{\"a}t D{\"u}sseldorf},
   year   = {2025}, month = {May}, type = {Bachelor's Thesis},
   url    = {https://github.com/BenB2/AutoKorrektur}
+}
+@article{dubey2024aigenerated,
+  author  = {Rachit Dubey and Mathew D. Hardy and Thomas L. Griffiths and Rahul Bhui},
+  title   = {{AI}-generated visuals of car-free {US} cities help improve support for sustainable policies},
+  journal = {Nature Sustainability},
+  volume  = {7}, pages = {399--403},
+  year    = {2024}, month = {April},
+  doi     = {10.1038/s41893-024-01299-6}
 }
 ```
 
