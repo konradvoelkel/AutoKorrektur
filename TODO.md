@@ -70,9 +70,9 @@ stays green through the interop.
 The Search Console property `sc-domain:autokorrektur.org` is verified (2026-11-18, archived as
 WEB-01).
 
-- [ ] **WEB-02. Sitemap.** Not submitted. The site is indexable (`robots.txt` allows everything,
-      no `noindex`, no `X-Robots-Tag`), but `site/build.sh` writes no `sitemap.xml` (404 on
-      2026-11-17). Generate one in the build, then submit it in the Search Console.
+- [ ] **WEB-02. Sitemap.** `site/build.sh` now writes `sitemap.xml` (five pages, de/en
+      alternates, lastmod from git) and names it in `robots.txt`; checked on a local build. Open:
+      commit, deploy, then submit `https://autokorrektur.org/sitemap.xml` in the Search Console.
 
 Google's Modern Web Guidance (audit at commit `64a6d70`): the deviations are fixed and live
 (CHANGELOG, 2026-11-22). The header wishes are with the server repo (its TODO B51).
@@ -93,10 +93,6 @@ Deliberately different, unless Konrad decides otherwise:
   on the button.
 
 Konrad decides:
-- **Browser support policy.** Proposal: anything the page needs in order to work must be Baseline
-  Widely available. Newer features come only as progressive enhancement that keeps the same
-  content (`fetchpriority`, `text-wrap`, `<meta name="text-scale">`), and nothing may need a
-  polyfill.
 - **`<meta name="text-scale" content="scale">`.** It works only in Chrome and Edge 146+. The
   stylesheet is ready for it now that body text is in rem.
 

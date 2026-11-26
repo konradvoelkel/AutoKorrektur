@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Assembles the static tree for autokorrektur.org into OUT (default site/dist, gitignored):
 #   /              site/index.html (de), en.html, impressum.html, site.css, robots.txt, icons/, img/
+#   /sitemap.xml   the five pages with their de/en alternates, lastmod from git; robots.txt names it
 #   /privacy       privacy.html rendered by pandoc from PRIVACY_POLICY.md (German, the URL the Play
 #                  listing points at) -- so the hosted policy cannot drift from the file
 #   /privacy-en    privacy-en.html from PRIVACY_POLICY.en.md (minus its italic maintainers' note)
@@ -153,8 +154,37 @@ for page in index.html en.html impressum.html; do
   if grep -q '__[A-Z0-9_]*__' "$out/$page"; then echo "build.sh: unfilled placeholder in $page" >&2; exit 1; fi
 done
 
+# --- /sitemap.xml --------------------------------------------------------------------------------
+# The canonical URL of each page (the same as its <link rel="canonical">), lastmod = the date of the
+# last commit to its source file, and the de/en pairs as hreflang alternates, as the pages declare
+# them. A new page needs a line here.
+lastmod() { git -C "$repo" log -1 --format=%cs -- "$@" 2>/dev/null; }
+alt() { # <lang> <path>
+  printf '    <xhtml:link rel="alternate" hreflang="%s" href="%s/%s"/>\n' "$1" "$base_url" "$2"
+}
+sitemap_url() { # <path> <lastmod> [alternate lines]
+  local path=$1 mod=$2; shift 2
+  printf '  <url>\n    <loc>%s/%s</loc>\n' "$base_url" "$path"
+  [ -n "$mod" ] && printf '    <lastmod>%s</lastmod>\n' "$mod"
+  printf '%s' "$*"
+  printf '  </url>\n'
+}
+home_alts="$(alt de ''; alt en en.html; alt x-default '')"$'\n'
+privacy_alts="$(alt de privacy; alt en privacy-en)"$'\n'
+{
+  echo '<?xml version="1.0" encoding="UTF-8"?>'
+  echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">'
+  sitemap_url ''           "$(lastmod site/index.html)"     "$home_alts"
+  sitemap_url en.html      "$(lastmod site/en.html)"        "$home_alts"
+  sitemap_url privacy      "$(lastmod PRIVACY_POLICY.md)"    "$privacy_alts"
+  sitemap_url privacy-en   "$(lastmod PRIVACY_POLICY.en.md)" "$privacy_alts"
+  sitemap_url impressum    "$(lastmod site/impressum.html)"
+  echo '</urlset>'
+} > "$out/sitemap.xml"
+printf '\nSitemap: %s/sitemap.xml\n' "$base_url" >> "$out/robots.txt"
+
 # --- precompress (Caddy: file_server precompressed br zstd gzip) ---------------------------------
-find "$out" -type f \( -name '*.html' -o -name '*.css' -o -name '*.svg' -o -name '*.txt' \) -print0 |
+find "$out" -type f \( -name '*.html' -o -name '*.css' -o -name '*.svg' -o -name '*.txt' -o -name '*.xml' \) -print0 |
   xargs -0 -r -P "$(nproc)" -I{} sh -c '
     brotli -kf "$1"
     zstd -q -kf -19 "$1"

@@ -1,7 +1,10 @@
 /* autokorrektur.org -- the landing, privacy and Impressum pages. Palette: BRANDING.md, hue 55°
    (orange). Every tone is oklch(L C 55) with only L and C moved; if something doesn't fit, move
    L/C for the whole set instead of patching one value. No external resource (the site's CSP is
-   default-src 'self', server repo role autokorrektur). Same layout as laberampel.de's site.css. */
+   default-src 'self', server repo role autokorrektur). Same layout as laberampel.de's site.css.
+   Browser support (Konrad, 2026-11-26), for this file and the HTML pages alike: what a page needs to
+   work is Baseline Widely available. Anything newer only as progressive enhancement that leaves the
+   same content (fetchpriority, text-wrap); nothing that would need a polyfill. */
 :root {
   color-scheme: light dark;
   --brand: oklch(0.52 0.12 55);          /* #9c5313 -- white on it is 5.7:1 */
